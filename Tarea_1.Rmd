@@ -172,6 +172,8 @@ plot(aleatorio,main='aleatorio')
 ```
 
 ## Suavizamiento exponencial 
+Para esta parte usaremos el método de Holt-Winter que pertenece a los métodos de 
+suavizamiento exponencial
 ```{r}
 xt.hw = HoltWinters(Serie_ln, seasonal="additive")
 plot(xt.hw)
