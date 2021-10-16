@@ -17,6 +17,8 @@ library(forecast)
 library(forecast)
 library(astsa)
 library(nortest)
+library(TSA)
+library(ggplot2)
 library(lmtest)
 #Leemos los datos
 #Probando
@@ -144,6 +146,60 @@ Pasamos los tests de Normalidad y homocedasticidad.
 
 (b) Filtros lineales o suavizamientos exponenciales.
 Realice un pronóstico de 3 años futuros.
+
+```{r}
+
+####FILTROS LINEALES#####
+
+#Tendencia y ciclos 
+Xt = Serie_ln
+##Frecuencia?
+p = periodogram(Xt, main="Periodograma", col=4) # Obtenemos el periodograma
+
+names(p)
+
+# Ordenamos de mayor a menor las estimaciones del periodograma.
+spec = sort(p$spec, decreasing = TRUE) 
+(spec = spec[1:5]) # Nos quedamos con los coeficientes de mayor frecuencia
+i = match(spec, p$spec) # Buscamos sus indices en el periodograma
+d = p$freq # Frecuencias del periodograma
+d = d[i] # Nos quedamos con las frecuencias que nos interesan
+###########
+cbind(spec,d,i)#
+d = 1 / d # Obtenemos los parametros para utilizar en promedios moviles.
+d = floor(d) #
+(d = sort(d))
+# Quitamos los periodos mas grandes
+d = d[-length(d)] 
+d = d[-length(d)] 
+d #Posibles periodos del ciclo 
+
+# Colores para graficar
+col = c("lightsalmon", "purple", "cyan3")
+plot(Serie_ln, lwd = 3, xlab = "Tiempo", col = "black",
+     main = "Serie con varianza Homoscedastica",
+     ylab = "Numero", col.main = "cornflowerblue")
+library(dplyr)
+t1 = seq(1987+0/12, 1993+11/12, by = 1 / 12)
+for (i in 1:3) {
+  lines(t1, stats::filter(Serie_ln, rep(1 / d[i], d[i])), col = col[i], 
+        lwd = 3)
+}
+legend("bottomright", col = col, lty = 2, lwd = 2, bty = "n",
+       legend = c(paste("d = ", d[1]), paste("d = ", d[2]),
+                  paste("d = ", d[3])), cex = 1)
+
+# Notemos que podemos aproximar la tendencia con d = 12.
+
+tendencia = stats::filter(Serie_ln, rep(1 / 12, 12))
+plot(Serie_ln, lwd = 3, xlab = "Tiempo", col = "black",
+     main = "Tendencia",
+     ylab = "Numero", col.main = "cornflowerblue")
+lines(tendencia, col = "plum2", lwd = 4)
+legend("bottomright", col = "plum2", lty = 1, lwd = 2, bty = "n",
+       legend = "Tendencia", cex = 1)
+```
+
 
 Utilizaremos promedios móviles para filtro lineles. Con Holt Winters trabajaremos el 
 suavizamiento exponencial y el pronóstico.
