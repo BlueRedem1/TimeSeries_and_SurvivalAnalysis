@@ -14,7 +14,6 @@ constante, tendencia, ciclos estacionales, periodicidad de los ciclos).
 ```{r,echo=FALSE, message=FALSE}
 #Cargamos las librerías
 library(forecast)
-library(forecast)
 library(astsa)
 library(nortest)
 library(TSA)
