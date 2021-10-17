@@ -13,7 +13,9 @@ constante, tendencia, ciclos estacionales, periodicidad de los ciclos).
 
 ```{r,echo=FALSE, message=FALSE}
 #Cargamos las librerías
+library(timeSeries)
 library(forecast)
+library(tseries)
 library(astsa)
 library(nortest)
 library(TSA)
@@ -40,7 +42,23 @@ Podemos observar una varianza creciente conforme pasa el tiempo, teniendo primer
 un ligero aumento de 1987 a 1990 de manera lineal, después parece que se mantene constante de 1990 a 1991 
 para posteriormente crecer demasiado de 1991 a 1994 Es decir, no es constante la varianza.
 Lo que hace que se dispare es la temporada alta vacacional (Al parecer, en noviembre
-y diciembre, ya que analizamos una playa en Australia, donde el verano comienza en diciembre)
+y diciembre, ya que analizamos una playa en Australia, donde el verano comienza en diciembre).
+Podemos comprobarlo con un bp test:
+```{r}
+# Ho: (Homocedasticidad)  vs  H1: La varianza no es constate (Heterocedasticidad)
+t1 = seq(1987+0/12, 1993+11/12, by = 1 / 12)
+bptest(Serie ~t1)
+```
+Inclusive podemos ver de una vez que no es estacionaria tanto con el test de Dickey-Fuller 
+como con el de Phillips:
+```{r}
+# Ho: La serie no es estacionaria vs. H1: La serie es estacionaria
+adf.test(Serie)
+#Por lo tanto: 
+
+# Ho: La serie es estacionaria vs. H1: La serie no es estacionaria
+kpss.test(Serie)
+```
 
 ## Tendencia
 
@@ -66,6 +84,7 @@ depués baja un poco para crecer de manera ligera nuevamente, pero al llegar lo 
 noviembre y diciembre (o los últimos meses del año)crece exageradamente; posteriormente 
 baja de diciembre a enero y se repite el ciclo.
 
+
 2.-Si la base presenta datos faltantes NA. Use algún método de imputación de la paquetería
 imputeTS.
 
@@ -85,11 +104,27 @@ Realice un pronóstico de 3 años futuros.
 Primero realizareos una transformación con el logarítmo para estabilizar la varianza
 
 ```{r}
-Serie_ln<-sqrt(log(Serie))
+Serie_ln<-(log(Serie))
 ts.plot(Serie_ln)
 ```
 
-Al parecer, la varianza ya se estabilizó considerablemente. 
+Al parecer, la varianza ya se estabilizó considerablemente (De manera gráfica).
+¡Comprobémoslo con un bp test!
+```{r}
+bptest(Serie_ln~t1)
+```
+
+¡Se pudo estabilizar! Pero, si tomamos la raíz, quizás podamos estabilizarla
+un poco más. comprobémoslo:
+```{r}
+Serie_ln<-sqrt(log(Serie))
+ts.plot(Serie_ln)
+bptest(Serie_ln~t1)
+```
+
+Nos quedaremos entonces con la raíz del logarítmo, puesto que presenta un 
+p-value mayor.
+
 
 Como la tendencia parece seguir un comportamiento de un polinomio de grado 2,
 intentaremos ajustarle una curva con dicho polinomio
