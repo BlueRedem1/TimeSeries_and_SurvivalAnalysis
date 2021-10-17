@@ -181,6 +181,9 @@ Pasamos los tests de Normalidad y homocedasticidad.
 (b) Filtros lineales o suavizamientos exponenciales.
 Realice un pronóstico de 3 años futuros.
 
+Vamos a descomponer usando filtros lineales. Con Holt Winters trabajaremos el 
+suavizamiento exponencial y el pronóstico.
+
 ```{r}
 
 #Realizamos mediante filtros lineales
@@ -213,7 +216,7 @@ d #Posibles periodos del ciclo
 #Realizamos la grafica:
 col = c("dodgerblue1", "darkorange1", "pink")
 plot(Serie_ln, lwd = 3, xlab = "Tiempo", col = "gray0",
-     main = "Serie con varianza Homoscedastica",
+     main = "Serie con varianza Homocedastica",
      ylab = "Numero", col.main = "burlywood")
 library(dplyr)
 t1 = seq(1987+0/12, 1993+11/12, by = 1 / 12)
@@ -292,7 +295,7 @@ parte_aleatoria = datos.ts4 - ciclo
 plot(parte_aleatoria, main = "Parte aleatoria", 
      col =30, lwd = 3, xlab = "Tiempo", ylab = "") 
 plot(Serie_ln)
-# Con estp, ya tenemos nuestras series
+# Con esto, ya tenemos nuestras series
 
 componentes = tendencia + ciclo+parte_aleatoria
 componentes = ts(componentes, start = start(Serie_ln), frequency = 12)
@@ -304,43 +307,18 @@ par(mfrow = c(1,1))
 plot(Serie_ln,col="darkblue", las=1, lwd=3,main="Serie_ln", ylab="",xlab="")
 invisible(lines(componentes, type="l", lwd=3, col="green",lty=6))
 legend("bottomright", col = c("darkblue","green"), lty = 1, lwd = 2, bty = "n",
-       legend = c("Serie Homoscedastica","Yt=T+C+A"), cex = 1)
+       legend = c("Serie Homocedastica","Yt=T+C+A"), cex = 1)
 
 
 
 ```
-Veamos que ya la podemos descomponer. 
+Veamos que ya la logramos descomponer.
 
 
-Utilizaremos promedios móviles para filtro lineles. Con Holt Winters trabajaremos el 
-suavizamiento exponencial y el pronóstico.
-
-## Promedios móviles
-
-```{r}
-xt = Serie_ln
-mj = rep(NA,6)
-for(j in 1:6){
-	mj[j] = sum(xt[12*(j-1)+1:12])/12
-}
-sk = rep(NA,12)
-for(k in 1:12){
-	sk[k] = sum(xt[(0:5)*12+k]-mj)/6
-}
-aleatorio = xt-rep(mj,each=12)-rep(sk,times=6)
-compon = rep(mj,each=12)+rep(sk,times=6)
-compon = ts(compon, start=start(xt), frequency=12)
-
-par(mfrow=c(1,2))
-plot(Serie,main='Serie original')
-lines(exp(compon**2),col="deeppink1")
-plot(aleatorio,main='aleatorio')
-
-```
-
-## Suavizamiento exponencial 
+## Suavizamiento exponencial
 Para esta parte usaremos el método de Holt-Winter que pertenece a los métodos de 
-suavizamiento exponencial
+suavizamiento exponencial. Usamos aditivo, debido que usamos el logaritmo.
+
 ```{r}
 xt.hw = HoltWinters(Serie_ln, seasonal="additive")
 plot(xt.hw)
@@ -357,9 +335,9 @@ wt= diff(diff(yt),2)
 tsplot(wt, main="Serie Con una diferencia", ylab="", xlab="", las=1)
 
 par(mfrow=c(3,1))
-plot(zt)
-acf(zt)
-pacf(zt)
+plot(wt)
+acf(wt)
+pacf(wt)
 
 kpss.test(wt)
 adf.test(wt)
