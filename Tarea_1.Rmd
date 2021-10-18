@@ -82,7 +82,7 @@ Complementando el comentario del punto anterior, en la gráfica observamos que
 el ciclo es anual. De enero a febrero (o los primeros meses del año)parece crecer ligeramente, 
 depués baja un poco para crecer de manera ligera nuevamente, pero al llegar lo que parece ser 
 noviembre y diciembre (o los últimos meses del año)crece exageradamente; posteriormente 
-baja de diciembre a enero y se repite el ciclo.
+baja de diciembre a enero y se repite el ciclo. Esto se confirma en la pregunta 3 con más detalle
 
 
 2.-Si la base presenta datos faltantes NA. Use algún método de imputación de la paquetería
@@ -112,6 +112,12 @@ Al parecer, la varianza ya se estabilizó considerablemente (De manera gráfica)
 ¡Comprobémoslo con un bp test!
 ```{r}
 bptest(Serie_ln~t1)
+# Ho: La serie no es estacionaria vs. H1: La serie es estacionaria
+adf.test(diff(Serie_ln))
+#Por lo tanto: 
+
+# Ho: La serie es estacionaria vs. H1: La serie no es estacionaria
+kpss.test(diff(Serie_ln))
 ```
 
 ¡Se pudo estabilizar! Pero, si tomamos la raíz, quizás podamos estabilizarla
@@ -120,14 +126,19 @@ un poco más. comprobémoslo:
 Serie_ln<-sqrt(log(Serie))
 ts.plot(Serie_ln)
 bptest(Serie_ln~t1)
+# Ho: La serie no es estacionaria vs. H1: La serie es estacionaria
+adf.test(diff(Serie_ln))
+#Por lo tanto: 
+
+# Ho: La serie es estacionaria vs. H1: La serie no es estacionaria
+kpss.test(diff(Serie_ln))
 ```
 
 Nos quedaremos entonces con la raíz del logarítmo, puesto que presenta un 
-p-value mayor.
+p-value mayor. También vemos que pasa la prueba de kpss y de df.
 
 
-Como la tendencia parece seguir un comportamiento de un polinomio de grado 2,
-intentaremos ajustarle una curva con dicho polinomio
+Después de usar varios modelos, vimos que para nuestro caso le ajustaba mejor la raíz cuadrada del tiempo, utilizando M para el componente de los ciclos
 
 ```{r}
 M <- factor(cycle(Serie_ln))
@@ -135,13 +146,13 @@ t = time(Serie_ln)-1987
 regresion_1= lm(Serie_ln ~ 0+ sqrt(t) +M,  na.action=NULL)
 summary(regresion_1)
 par(mfrow=c(1,2))
-plot(Serie_ln, type="o",col='darkorange1')
+plot(Serie_ln, type="l",col='darkorange1')
 lines(fitted(regresion_1), col='black')
+lines(0.138937*sqrt(t1-1987), col='blue')
 ```
 
 Observamos que todos los valores,tienen un p-value menor
-a $0.05$. Entonces, quitando el efecto de ciclos estacionales, sigue una tendencia
-en forma de raíz cuadrada. Usamos también la parte estacional, como el ciclo es de 12 (En el inciso b se hace a detalle el código para dicho análisis), basta con usar cycle para obtener dicho componente.
+a $0.05$.Usamos también la parte estacional, como el ciclo es de 12 (En el inciso b se hace a detalle el código para dicho análisis), basta con usar cycle para obtener dicho componente.
 
 Ajustamos:
 
@@ -160,6 +171,17 @@ ts.plot(Serie, xlim=c(1987,1998),main='Serie con predicción: Original')
 lines(1987+tnew,exp(pred1[,1]**2), lty=1,col=2)
 lines(1987+tnew,exp(pred1[,2]**2), lty=2,col=4)
 lines(1987+tnew,exp(pred1[,3]**2), lty=2,col=4)
+```
+Sin regresar a los valores normales, las predicciones son:
+```{r}
+ts(data=pred1,start=c(1994,1),end=c(1997,1),frequency=12)
+```
+
+
+Entonces las predicciones son, regresándolas a sus valores normales::
+```{r}
+pred2<-ts(data=exp(pred1**2),start=c(1994,1),end=c(1997,1),frequency=12)
+pred2
 ```
 
 Ahora comprobemos los supuestos de regresión
@@ -331,6 +353,17 @@ xt.hw = HoltWinters(Serie_ln, seasonal="additive")
 plot(xt.hw)
 xt.predict = predict(xt.hw, n.ahead=3*12)
 ts.plot(Serie_ln, xt.predict, lty=1:3)
+
+xt.predict
+```
+Explícitamente los valores de predicción son:
+```{r}
+xt.predict
+```
+Pero al hacer la transformación inversa:
+```{r}
+
+exp(xt.predict**2)
 ```
 
 (c) Diferencias.
@@ -340,6 +373,7 @@ yt= Serie_ln
 tsplot(Serie_ln, main="Serie original", ylab="", xlab="", las=1)
 wt= diff(diff(yt),12)
 tsplot(wt, main="Serie Con una diferencia", ylab="", xlab="", las=1)
+
 
 par(mfrow=c(3,1))
 plot(wt)
