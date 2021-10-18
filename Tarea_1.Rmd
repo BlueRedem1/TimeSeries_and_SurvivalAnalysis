@@ -148,7 +148,6 @@ summary(regresion_1)
 par(mfrow=c(1,2))
 plot(Serie_ln, type="l",col='darkorange1')
 lines(fitted(regresion_1), col='black')
-lines(0.138937*sqrt(t1-1987), col='blue')
 ```
 
 Observamos que todos los valores,tienen un p-value menor
