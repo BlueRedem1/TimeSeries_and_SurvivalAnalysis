@@ -131,8 +131,8 @@ intentaremos ajustarle una curva con dicho polinomio
 
 ```{r}
 M <- factor(cycle(Serie_ln))
-t = time(Serie_ln)-1987 
-regresion_1= lm(Serie_ln ~ 0+ t+M,  na.action=NULL)
+t = time(Serie_ln)-1987
+regresion_1= lm(Serie_ln ~ 0+ sqrt(t) +M,  na.action=NULL)
 summary(regresion_1)
 par(mfrow=c(1,2))
 plot(Serie_ln, type="o",col='darkorange1')
@@ -141,11 +141,7 @@ lines(fitted(regresion_1), col='black')
 
 Observamos que todos los valores,tienen un p-value menor
 a $0.05$. Entonces, quitando el efecto de ciclos estacionales, sigue una tendencia
-lineal.
-
-$\mathbb{E}[X_t]= 0.26872t+M$
-
-Donde M es la parte del ciclo estacional.
+en forma de raíz cuadrada. Usamos también la parte estacional, como el ciclo es de 12 (En el inciso b se hace a detalle el código para dicho análisis), basta con usar cycle para obtener dicho componente.
 
 Ajustamos:
 
@@ -154,12 +150,13 @@ Ajustamos:
 tnew = 7 + seq(0,3,length.out=37)
 Mnew = factor(c((1:12),(1:12),(1:12),1))
 pred1<- predict(regresion_1, newdata=list(t=tnew, M=Mnew), interval="prediction")
-par(mfrow=c(1,2))
-ts.plot(Serie_ln, xlim=c(1987,1998))
+par(mfrow=c(1,1))
+ts.plot(Serie_ln, xlim=c(1987,1998),main='Serie con predicción: Logarítmo')
 lines(1987+tnew,(pred1[,1]), lty=1,col=2)
 lines(1987+tnew,(pred1[,2]), lty=2,col=4)
 lines(1987+tnew,(pred1[,3]), lty=2,col=4)
-ts.plot(Serie_ln, xlim=c(1987,1998))
+
+ts.plot(Serie, xlim=c(1987,1998),main='Serie con predicción: Original')
 lines(1987+tnew,exp(pred1[,1]**2), lty=1,col=2)
 lines(1987+tnew,exp(pred1[,2]**2), lty=2,col=4)
 lines(1987+tnew,exp(pred1[,3]**2), lty=2,col=4)
@@ -178,6 +175,16 @@ bptest(regresion_1)
 
 Pasamos los tests de Normalidad y homocedasticidad.
 
+¿Desapareció la tendencia? ¿Desaparecieron los ciclos?
+
+```{r}
+aleatorio=ts(Serie_ln-regresion_1$fit,start=start(Serie_ln),end=end(Serie_ln),frequency = 12)
+par(mfrow=c(3,1))
+plot(aleatorio)
+acf(aleatorio)
+pacf(aleatorio)
+```
+¡Parece que pudimos deshacernos de los ciclos considerablemente! Ya no son tan notorios. Aunque como es un ajuste deterministico, no es tan perfecto.
 (b) Filtros lineales o suavizamientos exponenciales.
 Realice un pronóstico de 3 años futuros.
 
@@ -331,18 +338,15 @@ ts.plot(Serie_ln, xt.predict, lty=1:3)
 ```{r}
 yt= Serie_ln
 tsplot(Serie_ln, main="Serie original", ylab="", xlab="", las=1)
-wt= diff(diff(yt),2)
+wt= diff(diff(yt),12)
 tsplot(wt, main="Serie Con una diferencia", ylab="", xlab="", las=1)
 
 par(mfrow=c(3,1))
 plot(wt)
 acf(wt)
 pacf(wt)
-
-kpss.test(wt)
-adf.test(wt)
 ```
-Hacemos la diferencia con lag igual a 2, ya que en el inciso b) el periodo era de 2.
+Hacemos la diferencia con lag igual a 12, ya que en el inciso b) el periodo era de 12.
 4.- Describa brevemente en qué consisten los métodos de suavizado exponencial (exponential
 smoothing) para las series de tiempo y el método de Holt Winters.
 
