@@ -21,6 +21,25 @@ donde ${Z_{t}}$ es un ruido blanco Gaussiano.
 (f) En R simule el proceso ${X_{t}}$ para un tamaño de muestra $n$, grafique la serie de tiempo y los correlogramas ACF y PACF.
 Compare los correlogramas simulados con los del proceso original.
 
+Respueta: 
+
+a) $Var$($X_{t}$) = $Var(Z_{t} - 0.4_{t-1}, - 1.2Z_{t-2})$ .... (1)
+Como $Z_{k}$ $\perp$ $Z_{j}$ $\forall$ $k \ne j$
+
+Podemos expresar a (1) de la siguiente manera:
+
+$$ = Var(Z_{t}) + Var(-0.4 Z_{t-1}) + Var(-1.2Z_{t-2}) $$
+$$ =  Var(Z_{t}) + (-0.4)^{2} Var(Z_{t-1}) + (-1.2)^{2} Var(Z_{t-2}) .... (2)$$
+Como $Z_{t}$ son $v.a.i.i.d.$, con $E[Z_{t}] = 0$ y $Var(Z_{t}) = 1$
+
+$$ (2) = 1 + (.16)(1) + (1.44)(1)==
+$$ = 1 + .16 + 1.44 $$
+$$ = 2.6  Cov(Z_{t} - 1.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - Z_{t-2+k}) $$
+
+
+
+
+
 Automatizaremos la obtención de los coeficientes del PACF para el ejercicio 1:
 ```{r}
 #x será el vector con los coeficientes de autocorrelación
