@@ -1,6 +1,6 @@
 ---
-title: "Untitled"
-author: "Eduardo"
+title: "Tarea 2 Propiedades de los modelos ARMA"
+author: "Cuéllar, Eduardo, García Jesús, Miranda Areli, Ramirez José, Saldaña Ricardo "
 date: "10/26/2021"
 output: pdf_document
 ---
@@ -8,6 +8,18 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+1.- Considere el proceso $MA(2)$:
+
+$$ X_t = Z_t - 0.4Z_{t-1} - 1.2Z_{t-2} $$
+donde ${Z_{t}}$ es un ruido blanco Gaussiano.
+
+(a) Calcule $\sigma^{2}_{X}$ suponiendo que $\sigma^{2}_{Z}$ = 1.
+(b) Encuentre la expresión general para la función de autocorrelación $\rho_{k}$.
+(c) Grafique $\rho_{k}$ (correlograma ACF), para $k= 0,1,2,...,10$.
+(d) Encuentre la expresión general para la funció de autocorrelación parcial $\phi_{kk}$.
+(e) Grafique $\phi_{kk}$ (correlograma PACF), para $k = 0,1,2,...,10$.
+(f) En R simule el proceso ${X_{t}}$ para un tamaño de muestra $n$, grafique la serie de tiempo y los correlogramas ACF y PACF.
+Compare los correlogramas simulados con los del proceso original.
 
 Automatizaremos la obtención de los coeficientes del PACF para el ejercicio 1:
 ```{r}
@@ -32,7 +44,7 @@ coefs_pacf<-function(p,k){
 }
 ```
 
-Aquí deben ir los coeficientes de \rho_k distintos de 0
+Aquí deben ir los coeficientes de $\rho$_k distintos de 0
 ```{r}
 #cambiar a los que tengo en el pdf, estos son de prueba
 x=c(1,-180/269,50/269)
