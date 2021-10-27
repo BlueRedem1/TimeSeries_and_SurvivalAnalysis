@@ -20,6 +20,22 @@ donde ${Z_{t}}$ es un ruido blanco Gaussiano.
 (e) Grafique $\phi_{kk}$ (correlograma PACF), para $k = 0,1,2,...,10$.
 (f) En R simule el proceso ${X_{t}}$ para un tamaño de muestra $n$, grafique la serie de tiempo y los correlogramas ACF y PACF.
 Compare los correlogramas simulados con los del proceso original.
+```{r}
+#Cargamos librerías
+library(ggplot2)
+```
+
+Gráfica:
+```{r}
+acf_coefs_ej1=c(1,2/65,-6/13)
+#llenemos de 0 los faltantes
+for (i in (length(acf_coefs_ej1)+1):11){
+  acf_coefs_ej1[i]=0
+}
+ACF_1<-data.frame('ACF'=acf_coefs_ej1,lag=0:10)
+ACF_1
+ggplot(ACF_1,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
+```
 
 Respueta: 
 
@@ -44,6 +60,9 @@ Automatizaremos la obtención de los coeficientes del PACF para el ejercicio 1:
 ```{r}
 #x será el vector con los coeficientes de autocorrelación
 coefs_pacf<-function(p,k){
+  if(k==0){
+    return(1)
+  }
   if(length(p)<k+1){
     for(i in length(p):k){
       p[i+1]=0
@@ -62,14 +81,77 @@ coefs_pacf<-function(p,k){
   return(det(B)/det(A))
 }
 ```
+¿Cómo funciona? Bien, en clase, en la página 27 de las notas, podemos observar
+que $\phi_{kk}$, que es el coeficiente de autocorrelación parcial para un lag de $k$
+se puede calcular usando Cramer. Observamos el patrón de que en la matriz que 
+'va en el denominador', iba el coeficiente $\rho_{i}$ donde $i$ era el valor absoluto
+de la diferencia entre el número de columna y renglón, por ello es que llenamos la
+matriz como $A[i,j]=p[abs(i-j)+1]$. En la matriz 'numerador', únicamente es cambiar
+el último renglón por los $\rho_j$ donde $j$ es el número de renglón, siendo ambas
+matrices de dimensión $k*k$
 
-Aquí deben ir los coeficientes de $\rho$_k distintos de 0
+Ahora solo aplicamos la fórmula:
 ```{r}
-#cambiar a los que tengo en el pdf, estos son de prueba
-x=c(1,-180/269,50/269)
-for (i in 1:10){
-  print(coefs_pacf(x,i))
+pacf_ej1=c()
+for (i in 1:11){
+  pacf_ej1[i]<-coefs_pacf(acf_coefs_ej1,i-1)
 }
+PACF_1=data.frame(PACF=pacf_ej1,lag=c(0:10))
+PACF_1
+```
+
+Graficamos
+
+```{r}
+ggplot(PACF_1,aes(x=lag,y=PACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
+```
+
+##Ejercicio 2
+
+Programamos la función recursiva para los coeficientes de correlación
+```{r}
+#phi es un vector con los coeficientes del modelo AR(p)
+#p es un vector con los acf para lag=1 y 2
+coefs_acf<-function(phi,p,k){
+  for (i in length(p):k+1){
+    p[i]=phi[1]*p[i-1]+phi[2]*p[i-2]
+  }
+  return(p)
+}
+```
+Aplicamos:
+```{r}
+acf_coefs_ej2<-c(1,-8/35,-461/700)
+phi_ej2<-c(-0.4,-0.75)
+acf_coefs_ej2<-coefs_acf(phi_ej2,acf_coefs_ej2,10)
+ACF_2=data.frame(ACF=acf_coefs_ej2,lag=c(0:10))
+ACF_2
+ggplot(ACF_2,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
+```
+
+Entonces:
+```{r}
+Var_Xt<-1/(1-sum(phi_ej2*(acf_coefs_ej2[2:3])))
+Var_Xt
+```
+Sabemos que en un modelo AR(p), solo los primeros p coeficientes del PACF
+son distintos de 0, es decir, en este caso los primeros 2, para lag=1 y 2.
+Aplicamos la función escrita anteriormente:
+```{r}
+pacf_ej2=c()
+for (i in 1:3){
+  pacf_ej2[i]<-coefs_pacf(acf_coefs_ej2,i-1)
+}
+for (i in 4:11){
+  pacf_ej2[i]<-0
+}
+PACF_2=data.frame(PACF=pacf_ej2,lag=c(0:10))
+PACF_2
+```
+Graficamos
+
+```{r}
+ggplot(PACF_2,aes(x=lag,y=PACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
 ```
 
 
