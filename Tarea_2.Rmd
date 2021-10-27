@@ -1,0 +1,45 @@
+---
+title: "Untitled"
+author: "Eduardo"
+date: "10/26/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Automatizaremos la obtención de los coeficientes del PACF para el ejercicio 1:
+```{r}
+#x será el vector con los coeficientes de autocorrelación
+coefs_pacf<-function(p,k){
+  if(length(p)<k+1){
+    for(i in length(p):k){
+      p[i+1]=0
+    }
+  }
+  A<-matrix(nrow=k,ncol = k)
+  for (j in 1:k){
+    for (i in 1:k){
+       A[i,j]=p[abs(i-j)+1]
+    }
+  }
+  B<-A
+  for (i in 1:k){
+    B[i,k]=p[i+1]
+  }
+  return(det(B)/det(A))
+}
+```
+
+Aquí deben ir los coeficientes de \rho_k distintos de 0
+```{r}
+#cambiar a los que tengo en el pdf, estos son de prueba
+x=c(1,-180/269,50/269)
+for (i in 1:10){
+  print(coefs_pacf(x,i))
+}
+```
+
+
+
