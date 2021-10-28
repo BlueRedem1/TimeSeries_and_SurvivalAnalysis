@@ -238,7 +238,7 @@ Programamos la función recursiva para los coeficientes de correlación
 ```{r}
 #phi es un vector con los coeficientes del modelo AR(p)
 #p es un vector con los acf para lag=1 y 2
-coefs_acf<-function(phi,p,k){
+coefs_cor<-function(phi,p,k){
   for (i in length(p):k+1){
     p[i]=phi[1]*p[i-1]+phi[2]*p[i-2]
   }
@@ -247,19 +247,24 @@ coefs_acf<-function(phi,p,k){
 ```
 Aplicamos:
 ```{r}
-acf_coefs_ej2<-c(1,-8/35,-461/700)
+coefs_cor_ej2<-c(1,-8/35,-461/700)
 phi_ej2<-c(-0.4,-0.75)
-acf_coefs_ej2<-coefs_acf(phi_ej2,acf_coefs_ej2,10)
+coefs_cor_ej2<-coefs_acf(phi_ej2,coefs_cor_ej2,10)
+```
+
+Entonces:
+```{r}
+Var_Xt<-1/(1-sum(phi_ej2*(coefs_cor_ej2[2:3])))
+Var_Xt
+```
+Ahora dividimos entre la varianza para sacar los coeficientes del acf:
+```{r}
+acf_coefs_ej2<-coefs_cor_ej2/Var_Xt
 ACF_2=data.frame(ACF=acf_coefs_ej2,lag=c(0:10))
 ACF_2
 ggplot(ACF_2,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
 ```
 
-Entonces:
-```{r}
-Var_Xt<-1/(1-sum(phi_ej2*(acf_coefs_ej2[2:3])))
-Var_Xt
-```
 Sabemos que en un modelo AR(p), solo los primeros p coeficientes del PACF
 son distintos de 0, es decir, en este caso los primeros 2, para lag=1 y 2.
 Aplicamos la función escrita anteriormente:
