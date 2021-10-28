@@ -23,7 +23,9 @@ Compare los correlogramas simulados con los del proceso original.
 
 ```{r}
 #Cargamos librerías
-library(ggplot2)
+library(ggplot2);library(itsmr);library(forecast);library(TSA);library(lmtest)
+library(timeSeries);library(timeSeries);library(astsa);
+library(tseries);library(forecast);library(nortest)
 ```
 
 Respueta: 
@@ -114,6 +116,25 @@ Graficamos
 ggplot(PACF_1,aes(x=lag,y=PACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
 ```
 
+Simulamos 
+```{r}
+par(mfrow=c(1,1))
+MA2=arima.sim(list(order=c(0,0,2), ma=c(-0.4,-1.2)),n=500)
+plot(MA2, main="Simulación MA(2)", col="purple", ylab="", las=1, xlab="Tiempo")
+
+##Vamos a calcular el ACF de manera teorica 
+(ACFMA=ARMAacf( ma=c(-0.4,-1.2), ar=0,15))
+plot(ACFMA[-1],type="h", main="ACF teorico de un MA(2)", lwd=2, ylim=c(-1,1), las=1)
+abline(h=0, lwd=2, col="violet")
+acf(MA2)
+###?Que concluimos?
+##Vamos a calcular el PACF de manera teorica 
+(PACFMA=ARMAacf( ma=c(-0.4,-1.2), ar=0,15, pacf=T))
+plot(PACFMA,type="h", main="PACF teorico de un MA(2)", lwd=2, ylim=c(-1,1), las=1)
+abline(h=0, lwd=1, col="violet")
+pacf(MA2)
+```
+
 ##Ejercicio 2
 
 Programamos la función recursiva para los coeficientes de correlación
@@ -162,5 +183,22 @@ Graficamos
 ggplot(PACF_2,aes(x=lag,y=PACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
 ```
 
+Simulamos
+```{r}
+par(mfrow=c(1,1))
+AR2=arima.sim(list(order=c(2,0,0), ar=c(-0.4,-0.75)),n=500)
+plot(AR2, main="Simulación AR(2)", col="gold", lwd=2, las=1)
+(ACFAR=ARMAacf(ar=c(-0.4,-0.75), ma=0,15))
+plot(ACFAR,type="h", main="PACF teorico de un MA(2)", lwd=2, ylim=c(-1,1), las=1)
+abline(h=0, lwd=1, col="violet")
+acf(AR2)
+
+#PACF
+
+(PACFAR=ARMAacf(ar=c(-0.4,-0.75), ma=0,15, pacf=T))
+plot(PACFAR, type="h", lwd=3)
+abline(h=0, lwd=1, col="violet")
+pacf(AR2)
+```
 
 
