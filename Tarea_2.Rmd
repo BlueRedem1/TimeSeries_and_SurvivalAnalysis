@@ -21,7 +21,7 @@ donde ${Z_{t}}$ es un ruido blanco Gaussiano.
 (f) En R simule el proceso ${X_{t}}$ para un tamaño de muestra $n$, grafique la serie de tiempo y los correlogramas ACF y PACF.
 Compare los correlogramas simulados con los del proceso original.
 
-```{r}
+```{r,message=FALSE}
 #Cargamos librerías
 library(ggplot2);library(itsmr);library(forecast);library(TSA);library(lmtest)
 library(timeSeries);library(timeSeries);library(astsa);
@@ -30,13 +30,12 @@ library(tseries);library(forecast);library(nortest)
 
 Respueta: 
 
-a) $Var$($X_{t}$) = $Var(Z_{t} - 0.4_{t-1}, - 1.2Z_{t-2})$ .... (1)
-Como $Z_{k}$ $\perp$ $Z_{j}$ $\forall$ $k \ne j$
+a) $Var$($X_{t}$) = $Var(Z_{t} - 0.4_{t-1}, - 1.2Z_{t-2})$ $\dots$ (1)
 
-Podemos expresar a (1) de la siguiente manera:
+Como $Z_{k}$ $\perp$ $Z_{j}$ $\forall$ $k \ne j$, podemos expresar a (1) de la siguiente manera:
 
 $$ = Var(Z_{t}) + Var(-0.4 Z_{t-1}) + Var(-1.2Z_{t-2}) $$
-$$ =  Var(Z_{t}) + (-0.4)^{2} Var(Z_{t-1}) + (-1.2)^{2} Var(Z_{t-2}) .... (2)$$
+$$ =  Var(Z_{t}) + (-0.4)^{2} Var(Z_{t-1}) + (-1.2)^{2} Var(Z_{t-2}) \dots (2)$$
 Como $Z_{t}$ son $v.a.i.i.d.$, con $\mathbb{E}[Z_{t}] = 0$ y $Var(Z_{t}) = 1$
 
 $$ (2) = 1 + (.16)(1) + (1.44)(1) $$
