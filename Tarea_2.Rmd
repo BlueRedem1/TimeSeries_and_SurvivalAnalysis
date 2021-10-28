@@ -249,7 +249,7 @@ Aplicamos:
 ```{r}
 coefs_cor_ej2<-c(1,-8/35,-461/700)
 phi_ej2<-c(-0.4,-0.75)
-coefs_cor_ej2<-coefs_acf(phi_ej2,coefs_cor_ej2,10)
+coefs_cor_ej2<-coefs_cor(phi_ej2,coefs_cor_ej2,10)
 ```
 
 Entonces:
