@@ -42,14 +42,13 @@ $$ = 1 + .16 + 1.44 $$
 $$ = 2.6  Cov(Z_{t} - 1.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - Z_{t-2+k}) $$
 b) Veamos la autocovarianza:
 
-$$ \begin{align*}
-\gamma(k) &= Cov(X_{t}, X_{t+k})\\
-          &= Cov(Z_{t} - 0.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - 1.2Z_{t-2+k})\\
-          &= Cov(Z_{t}, Z{_t+k}) - 0.4 Cov(Z_{t}, Z_{t+k-1}) - 1.2 Cov(Z_{t}, Z_{t+k-2})\\
-           &-0.4 Cov(Z_{t-1},Z_{t+k}) + .16Cov(Z_{t-1},Z_{t+k-1}) + .48Cov(Z_{t-1}, Z_{t+k-2})\\
-           &-1.2Cov(Z_{t-2}, Z_{t+k}) + .48 Cov(Z_{t-2}, Z_{t+k_1}) + 1.44 Cov(Z_{t-2}, Z_{t+k-2})
+$$ \gamma(k) = Cov(X_{t}, X_{t+k})\\ $$
+          $$ = Cov(Z_{t} - 0.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - 1.2Z_{t-2+k})\\$$
+          $$ = Cov(Z_{t}, Z{_t+k}) - 0.4 Cov(Z_{t}, Z_{t+k-1}) - 1.2 Cov(Z_{t}, Z_{t+k-2})\\$$
+          $$ -0.4 Cov(Z_{t-1},Z_{t+k}) + .16Cov(Z_{t-1},Z_{t+k-1}) + .48Cov(Z_{t-1}, Z_{t+k-2})\\$$
+          $$ -1.2Cov(Z_{t-2}, Z_{t+k}) + .48 Cov(Z_{t-2}, Z_{t+k_1}) + 1.44 Cov(Z_{t-2}, Z_{t+k-2})$$
  
-\end{align*} $$
+ $$
 
 
 Gráfica:
