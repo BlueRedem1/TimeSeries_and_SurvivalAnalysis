@@ -34,104 +34,118 @@ a) $Var$($X_{t}$) = $Var(Z_{t} - 0.4_{t-1}, - 1.2Z_{t-2})$ $\dots$ (1)
 
 Como $Z_{k}$ $\perp$ $Z_{j}$ $\forall$ $k \ne j$, podemos expresar a (1) de la siguiente manera:
 
-$$ 
-\begin{aligned} &= Var(Z_{t}) + Var(-0.4 Z_{t-1}) + Var(-1.2Z_{t-2})\\ 
-                &=  Var(Z_{t}) + (-0.4)^{2} Var(Z_{t-1}) + (-1.2)^{2} Var(Z_{t-2}) \dots (2)
-\end{aligned}
-$$
+ 
+\begin{align*} &= Var(Z_{t}) + Var(-0.4 Z_{t-1}) + Var(-1.2Z_{t-2})\\ 
+               &=  Var(Z_{t}) + (-0.4)^{2} Var(Z_{t-1}) + (-1.2)^{2} Var(Z_{t-2}) \dots (2)
+\end{align*}
+
 Como $Z_{t}$ son $v.a.i.i.d.$, con $\mathbb{E}[Z_{t}] = 0$ y $Var(Z_{t}) = 1$
 
-$$ 
-\begin{aligned}(2) &= 1 + (.16)(1) + (1.44)(1)\\
-                   &= 1 + .16 + 1.44\\ 
-                   &= 2.6  Cov(Z_{t} - 1.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - Z_{t-2+k}) 
-\end{aligned}
-$$
+ 
+\begin{align*}(2) &= 1 + (.16)(1) + (1.44)(1)\\
+                  &= 1 + .16 + 1.44\\ 
+                  &= 2.6  Cov(Z_{t} - 1.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - Z_{t-2+k}) 
+\end{align*}
+
     
     
 b) Veamos la autocovarianza:
 
-$$ 
-\begin{aligned} \gamma(k) &= Cov(X_{t}, X_{t+k})\\ 
-                          &= Cov(Z_{t} - 0.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - 1.2Z_{t-2+k})\\
-                          &= Cov(Z_{t}, Z{_t+k}) - 0.4 Cov(Z_{t}, Z_{t+k-1}) - 1.2 Cov(Z_{t}, Z_{t+k-2})\\
-                          &-0.4 Cov(Z_{t-1},Z_{t+k}) + .16Cov(Z_{t-1},Z_{t+k-1}) + .48Cov(Z_{t-1}, Z_{t+k-2})\\
-                          &-1.2Cov(Z_{t-2}, Z_{t+k}) + .48 Cov(Z_{t-2}, Z_{t+k_1}) + 1.44 Cov(Z_{t-2}, Z_{t+k-2})
-\end{aligned}
-$$
+ 
+\begin{align*} \gamma(k) &= Cov(X_{t}, X_{t+k})\\ 
+                         &= Cov(Z_{t} - 0.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - 1.2Z_{t-2+k})\\
+                         &= Cov(Z_{t}, Z{_t+k}) - 0.4 Cov(Z_{t}, Z_{t+k-1}) - 1.2 Cov(Z_{t}, Z_{t+k-2})\\
+                         &-0.4 Cov(Z_{t-1},Z_{t+k}) + .16Cov(Z_{t-1},Z_{t+k-1}) + .48Cov(Z_{t-1}, Z_{t+k-2})\\
+                         &-1.2Cov(Z_{t-2}, Z_{t+k}) + .48 Cov(Z_{t-2}, Z_{t+k_1}) + 1.44 Cov(Z_{t-2}, Z_{t+k-2})
+\end{align*}
+
     
   
 Si $k = 0$, entonces:
 
-$$ 
-\begin{aligned} \gamma(0) &= Cov(Z_{t}, Z_{t}) + .16 Cov(Z_{t-1}, Z_{t+k-1}) + 1.44 Cov(Z_{t-2}, Z_{t+k-2})\\
-                          &= Var(Z_{t}) + .16Var(Z_{t}) + 1.44 Var(Z_{t})\\ 
-                          &= 2.6\\
-                          &= Var(X_{t}).
 
-\end{aligned}
-$$
+\begin{align*} \gamma(0) &= Cov(Z_{t}, Z_{t}) + .16 Cov(Z_{t-1}, Z_{t+k-1}) + 1.44 Cov(Z_{t-2}, Z_{t+k-2})\\
+                         &= Var(Z_{t}) + .16Var(Z_{t}) + 1.44 Var(Z_{t})\\ 
+                         &= 2.6\\
+                         &= Var(X_{t}).
+\end{align*}
+
     
 Y 0 en los demás, ya que $Z_{j}$ $\forall$ $k \ne j$
 
 Si $k = 1$ 
 
-$$ 
-\begin{aligned} \gamma(1) &= -0.4Cov(Z_{t}, Z_{t+1-1}) + .48 Cov(Z_{t-1}, Z_{t+1-2})\\
-                          &= -0.4Cov(Z_{t}, Z_{t}) + .48 Cov(Z_{t-1}, Z_{t-1})\\ 
-                          &= -0.4Var(Z_{t}) + .48 Var(Z_{t})\\
-                          &= -0.4 + .48\\
-                          &= .08
+ 
+\begin{align*} \gamma(1) &= -0.4Cov(Z_{t}, Z_{t+1-1}) + .48 Cov(Z_{t-1}, Z_{t+1-2})\\
+                         &= -0.4Cov(Z_{t}, Z_{t}) + .48 Cov(Z_{t-1}, Z_{t-1})\\ 
+                         &= -0.4Var(Z_{t}) + .48 Var(Z_{t})\\
+                         &= -0.4 + .48\\
+                         &= .08
+\end{align*}
 
-\end{aligned}
-$$
 Si $k = -1$ 
 
-$$ 
-\begin{aligned} \gamma(-1) &= -0.4Cov(Z_{t-1}, Z_{t-1}) + .48 Cov(Z_{t-2}, Z_{t-1-1})\\
+ 
+\begin{align*} \gamma(-1) &= -0.4Cov(Z_{t-1}, Z_{t-1}) + .48 Cov(Z_{t-2}, Z_{t-1-1})\\
                           &= -0.4Cov(Z_{t-1}, Z_{t-1}) + .48 Cov(Z_{t-2}, Z_{t-2})\\ 
                           &= -0.4Var(Z_{t}) + .48 Var(Z_{t})\\
                           &= -0.4 + .48\\
                           &= .08
+\end{align*}
 
-\end{aligned}
-$$
 Si $k = 2$ 
 
-$$ 
-\begin{aligned} \gamma(2) &= -1.2Cov(Z_{t}, Z_{t+2-2})\\
-                          &= -1.2Cov(Z_{t}, Z_{t})\\ 
-                          &= -1.2Var(Z_{t})\\
-                          &= -1.2\\
-                          
+ 
+\begin{align*} \gamma(2) &= -1.2Cov(Z_{t}, Z_{t+2-2})\\
+                         &= -1.2Cov(Z_{t}, Z_{t})\\ 
+                         &= -1.2Var(Z_{t})\\
+                         &= -1.2\\
+\end{align*}
 
-\end{aligned}
-$$
 
 Si $k = -2$ 
 
-$$ 
-\begin{aligned} \gamma(-2) &= -1.2Cov(Z_{t-2}, Z_{t-2})\\
-                           &= -1.2Cov(Z_{t-2}, Z_{t-2})\\ 
-                           &= -1.2Var(Z_{t})\\
-                           &= -1.2\\
-                          
+ 
+\begin{align*} \gamma(-2) &= -1.2Cov(Z_{t-2}, Z_{t-2})\\
+                          &= -1.2Cov(Z_{t-2}, Z_{t-2})\\ 
+                          &= -1.2Var(Z_{t})\\
+                          &= -1.2\\
+\end{align*}
 
-\end{aligned}
-$$
 
 Son los únicos $k$ para los cuales hay un término tal que, en $Cov(Z_{j}, Z_{i})$ tenemos $i = j$, y como $Z_{j} \perp Z_{i}$ $\forall j \ne i$ $\implies  Cov(Z_{j}, Z_{i}) = 0$
 
-$\therefore \gamma(k)$ = \[ \begin{cases} 
+$$\begin{aligned} \therefore \gamma(k) = \begin{cases} 
                              2.6   & k = 6 \\
                              0.08 & |k| = 1 \\
                             -1.2 &  |k|=2\\
                              0 & e.o.c
                             \end{cases}
-                          \]
-    
+\end{aligned}$$
 
+Entonces, tenemos que:
 
+Para $k = 1$:
+
+\begin{align*} \rho_{k} = 1 
+\end{align*}
+
+Para $|k| = 1$:
+
+\begin{align*} \rho_{k} = \frac{0.08}{2.6}
+                        &= \frac{2}{65}
+\end{align*}
+
+Para $|k| = 2$:
+
+\begin{align*} \rho_{k} = \frac{-1.2}{2.6}
+                        &= \frac{-6}{13}
+\end{align*}
+
+Para $|k| > 2$:
+
+\begin{align*} \rho_{k} = 0 
+\end{align*}
 
 
 Gráfica:
