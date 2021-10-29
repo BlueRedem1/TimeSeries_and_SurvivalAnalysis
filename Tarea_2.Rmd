@@ -368,7 +368,7 @@ a)
 \begin{align*}
 Z_{t} &= X_{t} - 0.6 X_{t-1} - 0.2 X_{t-2} - 0.4 Z_{t-1}\\
       &= X_{t} - 0.6B_X{t} - 0.2B^{2}X_{t} - 0.4 BZ_{t}\\
-      & (1 - 0.6B - 0.2B^{2})X_{t} = Z_{t} + 0.4BZ_{t}\\
+\implies & (1 - 0.6B - 0.2B^{2})X_{t} = Z_{t} + 0.4BZ_{t}\\
       & (1 - 0.6B - 0.2B^{2})X_{t} = Z_{t} (1 +0.4B)\\
       & X_{t} = \frac{(1 + 0.4B)}{(1 - 0.6B - 0.2B^{2})}Z_{t} = \frac{\theta(B)}{\phi(B)}Z_{t}\\
       & \implies \phi(B)X_{t} = \theta(B)Z_{t} 
