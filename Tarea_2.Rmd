@@ -55,7 +55,7 @@ b) Veamos la autocovarianza:
  
 \begin{align*} \gamma(k) &= Cov(X_{t}, X_{t+k})\\ 
                          &= Cov(Z_{t} - 0.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - 1.2Z_{t-2+k})\\
-                         &= Cov(Z_{t}, Z{_t+k}) - 0.4 Cov(Z_{t}, Z_{t+k-1}) - 1.2 Cov(Z_{t}, Z_{t+k-2})\\
+                         &= Cov(Z_{t}, Z_{t+k}) - 0.4 Cov(Z_{t}, Z_{t+k-1}) - 1.2 Cov(Z_{t}, Z_{t+k-2})\\
                          &-0.4 Cov(Z_{t-1},Z_{t+k}) + .16Cov(Z_{t-1},Z_{t+k-1}) + .48Cov(Z_{t-1}, Z_{t+k-2})\\
                          &-1.2Cov(Z_{t-2}, Z_{t+k}) + .48 Cov(Z_{t-2}, Z_{t+k_1}) + 1.44 Cov(Z_{t-2}, Z_{t+k-2})
 \end{align*}
@@ -72,7 +72,7 @@ Si $k = 0$, entonces:
 \end{align*}
 
     
-Y 0 en los demás, ya que $Z_{j}$ $\forall$ $k \ne j$
+Y 0 en los demás, ya que $Z_{k} \perp Z_{j}$ $\forall$ $k \ne j$
 
 Si $k = 1$ 
 
@@ -274,7 +274,7 @@ $$ Var(X_{t}) = \gamma(0) = \frac{\sigma^{2}_{Z}}{1 - \phi_{1}\rho(1) - \phi_{2}
 De esta manera, sabemos que debemos calcular $\rho(1)$ y $\rho(2)$. De igual manera, sabemos que, por lo visto en clase, que para un $AR(p)$ lo calculamos de la siguiente manera:
 
 $$\rho(k) = \phi_{1}\rho(k - 1) + \phi_{2}\rho(k - 2)+ \dots + \phi_{p}\rho(k - p)  $$
-Con $\rho(0) = 1$ y $\rho(-k) = \rho(p)$.
+Con $\rho(0) = 1$ y $\rho(-k) = \rho(k)$.
 
 Así, para $k = 1$ y $k = 2$ tenemos:
 
