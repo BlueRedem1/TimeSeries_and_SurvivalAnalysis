@@ -251,6 +251,21 @@ Compare los correlogramas simulados con los del proceso original.
 Primero, notemos que el proceso AR(2) lo podemos ver de la siguiente materia:
 $$ X_{t} = -.04 X_{t-1} - 0.75 X_{t-2} + Z{t} $$
 Además, notemos que: $\phi_{1} = -0.4$ y $\phi_{2} = - 0.75.$ 
+
+Igualmente, las raíces del polinomio de retraso caen fuera del círculo complejo
+unitario:
+```{r}
+x<-c(1,0.4,0.75)
+raices<-polyroot(x)
+#Las raíces son:
+raices
+
+#Ahora veamos que la norma es:
+norm(cbind(-0.266667,1.123487))
+norm(cbind(-0.266667,-1.123487))
+```
+
+
 Una vez lo anterior, pasemos al inciso a).
 
 a) En clase vimos lo siguiente:
