@@ -378,7 +378,7 @@ $$ X_{t} - 0.6X_{t-1} - 0.2X_{t-2} = Z_{t} + 0.4Z_{t-1} $$
 (a) Escriba el proceso {$X_{t}$} en su forma de polinomio de retraso, donde {$Z_{t}$} es un ruido blanco.
 (b) Clasifique el modelo como un $AR(p)$, $MA(q)$ o $ARMA(p,q)$ y defina el orden.
 (c) Determina si el proceso es estacionario, invertible o causal.
-(d) Obtenga la representación de un $AR(\infty)$ y $MA(\infty)$, respectivamente, si es que 
+(d) Obtenga la representación de un $AR(\infty)$ y $MA(\infty)$, respectivamente, si es que existe.
 
 a)
 \begin{align*}
@@ -452,7 +452,37 @@ Sea |$-\frac{1}{0.4}$| > 1, esto implica que el proceso es invertible ya que B n
 
 $\therefore$ El proceso $X_{t}$ es invertible y causal $_\blacksquare$
 
-d) 
+d) Como el proceso es causal e invertible entonces tenemos $AR(\infty)$ y $MA(\infty)$
+
+Para el $AR(\infty)$, veamos lo siguiente: 
+
+$$Z_{t}=\frac{\phi(B)X_{t}}{\theta(B)}$$
+Sea $\phi(B) = (1-0.6B-0.2B^{2})$ y $\theta(B)= 1.0.4B$
+
+$$ \implies Z_{t}= \frac{(1-0.6B-0.2B^{2})}{1+0.4B}$$
+
+Ahora resolvamos la divisiones polinomica: 
+```{r pressure, echo=FALSE, fig.cap=" ", out.width = '100%'}
+knitr::include_graphics("Imagen1.jpeg")
+```
+
+Así  
+$$ \therefore Z_{t}= (1-B+0.2B^2-0.08B^3...)X_{t} $$
+es $AR(\infty)$ $_\blacksquare$
+
+Para el $MA(\infty)$ tenemos lo siguiente:
+
+$$X_{t}=\frac{\theta(B)}{\phi(B)} Z_{t}$$
+Sea $\theta(B)= 1+0.4B$ y $\phi(B)= 1-0.6B-0.2B^2$
+
+$$\implies X_{t}= \frac{1+0.4B}{1-0.6B-0.2B^2}$$
+Ahora resolvamos la división polinomica:
+
+```{r pressure2, echo=FALSE, fig.cap=" ", out.width = '100%'}
+knitr::include_graphics("Imagen2.jpeg")
+```
+Así  
+$$ \therefore X_{t}= (1+B+0.8B^2+0.68B^3+...)Z_{t}$$ es $MA(\infty)$ $_\blacksquare$
 
 
 
