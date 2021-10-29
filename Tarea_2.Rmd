@@ -234,6 +234,55 @@ pacf(MA2)
 
 ## Ejercicio 2
 
+2.- Considere el proceso $AR(2)$:
+
+$$ X_{t} + 0.4X_{t-1} + 0.75X_{t-2} = Z_{t} $$
+
+donde {$Z_{t}$} es un ruido blanco Gaussiano.
+
+(a) Calcule $\sigma^{2}_{X}$ suponiendo que $\sigma{^{2}_{Z}} = 1$.
+(b) Encuentre la expresión general para la función de autocorrelación $\rho_{k}$.
+(c) Grafique $\rho_{k}$ (correlograma ACF), para $k = 0,1,2, \dots, 10$.
+(d) Encuentre la expresión general para la función de autocorrelación parcial  $\phi_{kk}$.
+(e) Grafique $\phi_{kk}$ (correlograma PACF), para $k = 0,1,2, \dots, 10$.
+(f) En R simule el proceso ${X_{t}}$ para un tamaño de muestra $n$ grafique la serie de tiempo y los correlogramas ACP y PACF.
+Compare los correlogramas simulados con los del proceso original.
+
+Primero, notemos que el proceso AR(2) lo podemos ver de la siguiente materia:
+$$ X_{t} = -.04 X_{t-1} - 0.75 X_{t-2} + Z{t} $$
+Además, notemos que: $\phi_{1} = -0.4$ y $\phi_{2} = - 0.75.$ 
+Una vez lo anterior, pasemos al inciso a).
+
+a) En clase vimos lo siguiente:
+
+$$ Var(X_{t}) = \gamma(0) = \frac{\sigma^{2}_{Z}}{1 - \phi_{1}\rho(1) - \phi_{2}\rho(2) - \dots - \phi_{p}\rho(p) } $$
+De esta manera, sabemos que debemos calcular $\rho(1)$ y $\rho(2)$. De igual manera, sabemos que, por lo visto en clase, que para un $AR(p)$ lo calculamos de la siguiente manera:
+
+$$\rho(k) = \phi_{1}\rho(k - 1) + \phi_{2}\rho(k - 2)+ \dots + \phi_{p}\rho(k - p)  $$
+Con $\rho(0) = 1$ y $\rho(-k) = \rho(p)$.
+
+Así, para $k = 1$ y $k = 2$ tenemos:
+
+\begin{align*}
+\rho(1) &= -0.4 \rho(0) - 0.75 \rho(1) \implies\\ 
+\rho(2) &= -0.4 \rho(1) - 0.75 \rho(0) 
+\end{align*}
+
+Entonces:
+
+\begin{align*} 
+\rho(1) &= -0.4 - 0.75 \rho(1) \implies  1.75 \rho(1) = -0.4\\
+\implies \rho(1) &= \frac{-0.4}{1.75}\\ 
+        &= \frac{-8}{35} 
+\end{align*}
+
+\begin{align*} 
+\rho(2) &= -0.4\rho(1) - 0.75\\ 
+\implies \rho(2) &= -0.4 \left(\frac{-0.4}{1.75}\right)- .75\\ 
+        &= \frac{-461}{700} 
+\end{align*}
+
+
 Programamos la función recursiva para los coeficientes de correlación
 ```{r}
 #phi es un vector con los coeficientes del modelo AR(p)
