@@ -295,10 +295,12 @@ Entonces:
 \rho(2) &= -0.4\rho(1) - 0.75\\ 
 \implies \rho(2) &= -0.4 \left(\frac{-0.4}{1.75}\right)- .75\\ 
         &= \frac{-461}{700} 
-\end{align*}
+\end{align*} $\blacksquare$
+
+Nota: Como necesitamos los coeficientes de autocorrelación, el ejercicio continua despúes del inciso c), a partir de donde dice "Entonces".
 
 
-Programamos la función recursiva para los coeficientes de correlación
+b) Programamos la función recursiva para los coeficientes de correlación
 ```{r}
 #phi es un vector con los coeficientes del modelo AR(p)
 #p es un vector con los acf para lag=1 y 2
@@ -317,16 +319,18 @@ coefs_acf_ej2<-coefs_acf(phi_ej2,coefs_acf_ej2,10)
 ACF_2=data.frame(ACF=coefs_acf_ej2,lag=c(0:10))
 ACF_2
 ```
-Gráfica
+c) Gráfica
 ```{r}
 ggplot(ACF_2,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
 ```
+Continuación del inciso a).
+
 Entonces:
 ```{r}
 Var_Xt<-1/(1-sum(phi_ej2*(coefs_acf_ej2[2:3])))
 Var_Xt
 ```
-Sabemos que en un modelo AR(p), solo los primeros p coeficientes del PACF
+d) Sabemos que en un modelo AR(p), solo los primeros p coeficientes del PACF
 son distintos de 0, es decir, en este caso los primeros 2, para lag=1 y 2.
 Aplicamos la función escrita anteriormente:
 ```{r}
@@ -340,13 +344,13 @@ for (i in 4:11){
 PACF_2=data.frame(PACF=pacf_ej2,lag=c(0:10))
 PACF_2
 ```
-Graficamos
+e) Graficamos
 
 ```{r}
 ggplot(PACF_2,aes(x=lag,y=PACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
 ```
 
-Simulamos
+f) Simulamos
 ```{r}
 par(mfrow=c(1,1))
 # Vamos a calcular el ACF de la muestra simulada
