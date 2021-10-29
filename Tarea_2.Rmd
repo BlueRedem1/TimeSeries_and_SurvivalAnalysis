@@ -158,7 +158,7 @@ for (i in (length(acf_coefs_ej1)+1):11){
 }
 ACF_1<-data.frame('ACF'=acf_coefs_ej1,lag=0:10)
 ACF_1
-ggplot(ACF_1,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
+ggplot(ACF_1,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='dodgerblue3')
 ```
 
 
@@ -209,7 +209,7 @@ PACF_1
 e) Graficamos
 
 ```{r}
-ggplot(PACF_1,aes(x=lag,y=PACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
+ggplot(PACF_1,aes(x=lag,y=PACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='chartreuse3')
 ```
 
 f) Simulamos 
@@ -222,13 +222,13 @@ plot(MA2, main="Simulación MA(2)", col="purple", ylab="", las=1, xlab="Tiempo")
 # Vamos a calcular el ACF de la muestra simulada
 (ACFMA=ARMAacf( ma=c(-0.4,-1.2), ar=0,15))
 plot(ACFMA[-1],type="h", main="ACF de la muestra de un MA(2)", lwd=2, ylim=c(-1,1), las=1)
-abline(h=0, lwd=2, col="violet")
+abline(h=0, lwd=2, col="chocolate1")
 acf(MA2)
 
 # Vamos a calcular el PACF de la muestra simulada 
 (PACFMA=ARMAacf( ma=c(-0.4,-1.2), ar=0,15, pacf=T))
 plot(PACFMA,type="h", main="PACF de la muestra de un MA(2)", lwd=2, ylim=c(-1,1), las=1)
-abline(h=0, lwd=1, col="violet")
+abline(h=0, lwd=1, col="deeppink2")
 pacf(MA2)
 ```
 
@@ -321,7 +321,7 @@ ACF_2
 ```
 c) Gráfica
 ```{r}
-ggplot(ACF_2,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='red')
+ggplot(ACF_2,aes(x=lag,y=ACF))+geom_point()+geom_abline(intercept = 0,slope=0,color='goldenrod3')
 ```
 Continuación del inciso a).
 
@@ -358,14 +358,14 @@ AR2=arima.sim(list(order=c(2,0,0), ar=c(-0.4,-0.75)),n=500)
 plot(AR2, main="Simulación AR(2)", col="gold", lwd=2, las=1)
 (ACFAR=ARMAacf(ar=c(-0.4,-0.75), ma=0,15))
 plot(ACFAR,type="h", main="PACF de la muestra de un MA(2)", lwd=2, ylim=c(-1,1), las=1)
-abline(h=0, lwd=1, col="violet")
+abline(h=0, lwd=1, col="purple")
 acf(AR2)
 
 
 # Vamos a calcular el PACF de la muestra simulada
 (PACFAR=ARMAacf(ar=c(-0.4,-0.75), ma=0,15, pacf=T))
 plot(PACFAR, type="h", lwd=3)
-abline(h=0, lwd=1, col="violet")
+abline(h=0, lwd=1, col="purple")
 pacf(AR2)
 ```
 
