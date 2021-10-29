@@ -46,7 +46,7 @@ Como $Z_{t}$ son $v.a.i.i.d.$, con $\mathbb{E}[Z_{t}] = 0$ y $Var(Z_{t}) = 1$
 \begin{align*}(2) &= 1 + (.16)(1) + (1.44)(1)\\
                   &= 1 + .16 + 1.44\\ 
                   &= 2.6  Cov(Z_{t} - 1.4Z_{t-1} - 1.2Z_{t-2}, Z_{t+k} - 0.4Z_{t-1+k} - Z_{t-2+k}) 
-\end{align*}
+\end{align*} $_\blacksquare$
 
     
     
@@ -146,7 +146,7 @@ Para $|k| = 2$:
 Para $|k| > 2$:
 
 \begin{align*} \rho_{k} = 0 
-\end{align*}
+\end{align*} $_\blacksquare$
 
 
 c) Gráfica:
@@ -352,5 +352,96 @@ plot(PACFAR, type="h", lwd=3)
 abline(h=0, lwd=1, col="violet")
 pacf(AR2)
 ```
+
+## Ejercicio 3
+
+3.- Considere el siguiente proceso:
+
+$$ X_{t} - 0.6X_{t-1} - 0.2X_{t-2} = Z_{t} + 0.4Z_{t-1} $$ 
+
+(a) Escriba el proceso {$X_{t}$} en su forma de polinomio de retraso, donde {$Z_{t}$} es un ruido blanco.
+(b) Clasifique el modelo como un $AR(p)$, $MA(q)$ o $ARMA(p,q)$ y defina el orden.
+(c) Determina si el proceso es estacionario, invertible o causal.
+(d) Obtenga la representación de un $AR(\infty)$ y $MA(\infty)$, respectivamente, si es que 
+
+a)
+\begin{align*}
+Z_{t} &= X_{t} - 0.6 X_{t-1} - 0.2 X_{t-2} - 0.4 Z_{t-1}\\
+      &= X_{t} - 0.6B_X{t} - 0.2B^{2}X_{t} - 0.4 BZ_{t}\\
+      & (1 - 0.6B - 0.2B^{2})X_{t} = Z_{t} + 0.4BZ_{t}\\
+      & (1 - 0.6B - 0.2B^{2})X_{t} = Z_{t} (1 +0.4B)\\
+      & X_{t} = \frac{(1 + 0.4B)}{(1 - 0.6B - 0.2B^{2})}Z_{t} = \frac{\theta(B)}{\phi(B)}Z_{t}\\
+      & \implies \phi(B)X_{t} = \theta(B)Z_{t} 
+\end{align*} $_\blacksquare$
+
+b) Sabemos que $X_{t}$ es un proceso autoregresivo de medias moviles $(ARMA(p,q)) si
+
+$$ X_{t} = \phi_{1}X_{t-1} + \phi_{2}X_{t-2} + \dots + \phi_{p}X_{t-p} + Z_{t} + \theta_{1} Z_{t-1} + \theta_{2} Z_{t-2} + \dots + \theta_{q} Z_{t-q}$$
+Equivalentemente
+
+$$ X_{t} = \sum_{i=1}^{p} \phi_{i} Z_{t-1} + Z_{t} + \sum_{i=1}^{q} \theta_{i}Z_{t-1} $$
+Ó 
+
+$$ \phi(B)X_{t} = \theta(B)Z_{t}$$
+
+Así, en nuestro caso
+
+$$ X_{t} - 0.6X_{t-1} - 0.2X_{t-2} = Z_{t} + 0.4Z_{t-1}$$
+es un proceso $ARMA(2,1)$, ya que lo podemos ver como:
+
+\begin{align*}
+& (1 - 0.6B - 0.2B^{2})X_{t} = (1 + 0.4B)Z_{t}\\
+& \implies \phi(B)X_{t} = \theta(B)Z_{t}
+\end{align*}
+
+con $\phi(B)$ = $1 - 0.6B - 0.2B^{2}$ y $\theta(B)$ = 1 + 0.4B  $_\blacksquare$
+
+c) Tenemos por definición de causalidad lo siguiente:
+
+Un proceso $X_{t} ARMA(p,q)$ es causal si existe una sucesión $\psi_{j}$ y lo podemos escribir como:
+
+$$ X_{t} = \sum_{j=0}^{\infty} \psi_{j} Z_{t-1} $$
+
+Esto quiere decir que el proceso $X_{t} puede escribirse como combinación lineal de los $Z_{t}$ anteriores y el actual.
+
+Entonces para ver si  $X_{t}$ es causal, nos centramos en la parte autoregresiva pues la parte $MA$ es causal por contrucción.
+
+Así que calculemos las raíces del polinomio $\phi(B)$:
+
+Sea 
+\begin{align*}
+\phi(B) &= 1 - 0.6B - 0.2B^{2}\\
+& \implies 1 - 0.6B - 0.2B^{2} = 0\\
+& \implies -0.2B^{2} - 0.6B + 1 = 0\\
+B_{1,2} &= \frac{-(-0.6) \pm \sqrt{(-0.6)^2 - 4 (-0.2)}}{2(-0.2)}\\
+        &= \frac{(0.6) \pm \sqrt{1.16)}}{-0.4}
+\end{align*}
+
+Así obtenemos:
+
+$$ B_{1} = \frac{-3}{2} + \frac{\sqrt{29}}{2}, B_{2} = \frac{-3}{2} - \frac{\sqrt{29}}{2}$$
+Como |$\frac{-3}{2} + \frac{\sqrt{29}}{2}$| > 1 y |$\frac{-3}{2} - \frac{\sqrt{29}}{2}$| > 2, implica que el proceso es causal, ya que las raíces no caen dentro del círculo unitario.
+
+
+Ahora para ver si es invertible, veremos la parte de promedios móviles:
+
+
+$$ \theta(B) = 1 + 0.4B $$ 
+\begin{align*}
+& \implies 1 + 0.4B = 0\\
+& \implies B = \frac{-1}{0.4}
+\end{align*}
+
+Sea |$-\frac{1}{0.4}$| > 1, esto implica que el proceso es invertible ya que B no cae cierto del círculo unitario.
+
+$\therefore$ El proceso $X_{t}$ es invertible y causal $_\blacksquare$
+
+d) 
+
+
+
+
+
+
 
 
