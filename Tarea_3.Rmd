@@ -248,10 +248,11 @@ Use al menos dos métodos de imputación de la paqueteríaa imputeTS. ¿Cuál m�
 adecuado para estos datos? (Note que el valor imputado debe aproximarse al valor omitido).
 
 Vamos a poner los datos que se piden, como NA:
+
 ```{r}
-Datos_a_comparar=Serie[29]
-Datos_a_comparar[2]=Serie[38]
-Datos_a_comparar[3]=Serie[39]
+Original=Serie[29]
+Original[2]=Serie[38]
+Original[3]=Serie[39]
 Serie_2=Serie
 Serie_2[29]=NA
 Serie_2[38:39]=NA
@@ -264,15 +265,16 @@ Un vistazo a la documentación de la paquetería mencionada nos menciona los sig
 métodos:
 
 \begin{enumerate}
-\item na_interpolation:
+\item na\_interpolation:
 
 Missing Value Imputation by Interpolation. Acepta 3 tipos:
 \begin{enumerate}
 \item "linear" - for linear interpolation using approx (default choice)
+
 ```{r}
-Comparaciones=data.frame(Datos_a_comparar)
-na_interpolation_lineal=na_interpolation(Serie_2,option='linear')[29]-Datos_a_comparar[1]
-na_interpolation_lineal[2:3]=na_interpolation(Serie_2,option='linear')[38:39]-Datos_a_comparar[2:3]
+Comparaciones=data.frame(Original)
+na_interpolation_lineal=na_interpolation(Serie_2,option='linear')[29]-Original[1]
+na_interpolation_lineal[2:3]=na_interpolation(Serie_2,option='linear')[38:39]-Original[2:3]
 Comparaciones['na_interpolation_lineal']=na_interpolation_lineal
 Comparaciones
 ```
@@ -289,7 +291,7 @@ na_interpolation(Serie_2,option='stine')
 
 \end{enumerate}
 
-\item na_kalman:
+\item na\_kalman:
 
 Missing Value Imputation by Kalman Smoothing and State Space Models. Acepta los suientes modelos:
 \begin{enumerate}
@@ -303,7 +305,7 @@ na_kalman(Serie_2,model='auto.arima')
 na_kalman(Serie_2,model='StructTS')
 ```
 \end{enumerate}
-\item na_locf:
+\item na\_locf:
 
 Missing Value Imputation by Last Observation Carried Forward. Acepta los siguientes métodos:
 \begin{enumerate}
@@ -320,7 +322,7 @@ na_locf(Serie_2,option = 'nocb')
 
 \end{enumerate}
 
-\item na_ma	Missing:
+\item na\_ma	Missing:
 
 Value Imputation by Weighted Moving Average. Acepta los siguientes métodos:
 \begin{enumerate}
@@ -339,7 +341,7 @@ na_ma(Serie_2,weighting = 'exponential')
 ```
 \end{enumerate}
 
-\item na_mean	Missing:
+\item na\_mean	Missing:
 
 Value Imputation by Mean Value. Acepta los siguientes métodos:
 \begin{enumerate}
@@ -365,14 +367,14 @@ na_mean(Serie_2,option = 'geometric')
 ```
 \end{enumerate}
 
-\item na_random:
+\item na\_random:
 
 Missing Value Imputation by Random Sample
 ```{r}
 na_random(Serie_2)
 ```
 
-\item na_seadec:
+\item na\_seadec:
 
 Seasonally Decomposed Missing Value Imputation. Admite los siguiente métodos:
 \begin{enumerate}
@@ -402,7 +404,7 @@ na_seadec(Serie_2,algorithm = 'kalman')
 na_seadec(Serie_2,algorithm = 'ma')
 ```
 \end{enumerate}
-\item na_seasplit:
+\item na\_seasplit:
 
 Seasonally Splitted Missing Value Imputation. Admite los siguiente métodos:
 \begin{enumerate}
