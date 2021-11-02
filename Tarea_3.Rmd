@@ -434,3 +434,16 @@ na_seasplit(Serie_2,algorithm = 'ma')
 \end{enumerate}
 \end{enumerate}
 
+## Ajuste
+
+Con los datos observados completos, ajuste un modelo ARIMA o SARIMA adecuado.
+
+Obtenga correlogramas, revise si los parámetros son significativos, compruebe los supuestos
+(que los residuales sean ruido blanco con distribución normal).
+Obtenga dos o más posibles modelos, realice análisis de residuales y calcule medidas de
+bondad de ajuste. Haga la comparación para decidir cuál modelo sería el más adecuado.
+
+## Forecasting 
+
+Con el modelo estimado, pronostique $n_{new}=$ 8 (2 años) valores futuros (obtenga
+intervalos de predicción).
