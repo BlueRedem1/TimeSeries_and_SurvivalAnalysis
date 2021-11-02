@@ -311,4 +311,11 @@ Value Imputation by Mean Value. Acepta los siguientes métodos:
 Missing Value Imputation by Random Sample
 \end{enumerate}
 
+Vamos a poner los datos como NA:
+```{r}
+Serie_2=Serie
+Serie_2[29]=NA
+Serie_2[38:39]=NA
+Serie_2
+```
 
