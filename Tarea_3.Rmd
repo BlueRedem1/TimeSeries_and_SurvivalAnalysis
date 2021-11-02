@@ -247,6 +247,16 @@ datos faltantes NA, es decir, sustituya estas observaciones por NA.
 Use al menos dos métodos de imputación de la paqueteríaa imputeTS. ¿Cuál método es
 adecuado para estos datos? (Note que el valor imputado debe aproximarse al valor omitido).
 
+Vamos a poner los datos que se piden, como NA:
+```{r}
+Serie_2=Serie
+Serie_2[29]=NA
+Serie_2[38:39]=NA
+Serie_2
+```
+
+Ahora, veamos método por método:
+
 Un vistazo a la documentación de la paquetería mencionada nos menciona los siguientes 
 métodos:
 
@@ -256,10 +266,20 @@ métodos:
 Missing Value Imputation by Interpolation. Acepta 3 tipos:
 \begin{enumerate}
 \item "linear" - for linear interpolation using approx (default choice)
+```{r}
+na_interpolation(Serie_2,option='linear')
+```
 
 \item "spline" - for spline interpolation using spline
+```{r}
+na_interpolation(Serie_2,option='spline')
+```
 
 \item "stine" - for Stineman interpolation using stinterp
+```{r}
+na_interpolation(Serie_2,option='stine')
+```
+
 \end{enumerate}
 
 \item na_kalman:
@@ -267,8 +287,14 @@ Missing Value Imputation by Interpolation. Acepta 3 tipos:
 Missing Value Imputation by Kalman Smoothing and State Space Models. Acepta los suientes modelos:
 \begin{enumerate}
 \item "auto.arima" - For using the state space representation of arima model (using auto.arima) (default choice)
+```{r}
+na_kalman(Serie_2,model='auto.arima')
+```
 
 \item "StructTS" - For using a structural model fitted by maximum likelihood (using StructTS)
+```{r}
+na_kalman(Serie_2,model='StructTS')
+```
 \end{enumerate}
 \item na_locf:
 
@@ -276,8 +302,15 @@ Missing Value Imputation by Last Observation Carried Forward. Acepta los siguien
 \begin{enumerate}
 
 \item "locf" - for Last Observation Carried Forward (default choice)
+```{r}
+na_locf(Serie_2,option = 'locf')
+```
 
 \item "nocb" - for Next Observation Carried Backward
+```{r}
+na_locf(Serie_2,option = 'nocb')
+```
+
 \end{enumerate}
 
 \item na_ma	Missing:
@@ -285,10 +318,18 @@ Missing Value Imputation by Last Observation Carried Forward. Acepta los siguien
 Value Imputation by Weighted Moving Average. Acepta los siguientes métodos:
 \begin{enumerate}
 \item "simple" - Simple Moving Average (SMA)
+```{r}
+na_ma(Serie_2,weighting = 'simple')
+```
 
 \item "linear" - Linear Weighted Moving Average (LWMA)
-
+```{r}
+na_ma(Serie_2,weighting = 'linear')
+```
 \item "exponential" - Exponential Weighted Moving Average (EWMA) (default choice)
+```{r}
+na_ma(Serie_2,weighting = 'exponential')
+```
 \end{enumerate}
 
 \item na_mean	Missing:
@@ -296,26 +337,93 @@ Value Imputation by Weighted Moving Average. Acepta los siguientes métodos:
 Value Imputation by Mean Value. Acepta los siguientes métodos:
 \begin{enumerate}
 \item "mean" - take the mean for imputation (default choice)
-
+```{r}
+na_mean(Serie_2,option = 'mean')
+```
 \item "median" - take the median for imputation
-
+```{r}
+na_mean(Serie_2,option = 'median')
+```
 \item "mode" - take the mode for imputation
-
+```{r}
+na_mean(Serie_2,option = 'mode')
+```
 \item "harmonic" - take the harmonic mean
-
+```{r}
+na_mean(Serie_2,option = 'harmonic')
+```
 \item "geometric" - take the geometric mean
+```{r}
+na_mean(Serie_2,option = 'geometric')
+```
 \end{enumerate}
 
 \item na_random:
 
 Missing Value Imputation by Random Sample
-\end{enumerate}
-
-Vamos a poner los datos como NA:
 ```{r}
-Serie_2=Serie
-Serie_2[29]=NA
-Serie_2[38:39]=NA
-Serie_2
+na_random(Serie_2)
 ```
+
+\item na_seadec:
+
+Seasonally Decomposed Missing Value Imputation. Admite los siguiente métodos:
+\begin{enumerate}
+\item "interpolation" - Imputation by Interpolation (default choice)
+```{r}
+na_seadec(Serie_2,algorithm = 'interpolation')
+```
+
+\item "locf" - Imputation by Last Observation Carried Forward
+```{r}
+na_seadec(Serie_2,algorithm = 'locf')
+```
+\item "mean" - Imputation by Mean Value
+```{r}
+na_seadec(Serie_2,algorithm = 'mean')
+```
+\item "random" - Imputation by Random Sample
+```{r}
+na_seadec(Serie_2,algorithm = 'random')
+```
+\item "kalman" - Imputation by Kalman Smoothing and State Space Models
+```{r}
+na_seadec(Serie_2,algorithm = 'kalman')
+```
+\item "ma" - Imputation by Weighted Moving Average
+```{r}
+na_seadec(Serie_2,algorithm = 'ma')
+```
+\end{enumerate}
+\item na_seasplit:
+
+Seasonally Splitted Missing Value Imputation. Admite los siguiente métodos:
+\begin{enumerate}
+\item "interpolation" - Imputation by Interpolation (default choice)
+```{r}
+na_seasplit(Serie_2,algorithm = 'interpolation')
+```
+
+\item "locf" - Imputation by Last Observation Carried Forward
+```{r}
+na_seasplit(Serie_2,algorithm = 'locf')
+```
+\item "mean" - Imputation by Mean Value
+```{r}
+na_seasplit(Serie_2,algorithm = 'mean')
+```
+\item "random" - Imputation by Random Sample
+```{r}
+na_seasplit(Serie_2,algorithm = 'random')
+```
+\item "kalman" - Imputation by Kalman Smoothing and State Space Models
+```{r}
+na_seasplit(Serie_2,algorithm = 'kalman')
+```
+\item "ma" - Imputation by Weighted Moving Average
+```{r}
+na_seasplit(Serie_2,algorithm = 'ma')
+```
+\end{enumerate}
+\end{enumerate}
 
