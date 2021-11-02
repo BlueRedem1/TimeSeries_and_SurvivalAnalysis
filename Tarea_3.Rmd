@@ -21,7 +21,7 @@ librería; así como otras necesarias para esta tarea.
 ```{r,message=FALSE}
 library(tsdl);library(ggplot2);library(itsmr);library(forecast);library(TSA);library(lmtest)
 library(timeSeries);library(timeSeries);library(astsa);
-library(tseries);library(forecast);library(nortest);library(dplyr)
+library(tseries);library(forecast);library(nortest);library(dplyr);library(imputeTS)
 ```
 
 Cargamos la base de datos, nos aseguramos de que es la deseada.
@@ -238,3 +238,77 @@ legend("bottomright", col = c("darkblue","green"), lty = 1, lwd = 2, bty = "n",
 ```
 
 ¡Logramos identificar los componentes de la serie!
+
+## Missing data
+
+Suponga que las observaciones de 1971 Qtr1, 1973 Qtr2 y 1973 Qtr3, son
+datos faltantes NA, es decir, sustituya estas observaciones por NA.
+
+Use al menos dos métodos de imputación de la paqueteríaa imputeTS. ¿Cuál método es
+adecuado para estos datos? (Note que el valor imputado debe aproximarse al valor omitido).
+
+Un vistazo a la documentación de la paquetería mencionada nos menciona los siguientes 
+métodos:
+
+\begin{enumerate}
+\item na_interpolation:
+
+Missing Value Imputation by Interpolation. Acepta 3 tipos:
+\begin{enumerate}
+\item "linear" - for linear interpolation using approx (default choice)
+
+\item "spline" - for spline interpolation using spline
+
+\item "stine" - for Stineman interpolation using stinterp
+\end{enumerate}
+
+\item na_kalman:
+
+Missing Value Imputation by Kalman Smoothing and State Space Models. Acepta los suientes modelos:
+\begin{enumerate}
+\item "auto.arima" - For using the state space representation of arima model (using auto.arima) (default choice)
+
+\item "StructTS" - For using a structural model fitted by maximum likelihood (using StructTS)
+\end{enumerate}
+\item na_locf:
+
+Missing Value Imputation by Last Observation Carried Forward. Acepta los siguientes métodos:
+\begin{enumerate}
+
+\item "locf" - for Last Observation Carried Forward (default choice)
+
+\item "nocb" - for Next Observation Carried Backward
+\end{enumerate}
+
+\item na_ma	Missing:
+
+Value Imputation by Weighted Moving Average. Acepta los siguientes métodos:
+\begin{enumerate}
+\item "simple" - Simple Moving Average (SMA)
+
+\item "linear" - Linear Weighted Moving Average (LWMA)
+
+\item "exponential" - Exponential Weighted Moving Average (EWMA) (default choice)
+\end{enumerate}
+
+\item na_mean	Missing:
+
+Value Imputation by Mean Value. Acepta los siguientes métodos:
+\begin{enumerate}
+\item "mean" - take the mean for imputation (default choice)
+
+\item "median" - take the median for imputation
+
+\item "mode" - take the mode for imputation
+
+\item "harmonic" - take the harmonic mean
+
+\item "geometric" - take the geometric mean
+\end{enumerate}
+
+\item na_random:
+
+Missing Value Imputation by Random Sample
+\end{enumerate}
+
+
