@@ -249,6 +249,9 @@ adecuado para estos datos? (Note que el valor imputado debe aproximarse al valor
 
 Vamos a poner los datos que se piden, como NA:
 ```{r}
+Datos_a_comparar=Serie[29]
+Datos_a_comparar[2]=Serie[38]
+Datos_a_comparar[3]=Serie[39]
 Serie_2=Serie
 Serie_2[29]=NA
 Serie_2[38:39]=NA
@@ -267,7 +270,11 @@ Missing Value Imputation by Interpolation. Acepta 3 tipos:
 \begin{enumerate}
 \item "linear" - for linear interpolation using approx (default choice)
 ```{r}
-na_interpolation(Serie_2,option='linear')
+Comparaciones=data.frame(Datos_a_comparar)
+na_interpolation_lineal=na_interpolation(Serie_2,option='linear')[29]-Datos_a_comparar[1]
+na_interpolation_lineal[2:3]=na_interpolation(Serie_2,option='linear')[38:39]-Datos_a_comparar[2:3]
+Comparaciones['na_interpolation_lineal']=na_interpolation_lineal
+Comparaciones
 ```
 
 \item "spline" - for spline interpolation using spline
