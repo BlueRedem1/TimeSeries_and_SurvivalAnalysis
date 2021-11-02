@@ -1,0 +1,240 @@
+---
+title: "Tarea_3"
+author: "Cuéllar, E. Tapia, J. Maciel, J. Saldaña, R. Miranda, G"
+date: "11/1/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Analizar los datos Quarterly U.S. new plant/equip. expenditures 64 76 billions de la liberia
+tsdl de R.
+
+## Análisis descriptivo.
+Grafique los datos, describa lo que observe (varianza constante o no
+constante, descomposición clásica, tendencia, ciclos estacionales, periodicidad de los ciclos).
+
+Primero carguemos la librería tsdl, ya que los datos necesarios se encuentran en dicha
+librería; así como otras necesarias para esta tarea.
+```{r,message=FALSE}
+library(tsdl);library(ggplot2);library(itsmr);library(forecast);library(TSA);library(lmtest)
+library(timeSeries);library(timeSeries);library(astsa);
+library(tseries);library(forecast);library(nortest);library(dplyr)
+```
+
+Cargamos la base de datos, nos aseguramos de que es la deseada.
+```{r}
+Data <- tsdl[[12]]
+attributes(Data)
+```
+Ahora que noa aseguramos de que es la base que queriamos, procedemos a graficar:
+```{r}
+plot(Data, main = "Quarterly U.S. new plant/equip. expenditures \n 64 76 billions")
+```
+### Varianza
+Al menos de manera gráfica, la intuición nos dice que no hay varianza constante, pero
+probémoslo con un test de homocedasticidad:
+```{r}
+#Los pasamos a series de tiempo
+Serie<-ts(data=Data,start=c(1964,01),end=c(1976,4),frequency=4)
+tiempo<-seq(1964+0/4, 1976+3/4, by = 1/4)
+bptest(Serie~tiempo)
+```
+
+Efectivamente, no pasa el test de homocedasticidad. 
+
+Veamos qué pasa si aplicamos la transformación logaritmo:
+```{r}
+bptest(log(Serie)~tiempo)
+plot(log(Serie))
+```
+Tampoco ayudó, aunque mejoró un poco. Intentemos con la raíz cuadrada
+```{r}
+bptest(sqrt(Serie)~tiempo)
+plot(sqrt(Serie))
+```
+¡Logramos estabilizarla!
+
+Veamos si es estacionaria.
+```{r}
+adf.test(sqrt(Serie))
+kpss.test(sqrt(Serie))
+```
+### Tendencia
+
+Podemos observar una tendencia creciente que se presenta de manera lineal (al parecer), 
+de manera general a lo largo de la serie
+
+### Ciclos estacionales
+
+Los ciclos están bastante marcados , y tiene sentido puesto que son los datos 
+de gastos de una empresa en maquinaria por trimestre, y en ese contexto es 
+lógico que se presenten ciclos: Generalmente decae del último trimestre del año anterior 
+al primero del año siguiente, para después  crecer en el segundo semestre, en el tercero 
+se mantiene casi al mismo nivel que el segundo, pero en el último aumenta; y es un
+comportamiento que se repite año con año
+
+### Periodicidad de los ciclos
+
+Como comentamos en el apartado anterior, parece (al menos de manera gráfica) que se
+tienen ciclos anuales.
+
+### Descomposición clásica
+
+Descomponeremos la serie por medio de filtros lineales:
+
+#### Estabilización de la varianza
+
+Aplicamos la transformación raíz cuadrada
+```{r}
+Serie_sq<-sqrt(Serie)
+bptest(Serie_sq~tiempo)
+```
+Podemos asumir varianza constante
+
+#### Periodicidad de ciclos
+
+```{r}
+#Veamos la tendencia y los ciclos 
+Xt = Serie_sq
+p = periodogram(Xt, main="Periodograma", col=4) # Obtenemos el periodograma
+
+names(p)
+
+# Ordenamos de mayor a menor las estimaciones del periodograma.
+spec = sort(p$spec, decreasing = TRUE) 
+(spec = spec[1:10]) # Nos quedamos con los 8 coeficientes de mayor frecuencia.
+i = match(spec, p$spec) # Buscamos sus indices en el periodograma.
+d = p$freq # Vemos las frecuencias del periodograma.
+d = d[i] # Nos quedamos con las frecuencias que nos interesan.
+
+cbind(spec,d,i)#
+d = 1 / d # Obtenemos los parametros para utilizar en promedios moviles.
+d = floor(d) #
+(d = sort(d))
+# Quitamos los periodos mas grandes
+d = d[-length(d)] 
+d = d[-length(d)]
+# Quitamos el más pequeño
+d = d[-1]
+d #Posibles periodos del ciclo 
+
+#Realizamos la grafica:
+col = c("dodgerblue1", "darkorange1", "brown")
+plot(Serie_sq, lwd = 3, xlab = "Tiempo", col = "gray0",
+     main = "Serie con varianza Homocedastica",
+     ylab = "Numero", col.main = "burlywood")
+for (i in 1:3) {
+  lines(tiempo, stats::filter(Serie_sq, rep(1 / d[i], d[i])), col = col[i], 
+        lwd = 3)
+}
+legend("bottomright", col = col, lty = 2, lwd = 2, bty = "n",
+       legend = c(paste("d = ", d[1]), paste("d = ", d[2]),
+                  paste("d = ", d[3])), cex = 1)
+
+```
+Notemos que $d=2$ parece sobreajustar un poco nuestra gráfica, de hecho, bastante. 
+Sin embargo, con $d=4$ podemos obtener un buen suavizamiento sin pagar el costo de 
+otros $2$ datos al elegir $d=6$. Veamos el ACF y PACF:
+
+```{r}
+tsdisplay(Serie_sq)
+```
+Y, junto con este último resultado, nos parece ideal concluir que el ciclo es $d=4$
+
+### Tendencia
+
+Ahora, aislemos la tendencia:
+
+```{r}
+tendencia = stats::filter(Serie_sq, rep(1/4, 4))
+plot(Serie_sq, lwd = 3, xlab = "Tiempo", col = "black",
+     main = "Tendencia",
+     ylab = "Numero", col.main = "burlywood")
+lines(tendencia, col = "gold4", lwd = 4)
+legend("bottomright", col = "gold4", lty = 1, lwd = 2, bty = "n",
+       legend = "Tendencia", cex = 1)
+```
+
+Lo que refuerza lo que creíamos: Tiene tebdebcua creciente casi de manera general.
+
+#### Tendencia
+
+```{r}
+# Quitamos la tendencia
+# Solo trabajamos con la serie cuya varianza es cte. 
+
+datosSinTendencia = Serie_sq - tendencia # Serie sin tendencia
+plot(datosSinTendencia, main="Serie sin tendencia", lwd=2, ylab="", col=14)
+
+# Convertimos datosSinTendencia en objeto TS, dado que hicimos promedios moviles
+
+inicio=start(Serie_sq)
+final=end(Serie_sq)
+
+datos.ts4=ts(datosSinTendencia, frequency = 4, start=inicio,end=final) 
+which(is.na(datos.ts4)==T)
+
+par(mfrow = c(3,1))
+plot(datos.ts4, col = "slateblue4", lwd = 2, ylab = " ", type = "l",
+     main = "Serie de tiempo sin tendencia", xlab = "Tiempo")
+
+acf(datos.ts4[2:50])
+pacf(datos.ts4[2:50])
+par(mfrow = c(1,1))
+tsdisplay(datos.ts4, col="purple", lwd=2)
+```
+Parece que eliminamos la tendencia, ahora tratemos de verificar los ciclos
+
+#Ciclos o parte estacional
+ Ahora, estimaremos la parte estacional. Tenemos que d = 4.
+Originalmente contábamos con 52 datos, pero ahora tenemos 48 (por los NA), 
+entonces $\frac{48}{4}=12$ ciclos.
+```{r}
+# Creamos un ciclo promedio que estime la parte estacional,
+# usando la serie sin tendencia.
+d = 4
+k = length(datos.ts4) / d # Numero de ciclos de la serie sin tendencia
+w = rep(0, 4) 
+# Para el resto de los trimestres
+for (i in 1:4)
+  w[i] = sum(datos.ts4[d * (0:(k-1)) + i], na.rm = TRUE) / k
+
+# Ahora, ajustamos el ciclo obtenido
+ciclo  = w - mean(w)
+ciclo = ts(rep(ciclo, times = k), start = start(Serie_sq), 
+           frequency = frequency(Serie_sq))
+par(mfrow = c(1, 1))
+plot(ciclo, col =20, lwd = 3, ylab = " ", xlab = "Tiempo",
+     main = "Ciclos de la serie")# Es el ciclo de la serie 
+# Ciclos anuales
+```
+Ahora verifiquemos de manera gráfica
+
+```{r}
+# Calculamos la parte aleatoria
+parte_aleatoria = datos.ts4 - ciclo
+plot(parte_aleatoria, main = "Parte aleatoria", 
+     col =30, lwd = 3, xlab = "Tiempo", ylab = "") 
+plot(Serie_sq)
+# Con esto, ya tenemos nuestras series
+
+componentes = tendencia + ciclo+parte_aleatoria
+componentes = ts(componentes, start = start(Serie_sq), frequency = 4)
+par(mfrow = c(2,1))
+plot(Serie_sq, col=28, las=1, main="Serie con varianza constante", lwd=3, xlab="",ylab="")
+plot(componentes, col = 18, lwd = 3, las=1, main="Yt=tendencia+ciclos+aleatoria", xlab="",ylab="")
+
+par(mfrow = c(1,1))
+plot(Serie_sq,col="darkblue", las=1, lwd=3,main="Serie_ln", ylab="",xlab="")
+invisible(lines(componentes, type="l", lwd=3, col="green",lty=6))
+legend("bottomright", col = c("darkblue","green"), lty = 1, lwd = 2, bty = "n",
+       legend = c("Serie Homocedastica","Yt=T+C+A"), cex = 1)
+
+
+
+```
+
+¡Logramos identificar los componentes de la serie!
