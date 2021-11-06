@@ -1,9 +1,11 @@
+
 ---
-title: "Tarea_3"
-author: "Cuéllar, E. Tapia, J. Maciel, J. Saldaña, R. Miranda, G"
-date: "11/1/2021"
 output: pdf_document
 ---
+
+```{r pressure2, echo=FALSE, out.width = '200%'}
+knitr::include_graphics("CARATULA.PNG")
+```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
