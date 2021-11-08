@@ -518,6 +518,52 @@ na_seadec_ma[2:3]=na_seasplit(Serie_2,algorithm = 'ma')[38:39]-Original[2:3]
 Comparaciones['na_seadec_ma']=na_seadec_ma
 ```
 
+En el dataframe Comparaciones, lo que hacemos es guardar las diferencias
+respecto a la observación original, acorde al método respectivo de ajuste.
+
+Veamos cuál es el que minimiza dicho error:
+```{r}
+Qr1_1971<-Comparaciones[1,]
+Qr2_1973<-Comparaciones[2,]
+Qr3_1973<-Comparaciones[3,]
+
+#Para el primer trimiestre de 1971
+dif_minima_Qr1_1971<-min(abs(Qr1_1971))
+dif_minima_Qr1_1971
+metodo_minimiza_Qr1_1971<-which.min(abs(Qr1_1971))
+metodo_minimiza_Qr1_1971
+#Los 5 mejores
+aux_indices1<-(sort.list(abs(Qr1_1971)))[1:5]
+i=1
+for (indice in aux_indices1){
+  print(Qr1_1971[indice])
+  i=i+1
+}
+#Para el segundo trimiestre de 1973
+dif_minima_Qr2_1973<-min(abs(Qr2_1973))
+dif_minima_Qr2_1973
+metodo_minimiza_Qr2_1973<-which.min(abs(Qr2_1973))
+metodo_minimiza_Qr2_1973
+#Los 5 mejores
+aux_indices2<-(sort.list(abs(Qr2_1973)))[1:5]
+i=1
+for (indice in aux_indices2){
+  print(Qr2_1973[indice])
+  i=i+1
+}
+#Para el tercer trimiestre de 1973
+dif_minima_Qr3_1973<-min(abs(Qr3_1973))
+dif_minima_Qr3_1973
+metodo_minimiza_Qr3_1973<-which.min(abs(Qr3_1973))
+metodo_minimiza_Qr3_1973
+#Los 5 mejores
+aux_indices3<-(sort.list(abs(Qr3_1973)))[1:5]
+i=1
+for (indice in aux_indices3){
+  print(Qr2_1973[indice])
+  i=i+1
+}
+```
 
 ## Ajuste
 
