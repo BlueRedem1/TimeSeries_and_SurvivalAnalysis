@@ -279,7 +279,6 @@ Comparaciones=data.frame(Original)
 na_interpolation_lineal=na_interpolation(Serie_2,option='linear')[29]-Original[1]
 na_interpolation_lineal[2:3]=na_interpolation(Serie_2,option='linear')[38:39]-Original[2:3]
 Comparaciones['na_interpolation_lineal']=na_interpolation_lineal
-Comparaciones
 ```
 
 
@@ -289,7 +288,6 @@ na_interpolation(Serie_2,option='spline')
 na_interpolation_spline=na_interpolation(Serie_2,option='spline')[29]-Original[1]
 na_interpolation_spline[2:3]=na_interpolation(Serie_2,option='spline')[38:39]-Original[2:3]
 Comparaciones['na_interpolation_spline']=na_interpolation_spline
-Comparaciones
 ```
 
  "stine" - for Stineman interpolation using stinterp
@@ -298,7 +296,6 @@ na_interpolation(Serie_2,option='stine')
 na_interpolation_stine=na_interpolation(Serie_2,option='stine')[29]-Original[1]
 na_interpolation_stine[2:3]=na_interpolation(Serie_2,option='stine')[38:39]-Original[2:3]
 Comparaciones['na_interpolation_stine']=na_interpolation_stine
-Comparaciones
 ```
 
 
@@ -310,16 +307,16 @@ Missing Value Imputation by Kalman Smoothing and State Space Models. Acepta los 
  "auto.arima" - For using the state space representation of arima model (using auto.arima) (default choice)
 ```{r}
 na_kalman(Serie_2,model='auto.arima')
-na_kalman_auto.arima=auto.arima(Serie_2,option='auto.arima')[29]-Original[1]
-na_kalman_auto.arima[2:3]=auto.arima(Serie_2,option='auto.arima')[38:39]-Original[2:3]
+na_kalman_auto.arima=na_kalman(Serie_2,model ='auto.arima')[29]-Original[1]
+na_kalman_auto.arima[2:3]=na_kalman(Serie_2,model='auto.arima')[38:39]-Original[2:3]
 Comparaciones['na_kalman_auto.arima']=na_kalman_auto.arima
 ```
 
  "StructTS" - For using a structural model fitted by maximum likelihood (using StructTS)
 ```{r}
 na_kalman(Serie_2,model='StructTS')
-na_kalman_StructTS=na_interpolation(Serie_2,option='StructTS')[29]-Original[1]
-na_kalman_StructTS[2:3]=na_interpolation(Serie_2,option='StructTS')[38:39]-Original[2:3]
+na_kalman_StructTS=na_kalman(Serie_2,model='StructTS')[29]-Original[1]
+na_kalman_StructTS[2:3]=na_kalman(Serie_2,model='StructTS')[38:39]-Original[2:3]
 Comparaciones['na_StructTS']=na_kalman_StructTS
 ```
 
@@ -331,16 +328,16 @@ Missing Value Imputation by Last Observation Carried Forward. Acepta los siguien
  "locf" - for Last Observation Carried Forward (default choice)
 ```{r}
 na_locf(Serie_2,option = 'locf')
-na_locf=na_interpolation(Serie_2,option='locf')[29]-Original[1]
-na_locf[2:3]=na_interpolation(Serie_2,option='locf')[38:39]-Original[2:3]
+na_locf=na_locf(Serie_2,option='locf')[29]-Original[1]
+na_locf[2:3]=na_locf(Serie_2,option='locf')[38:39]-Original[2:3]
 Comparaciones['na_locf']=na_locf
 ```
 
  "nocb" - for Next Observation Carried Backward
 ```{r}
 na_locf(Serie_2,option = 'nocb')
-na_locf_nocb=na_interpolation(Serie_2,option='nocb')[29]-Original[1]
-na_locf_nocb[2:3]=na_interpolation(Serie_2,option='nocb')[38:39]-Original[2:3]
+na_locf_nocb=na_locf(Serie_2,option='nocb')[29]-Original[1]
+na_locf_nocb[2:3]=na_locf(Serie_2,option='nocb')[38:39]-Original[2:3]
 Comparaciones['na_locf_nocb']=na_locf_nocb
 ```
 
@@ -353,8 +350,8 @@ Value Imputation by Weighted Moving Average. Acepta los siguientes métodos:
  "simple" - Simple Moving Average (SMA)
 ```{r}
 na_ma(Serie_2,weighting = 'simple')
-na_ma_simple=na_interpolation(Serie_2,option='simple')[29]-Original[1]
-na_ma_simple[2:3]=na_interpolation(Serie_2,option='simple')[38:39]-Original[2:3]
+na_ma_simple=na_ma(Serie_2,weighting='simple')[29]-Original[1]
+na_ma_simple[2:3]=na_ma(Serie_2,weighting='simple')[38:39]-Original[2:3]
 Comparaciones['na_ma_simple']=na_ma_simple
 ```
 
@@ -368,6 +365,9 @@ Comparaciones['na_ma_linear']=na_ma_linear
  "exponential" - Exponential Weighted Moving Average (EWMA) (default choice)
 ```{r}
 na_ma(Serie_2,weighting = 'exponential')
+na_ma_exponential=na_ma(Serie_2,weighting='exponential')[29]-Original[1]
+na_ma_exponential[2:3]=na_ma(Serie_2,weighting='exponential')[38:39]-Original[2:3]
+Comparaciones['na_exponential']=na_ma_exponential
 ```
 
 
@@ -378,22 +378,37 @@ Value Imputation by Mean Value. Acepta los siguientes métodos:
  "mean" - take the mean for imputation (default choice)
 ```{r}
 na_mean(Serie_2,option = 'mean')
+na_mean=na_mean(Serie_2,option='mean')[29]-Original[1]
+na_mean[2:3]=na_mean(Serie_2,option='mean')[38:39]-Original[2:3]
+Comparaciones['na_mean']=na_mean
 ```
  "median" - take the median for imputation
 ```{r}
 na_mean(Serie_2,option = 'median')
+na_mean_median=na_mean(Serie_2,option='median')[29]-Original[1]
+na_mean_median[2:3]=na_mean(Serie_2,option='median')[38:39]-Original[2:3]
+Comparaciones['na_mean_median']=na_interpolation_lineal
 ```
  "mode" - take the mode for imputation
 ```{r}
 na_mean(Serie_2,option = 'mode')
+na_mean_mode=na_mean(Serie_2,option='mode')[29]-Original[1]
+na_mean_mode[2:3]=na_mean(Serie_2,option='mode')[38:39]-Original[2:3]
+Comparaciones['na_mean_mode']=na_mean_mode
 ```
  "harmonic" - take the harmonic mean
 ```{r}
 na_mean(Serie_2,option = 'harmonic')
+na_mean_harmonic=na_mean(Serie_2,option='harmonic')[29]-Original[1]
+na_mean_harmonic[2:3]=na_mean(Serie_2,option='harmonic')[38:39]-Original[2:3]
+Comparaciones['na_mean_harmonic']=na_mean_harmonic
 ```
  "geometric" - take the geometric mean
 ```{r}
 na_mean(Serie_2,option = 'geometric')
+na_mean_geometric=na_mean(Serie_2,option='geometric')[29]-Original[1]
+na_mean_geometric[2:3]=na_mean(Serie_2,option='geometric')[38:39]-Original[2:3]
+Comparaciones['na_mean_geometric']=na_mean_geometric
 ```
 
 
@@ -402,6 +417,9 @@ na_mean(Serie_2,option = 'geometric')
 Missing Value Imputation by Random Sample
 ```{r}
 na_random(Serie_2)
+na_random=na_random(Serie_2)[29]-Original[1]
+na_random[2:3]=na_random(Serie_2)[38:39]-Original[2:3]
+Comparaciones['na_random']=na_random
 ```
 
  na\_seadec:
@@ -411,27 +429,45 @@ Seasonally Decomposed Missing Value Imputation. Admite los siguiente métodos:
  "interpolation" - Imputation by Interpolation (default choice)
 ```{r}
 na_seadec(Serie_2,algorithm = 'interpolation')
+na_seadec_interpolation=na_seadec(Serie_2,algorithm='interpolation')[29]-Original[1]
+na_seadec_interpolation[2:3]=na_seadec(Serie_2,algorithm='interpolation')[38:39]-Original[2:3]
+Comparaciones['na_seadec_interpolation']=na_seadec_interpolation
 ```
 
  "locf" - Imputation by Last Observation Carried Forward
 ```{r}
 na_seadec(Serie_2,algorithm = 'locf')
+na_seadec_locf=na_seadec(Serie_2,algorithm='locf')[29]-Original[1]
+na_seadec_locf[2:3]=na_seadec(Serie_2,algorithm='locf')[38:39]-Original[2:3]
+Comparaciones['na_seadec_locf']=na_seadec_locf
 ```
  "mean" - Imputation by Mean Value
 ```{r}
 na_seadec(Serie_2,algorithm = 'mean')
+na_seadec_mean=na_seadec(Serie_2,algorithm = 'mean')[29]-Original[1]
+na_seadec_mean[2:3]=na_seadec(Serie_2,algorithm = 'mean')[38:39]-Original[2:3]
+Comparaciones['na_seadec_mean']=na_seadec_mean
 ```
  "random" - Imputation by Random Sample
 ```{r}
 na_seadec(Serie_2,algorithm = 'random')
+na_seadec_random=na_seadec(Serie_2,algorithm = 'random')[29]-Original[1]
+na_seadec_random[2:3]=na_seadec(Serie_2,algorithm = 'random')[38:39]-Original[2:3]
+Comparaciones['na_seadec_random']=na_seadec_random
 ```
  "kalman" - Imputation by Kalman Smoothing and State Space Models
 ```{r}
 na_seadec(Serie_2,algorithm = 'kalman')
+na_seadec_kalman=na_seadec(Serie_2,algorithm = 'kalman')[29]-Original[1]
+na_seadec_kalman[2:3]=na_seadec(Serie_2,algorithm = 'kalman')[38:39]-Original[2:3]
+Comparaciones['na_seadec_kalman']=na_seadec_kalman
 ```
  "ma" - Imputation by Weighted Moving Average
 ```{r}
 na_seadec(Serie_2,algorithm = 'ma')
+na_seadec_ma=na_seadec(Serie_2,algorithm = 'ma')[29]-Original[1]
+na_seadec_ma[2:3]=na_seadec(Serie_2,algorithm = 'ma')[38:39]-Original[2:3]
+Comparaciones['na_seadec_ma']=na_seadec_ma
 ```
 
  na\_seasplit:
@@ -441,27 +477,45 @@ Seasonally Splitted Missing Value Imputation. Admite los siguiente métodos:
  "interpolation" - Imputation by Interpolation (default choice)
 ```{r}
 na_seasplit(Serie_2,algorithm = 'interpolation')
+na_seasplit_interpolation=na_seasplit(Serie_2,algorithm = 'interpolation')[29]-Original[1]
+na_seasplit_interpolation[2:3]=na_seasplit(Serie_2,algorithm = 'interpolation')[38:39]-Original[2:3]
+Comparaciones['na_seadec_interpolation']=na_seasplit_interpolation
 ```
 
  "locf" - Imputation by Last Observation Carried Forward
 ```{r}
 na_seasplit(Serie_2,algorithm = 'locf')
+na_seadec_locf=na_seasplit(Serie_2,algorithm = 'locf')[29]-Original[1]
+na_seadec_locf[2:3]=na_seasplit(Serie_2,algorithm = 'locf')[38:39]-Original[2:3]
+Comparaciones['na_seadec_locf']=na_seadec_locf
 ```
  "mean" - Imputation by Mean Value
 ```{r}
 na_seasplit(Serie_2,algorithm = 'mean')
+na_seadec_mean=na_seasplit(Serie_2,algorithm = 'mean')[29]-Original[1]
+na_seadec_mean[2:3]=na_seasplit(Serie_2,algorithm = 'mean')[38:39]-Original[2:3]
+Comparaciones['na_seadec_mean']=na_seadec_mean
 ```
  "random" - Imputation by Random Sample
 ```{r}
 na_seasplit(Serie_2,algorithm = 'random')
+na_seadec_random=na_seasplit(Serie_2,algorithm = 'random')[29]-Original[1]
+na_seadec_random[2:3]=na_seasplit(Serie_2,algorithm = 'random')[38:39]-Original[2:3]
+Comparaciones['na_seadec_random']=na_seadec_random
 ```
  "kalman" - Imputation by Kalman Smoothing and State Space Models
 ```{r}
 na_seasplit(Serie_2,algorithm = 'kalman')
+na_seadec_kalman=na_seasplit(Serie_2,algorithm = 'kalman')[29]-Original[1]
+na_seadec_kalman[2:3]=na_seasplit(Serie_2,algorithm = 'kalman')[38:39]-Original[2:3]
+Comparaciones['na_seadec_kalman']=na_seadec_kalman
 ```
  "ma" - Imputation by Weighted Moving Average
 ```{r}
 na_seasplit(Serie_2,algorithm = 'ma')
+na_seadec_ma=na_seasplit(Serie_2,algorithm = 'ma')[29]-Original[1]
+na_seadec_ma[2:3]=na_seasplit(Serie_2,algorithm = 'ma')[38:39]-Original[2:3]
+Comparaciones['na_seadec_ma']=na_seadec_ma
 ```
 
 
