@@ -3,7 +3,7 @@
 output: pdf_document
 ---
 
-```{r pressure2, echo=FALSE, out.width = '200%'}
+```{r pressure2, echo=FALSE, out.width = '210%'}
 knitr::include_graphics("CARATULA.PNG")
 ```
 
@@ -11,6 +11,7 @@ knitr::include_graphics("CARATULA.PNG")
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+\newpage
 Analizar los datos Quarterly U.S. new plant/equip. expenditures 64 76 billions de la liberia
 tsdl de R.
 
@@ -266,12 +267,12 @@ Ahora, veamos método por método:
 Un vistazo a la documentación de la paquetería mencionada nos menciona los siguientes 
 métodos:
 
-\begin{enumerate}
-\item na\_interpolation:
+
+ na\_interpolation:
 
 Missing Value Imputation by Interpolation. Acepta 3 tipos:
-\begin{enumerate}
-\item "linear" - for linear interpolation using approx (default choice)
+
+ "linear" - for linear interpolation using approx (default choice)
 
 ```{r}
 Comparaciones=data.frame(Original)
@@ -281,162 +282,162 @@ Comparaciones['na_interpolation_lineal']=na_interpolation_lineal
 Comparaciones
 ```
 
-\item "spline" - for spline interpolation using spline
+
+ "spline" - for spline interpolation using spline
 ```{r}
 na_interpolation(Serie_2,option='spline')
 ```
 
-\item "stine" - for Stineman interpolation using stinterp
+ "stine" - for Stineman interpolation using stinterp
 ```{r}
 na_interpolation(Serie_2,option='stine')
 ```
 
-\end{enumerate}
 
-\item na\_kalman:
+
+ na\_kalman:
 
 Missing Value Imputation by Kalman Smoothing and State Space Models. Acepta los suientes modelos:
 \begin{enumerate}
-\item "auto.arima" - For using the state space representation of arima model (using auto.arima) (default choice)
+ "auto.arima" - For using the state space representation of arima model (using auto.arima) (default choice)
 ```{r}
 na_kalman(Serie_2,model='auto.arima')
 ```
 
-\item "StructTS" - For using a structural model fitted by maximum likelihood (using StructTS)
+ "StructTS" - For using a structural model fitted by maximum likelihood (using StructTS)
 ```{r}
 na_kalman(Serie_2,model='StructTS')
 ```
-\end{enumerate}
-\item na\_locf:
+
+ na\_locf:
 
 Missing Value Imputation by Last Observation Carried Forward. Acepta los siguientes métodos:
-\begin{enumerate}
 
-\item "locf" - for Last Observation Carried Forward (default choice)
+
+ "locf" - for Last Observation Carried Forward (default choice)
 ```{r}
 na_locf(Serie_2,option = 'locf')
 ```
 
-\item "nocb" - for Next Observation Carried Backward
+ "nocb" - for Next Observation Carried Backward
 ```{r}
 na_locf(Serie_2,option = 'nocb')
 ```
 
-\end{enumerate}
 
-\item na\_ma	Missing:
+
+ na\_ma	Missing:
 
 Value Imputation by Weighted Moving Average. Acepta los siguientes métodos:
-\begin{enumerate}
-\item "simple" - Simple Moving Average (SMA)
+
+ "simple" - Simple Moving Average (SMA)
 ```{r}
 na_ma(Serie_2,weighting = 'simple')
 ```
 
-\item "linear" - Linear Weighted Moving Average (LWMA)
+ "linear" - Linear Weighted Moving Average (LWMA)
 ```{r}
 na_ma(Serie_2,weighting = 'linear')
 ```
-\item "exponential" - Exponential Weighted Moving Average (EWMA) (default choice)
+ "exponential" - Exponential Weighted Moving Average (EWMA) (default choice)
 ```{r}
 na_ma(Serie_2,weighting = 'exponential')
 ```
-\end{enumerate}
 
-\item na\_mean	Missing:
+
+ na\_mean	Missing:
 
 Value Imputation by Mean Value. Acepta los siguientes métodos:
-\begin{enumerate}
-\item "mean" - take the mean for imputation (default choice)
+
+ "mean" - take the mean for imputation (default choice)
 ```{r}
 na_mean(Serie_2,option = 'mean')
 ```
-\item "median" - take the median for imputation
+ "median" - take the median for imputation
 ```{r}
 na_mean(Serie_2,option = 'median')
 ```
-\item "mode" - take the mode for imputation
+ "mode" - take the mode for imputation
 ```{r}
 na_mean(Serie_2,option = 'mode')
 ```
-\item "harmonic" - take the harmonic mean
+ "harmonic" - take the harmonic mean
 ```{r}
 na_mean(Serie_2,option = 'harmonic')
 ```
-\item "geometric" - take the geometric mean
+ "geometric" - take the geometric mean
 ```{r}
 na_mean(Serie_2,option = 'geometric')
 ```
-\end{enumerate}
 
-\item na\_random:
+
+ na\_random:
 
 Missing Value Imputation by Random Sample
 ```{r}
 na_random(Serie_2)
 ```
 
-\item na\_seadec:
+ na\_seadec:
 
 Seasonally Decomposed Missing Value Imputation. Admite los siguiente métodos:
-\begin{enumerate}
-\item "interpolation" - Imputation by Interpolation (default choice)
+
+ "interpolation" - Imputation by Interpolation (default choice)
 ```{r}
 na_seadec(Serie_2,algorithm = 'interpolation')
 ```
 
-\item "locf" - Imputation by Last Observation Carried Forward
+ "locf" - Imputation by Last Observation Carried Forward
 ```{r}
 na_seadec(Serie_2,algorithm = 'locf')
 ```
-\item "mean" - Imputation by Mean Value
+ "mean" - Imputation by Mean Value
 ```{r}
 na_seadec(Serie_2,algorithm = 'mean')
 ```
-\item "random" - Imputation by Random Sample
+ "random" - Imputation by Random Sample
 ```{r}
 na_seadec(Serie_2,algorithm = 'random')
 ```
-\item "kalman" - Imputation by Kalman Smoothing and State Space Models
+ "kalman" - Imputation by Kalman Smoothing and State Space Models
 ```{r}
 na_seadec(Serie_2,algorithm = 'kalman')
 ```
-\item "ma" - Imputation by Weighted Moving Average
+ "ma" - Imputation by Weighted Moving Average
 ```{r}
 na_seadec(Serie_2,algorithm = 'ma')
 ```
-\end{enumerate}
-\item na\_seasplit:
+
+ na\_seasplit:
 
 Seasonally Splitted Missing Value Imputation. Admite los siguiente métodos:
-\begin{enumerate}
-\item "interpolation" - Imputation by Interpolation (default choice)
+
+ "interpolation" - Imputation by Interpolation (default choice)
 ```{r}
 na_seasplit(Serie_2,algorithm = 'interpolation')
 ```
 
-\item "locf" - Imputation by Last Observation Carried Forward
+ "locf" - Imputation by Last Observation Carried Forward
 ```{r}
 na_seasplit(Serie_2,algorithm = 'locf')
 ```
-\item "mean" - Imputation by Mean Value
+ "mean" - Imputation by Mean Value
 ```{r}
 na_seasplit(Serie_2,algorithm = 'mean')
 ```
-\item "random" - Imputation by Random Sample
+ "random" - Imputation by Random Sample
 ```{r}
 na_seasplit(Serie_2,algorithm = 'random')
 ```
-\item "kalman" - Imputation by Kalman Smoothing and State Space Models
+ "kalman" - Imputation by Kalman Smoothing and State Space Models
 ```{r}
 na_seasplit(Serie_2,algorithm = 'kalman')
 ```
-\item "ma" - Imputation by Weighted Moving Average
+ "ma" - Imputation by Weighted Moving Average
 ```{r}
 na_seasplit(Serie_2,algorithm = 'ma')
 ```
-\end{enumerate}
-\end{enumerate}
+
 
 ## Ajuste
 
