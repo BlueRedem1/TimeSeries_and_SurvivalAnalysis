@@ -23,7 +23,7 @@ Primero carguemos la librería tsdl, ya que los datos necesarios se encuentran e
 librería; así como otras necesarias para esta tarea.
 ```{r,message=FALSE}
 library(tsdl);library(ggplot2);library(itsmr);library(forecast);library(TSA);library(lmtest)
-library(timeSeries);library(timeSeries);library(astsa);
+library(timeSeries);library(timeSeries);library(astsa);library(dygraphs);
 library(tseries);library(forecast);library(nortest);library(dplyr);library(imputeTS)
 ```
 
@@ -574,6 +574,358 @@ Obtenga correlogramas, revise si los parámetros son significativos, compruebe l
 Obtenga dos o más posibles modelos, realice análisis de residuales y calcule medidas de
 bondad de ajuste. Haga la comparación para decidir cuál modelo sería el más adecuado.
 
+
+### ¿Es estacionaria?
+
+En la primera parte vimos que si le aplicamos la transformación raíz cuadrada
+a la serie original, pasa la prueba para varianza constnte:
+```{r}
+bptest(Serie_sq~tiempo)
+```
+
+Ahora, las pruebas para estacionariedad:
+```{r}
+adf.test(Serie_sq)
+kpss.test(Serie_sq)
+```
+No las pasa.
+
+Aplicamos una diferencia
+
+```{r}
+plot(diff(Serie_sq), col = "plum", lwd = 3, xlab = "Tiempo", ylab = " ",
+     main = "Serie homoscedastica con una diferencia" )
+adf.test(diff(Serie_sq))
+kpss.test(diff(Serie_sq))
+```
+Se contradicen. Apliquemos otra diferencia
+```{r}
+plot(diff(diff(Serie_sq)), col = "plum", lwd = 3, xlab = "Tiempo", ylab = " ",
+     main = "Serie homoscedastica con dos diferencias" )
+adf.test(diff(diff(Serie_sq)))
+kpss.test(diff(diff(Serie_sq)))
+```
+Pasa las dos pruebas si aplicamos dos diferencias; trabajaremos con esa.
+
+### Correlogramas
+
+```{r}
+Serie_est<-diff(diff(Serie_sq))
+```
+
+Visualizamos ACF y PACF
+
+```{r}
+tsdisplay(Serie_est)
+```
+```{r}
+k=length(Serie_est)
+banda<-qnorm(0.95)/(sqrt(k))
+auxacf=acf(Serie_est,plot = F)#MA(6)
+ACF_superior<-sum(auxacf$acf>banda)
+ACF_inferior<-sum(auxacf$acf< -banda)
+superan_banda_acf<-ACF_superior+ACF_inferior
+superan_banda_acf
+pauxacf=pacf(Serie_est,plot = F)#AR(6)
+PACF_superior<-sum(pauxacf$acf>banda)
+PACF_inferior<-sum(pauxacf$acf< -banda)
+superan_banda_pacf<-PACF_superior+PACF_inferior
+superan_banda_pacf
+```
+Parece, a simple vista, que puede que tengamos un ARIMA(3,1,16). Sin embargo, no hemos
+considerado la parte de los ciclos aún.
+
+Veamos qué nos dice el ajuste con la función auto.arima:
+```{r}
+modelo_automatico<-auto.arima(Serie_sq)
+modelo_automatico
+```
+
+Veamos el ARIMA(3,2,16)...
+```{r}
+ARIMA<-arima(Serie_sq,order=c(16,2,3))
+ARIMA
+```
+
+Ahora veamos la gráfica
+```{r}
+ARIMA_ajuste <- (Serie_sq - residuals(ARIMA))
+ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
+points(ARIMA_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
+###Y ahora los residuales
+plot(ARIMA$residuals, type="p", col="blue", ylim=c(-0.15,0.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
+abline(h=3*(var(ARIMA$residuals)), col="purple", lwd=3)
+abline(h=-3*(var(ARIMA$residuals)), col="purple",lwd=3)
+```
+¡Tenemos muchísimos datos discrepantes!
+Estamos sobreajustando los datos
+
+Ahora atacaremos el problema con un SARIMA(p,d,q)x(P,D,Q), usando la estrategia
+definida en la página 180 de Introduction to Time Series and Forecasting de
+Peter Brockwell y Richard Davis.
+
+Por el análisis hecho en la primera parte, sabemos que:
+$$s=4$$
+
+Podemos estimar d y D como aquellos que hacen que 
+$$Y_t=(1-B)^{d}(1-B^s)^D$$
+Sea estacionaria. Probemos con d=0 y D=1
+```{r}
+plot(diff(Serie_sq,lag=4), col = "plum", lwd = 3, xlab = "Tiempo", ylab = " ",
+     main = "Serie homoscedastica con una diferencia de lag=4" )
+adf.test(diff(Serie_sq,lag=4))
+kpss.test(diff(Serie_sq,lag=4))
+```
+
+¡Las pasa! Entonces:
+$$d=0,D=1$$
+
+Trabajaremos con esta serie. Veamos su ACF y PACF
+
+```{r}
+Serie_est<-diff(Serie_sq,lag=4)
+tsdisplay(Serie_est)
+```
+¡Se ve mucho mejor que el anterior!
+
+¿Cómo elegimos P y Q?
+La metodología seguida nos dice que veamos los lags que son múltiplos del ciclo
+(de s=4), y ver aquellos que se ajustan a un ARMA(P,Q). Es decir, en los lags
+ks $s=4, k\in\mathbb{N}\setminus\{0\}$
+
+¿Cómo elegimos p y q? Debemos fijarnos en aquellos lags entre 1 y s-1, es decir:
+Nos fijaremos en los lags $1,2,3$ y los ajustaremos a un ARMA(p,q)
+
+Veamos el ACF
+```{r}
+k=length(Serie_est)
+banda<-qnorm(0.95)/(sqrt(k))
+auxacf=acf(Serie_est,plot = F)#MA(6)
+ACF_superior<-sum(auxacf$acf>banda)
+ACF_inferior<-sum(auxacf$acf< -banda)
+superan_banda_acf<-ACF_superior+ACF_inferior
+superan_banda_acf
+#Los que superan las bandas del acf son:
+which(abs(auxacf$acf) > banda)
+```
+Por lo que:
+$$q=2,Q=1$$
+
+Para el PACF:
+```{r}
+pauxacf=pacf(Serie_est,plot = F)
+PACF_superior<-sum(pauxacf$acf>banda)
+PACF_inferior<-sum(pauxacf$acf< -banda)
+superan_banda_pacf<-PACF_superior+PACF_inferior
+superan_banda_pacf
+#Los que superan las bandas del pacf son:
+which(abs(pauxacf$acf) > banda)
+```
+Por lo que:
+$$p=2, P=0$$
+Entonces tenemos un modelo 
+
+$$SARIMA(2,0,2)\times(0,1,1)_{\left[4\right]}$$
+Ajustémoslo:
+
+```{r}
+SARIMA<-arima(Serie_est,order=c(2,0,1),seasonal=list(order=c(0,1,1),period=4), include.mean=F) 
+SARIMA
+```
+
+```{r}
+SARIMA_ajuste <- Serie_sq - residuals(SARIMA)
+ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
+points(SARIMA_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
+###Y ahora los residuales
+plot(SARIMA$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
+abline(h=3*(var(SARIMA$residuals)), col="purple", lwd=2)
+abline(h=-3*(var(SARIMA$residuals)), col="purple",lwd=2)
+```
+Parece que es un buen modelo, al menos en el sentido de que ajusta bien.
+
+Comparemos con el que ajusta R:
+
+```{r}
+AUTOMATICO_ajuste <- Serie_sq - residuals(modelo_automatico)
+ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
+points(AUTOMATICO_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
+###Y ahora los residuales
+plot(modelo_automatico$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
+abline(h=3*(var(modelo_automatico$residuals)), col="purple", lwd=2)
+abline(h=-3*(var(modelo_automatico$residuals)), col="purple",lwd=2)
+```
+Al menos de manera visual, parece que el modelo que nosotros propusimos le 
+ajusta mejor. No quitaremos ningún dato debido a que hay varios datos
+discrepantes, pero por muy poco. Sin embargo, el ajuste automático llega a 
+sobreestimar un poco las observaciones. Analizemos estos dos modelos:
+
+Por el AIC y BIC
+```{r}
+AIC<-c(SARIMA$aic,ARIMA$aic,modelo_automatico$aic)
+BIC<-c(SARIMA$bic,ARIMA$bic,modelo_automatico$bic)
+loglik<-c(SARIMA$loglik,ARIMA$loglik,modelo_automatico$loglik)
+Comparar<-data.frame('AIC'=AIC,'BIC'=BIC,'Loglik'=loglik,row.names = c('SARIMA','ARIMA','Automatico'))
+Comparar
+```
+Comparemos los errores:
+```{r}
+comparar_=cbind("ARIMA",ARIMA$aic,BIC(ARIMA), mean(ARIMA$residuals),
+                mean(abs(ARIMA$residuals)),sqrt(mean((ARIMA$residuals)^2)),
+                12)
+
+comparar_2=cbind("SARIMA",SARIMA$aic,BIC(SARIMA), mean(SARIMA$residuals),
+                 mean(abs(SARIMA$residuals)),sqrt(mean((SARIMA$residuals)^2)),
+                 8)
+
+comparar_3=cbind("SARIMA con drift",modelo_automatico$aic,BIC(modelo_automatico), mean(modelo_automatico$residuals),
+                 mean(abs(modelo_automatico$residuals)),sqrt(mean((modelo_automatico$residuals)^2)),
+                 3)
+nombres=cbind("AJUSTE", "AIC", "BIC","ME","MAE", "RMSE","#Paramatros")
+
+resultados<-rbind(comparar_,comparar_2,comparar_3)
+resultados<-as.table(resultados)
+colnames(resultados)=c("AJUSTE", "AIC", "BIC","ME","MAE", "RMSE","#Parametros")
+rownames(resultados)=c("","", "")
+
+(resultados)
+```
+
+Hagamos la comprobación de supuestos:
+
+### Normalidad
+
+#### ARIMA
+```{r}
+#ARIMA
+qqnorm(ARIMA$residuals)
+qqline(ARIMA$residuals, col="red", lwd=2)
+#Prueba Anderson-Darling
+ad.test(ARIMA$residuals)
+#Prueba de Shapiro
+shapiro.test(ARIMA$residuals)
+#Jarque-Bera Test
+jarque.bera.test(ARIMA$residuals)
+```
+
+#### SARIMA
+```{r}
+#SARIMA
+qqnorm(SARIMA$residuals)
+qqline(SARIMA$residuals, col="red", lwd=2)
+#Prueba Anderson-Darling
+ad.test(SARIMA$residuals)
+#Prueba de Shapiro
+shapiro.test(SARIMA$residuals)
+#Jarque-Bera Test. tseries
+jarque.bera.test(SARIMA$residuals)
+```
+
+#### SARIMA con drift
+```{r}
+#SARIMA con drift
+qqnorm(modelo_automatico$residuals)
+qqline(modelo_automatico$residuals, col="red", lwd=2)
+#Prueba Anderson-Darling
+ad.test(modelo_automatico$residuals)
+#Prueba de Shapiro
+shapiro.test(modelo_automatico$residuals)
+#Jarque-Bera Test. tseries
+jarque.bera.test(modelo_automatico$residuals)
+```
+
+Parece que el SARIMA tiene p-values más grandes y se ajusta mejor al qq-plot.
+
+### Varianza constante
+
+#### ARIMA
+```{r}
+#ARIMA
+Y <- as.numeric(ARIMA$residuals)
+X <- 1:length(ARIMA$residuals)
+bptest(Y ~ X)
+```
+
+#### SARIMA
+```{r}
+#SARIMA
+Y <- as.numeric(SARIMA$residuals)
+X <- 1:length(SARIMA$residuals)
+bptest(Y ~ X)
+```
+
+#### SARIMA con drift
+```{r}
+#SARIMA con drift
+Y <- as.numeric(modelo_automatico$residuals)
+X <- 1:length(modelo_automatico$residuals)
+bptest(Y ~ X)
+```
+
+### Media cero 
+
+#### ARIMA
+```{r}
+t.test(ARIMA$residuals,mu=0)
+```
+#### SARIMA
+```{r}
+t.test(SARIMA$residuals,mu=0)
+```
+#### SARIMA con drift
+```{r}
+t.test(modelo_automatico$residuals,mu=0)
+```
+### Residuales no correlacionados
+
+#### ARIMA
+```{r}
+checkresiduals(ARIMA$residuals)
+ggtsdisplay(ARIMA$residuals,main="Residuales")
+#Notamos que se "sale" en muchos lags por lo que:
+#Box-Pierce test contrasta
+# Ho: Independencia vs. H1: Dependencia
+Box.test(ARIMA$residuals, lag =10) #
+#Por lo que no están relacionados de manera conjunta
+
+#De manera conjunta, con la prueba de Ljung y Box
+#H0:No estan correlacionados de manera conjunta 
+# vs 
+#H1:Estan correlacionados de manera conjunta
+tsdiag(ARIMA)
+```
+#### SARIMA
+```{r}
+checkresiduals(SARIMA$residuals)
+ggtsdisplay(SARIMA$residuals,main="Residuales")
+#Notamos que se "sale" en muchos lags por lo que:
+#Box-Pierce test contrasta
+# Ho: Independencia vs. H1: Dependencia
+Box.test(SARIMA$residuals, lag =10) #
+#Por lo que:
+
+#De manera conjunta, con la prueba de Ljung y Box
+#H0:No estan correlacionados de manera conjunta 
+# vs 
+#H1:Estan correlacionados de manera conjunta
+tsdiag(SARIMA)
+```
+#### SARIMA con drift
+```{r}
+checkresiduals(modelo_automatico$residuals)
+ggtsdisplay(modelo_automatico$residuals,main="Residuales")
+#Notamos que se "sale" en muchos lags por lo que:
+#Box-Pierce test contrasta
+# Ho: Independencia vs. H1: Dependencia
+Box.test(modelo_automatico$residuals, lag =10) #
+#Por lo que:
+
+#De manera conjunta, con la prueba de Ljung y Box
+#H0:No estan correlacionados de manera conjunta 
+# vs 
+#H1:Estan correlacionados de manera conjunta
+tsdiag(modelo_automatico)
+```
 ## Forecasting 
 
 Con el modelo estimado, pronostique $n_{new}=$ 8 (2 años) valores futuros (obtenga
