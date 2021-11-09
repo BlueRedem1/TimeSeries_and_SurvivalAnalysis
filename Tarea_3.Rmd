@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Analizar los datos Quarterly U.S. new plant/equip. expenditures 64 76 billions de la liberia
 tsdl de R.
 
-## Análisis descriptivo.
+# 1. Análisis descriptivo.
 Grafique los datos, describa lo que observe (varianza constante o no
 constante, descomposición clásica, tendencia, ciclos estacionales, periodicidad de los ciclos).
 
@@ -36,7 +36,7 @@ Ahora que noa aseguramos de que es la base que queriamos, procedemos a graficar:
 ```{r}
 plot(Data, main = "Quarterly U.S. new plant/equip. expenditures \n 64 76 billions")
 ```
-### Varianza
+## Varianza
 Al menos de manera gráfica, la intuición nos dice que no hay varianza constante, pero
 probémoslo con un test de homocedasticidad:
 ```{r}
@@ -65,12 +65,12 @@ Veamos si es estacionaria.
 adf.test(sqrt(Serie))
 kpss.test(sqrt(Serie))
 ```
-### Tendencia
+## Tendencia
 
 Podemos observar una tendencia creciente que se presenta de manera lineal (al parecer), 
 de manera general a lo largo de la serie
 
-### Ciclos estacionales
+## Ciclos estacionales
 
 Los ciclos están bastante marcados , y tiene sentido puesto que son los datos 
 de gastos de una empresa en maquinaria por trimestre, y en ese contexto es 
@@ -79,16 +79,16 @@ al primero del año siguiente, para después  crecer en el segundo semestre, en 
 se mantiene casi al mismo nivel que el segundo, pero en el último aumenta; y es un
 comportamiento que se repite año con año
 
-### Periodicidad de los ciclos
+## Periodicidad de los ciclos
 
 Como comentamos en el apartado anterior, parece (al menos de manera gráfica) que se
 tienen ciclos anuales.
 
-### Descomposición clásica
+## Descomposición clásica
 
 Descomponeremos la serie por medio de filtros lineales:
 
-#### Estabilización de la varianza
+### Estabilización de la varianza
 
 Aplicamos la transformación raíz cuadrada
 ```{r}
@@ -97,7 +97,7 @@ bptest(Serie_sq~tiempo)
 ```
 Podemos asumir varianza constante
 
-#### Periodicidad de ciclos
+### Periodicidad de ciclos
 
 ```{r}
 #Veamos la tendencia y los ciclos 
@@ -147,7 +147,7 @@ tsdisplay(Serie_sq)
 ```
 Y, junto con este último resultado, nos parece ideal concluir que el ciclo es $d=4$
 
-### Tendencia
+## Tendencia
 
 Ahora, aislemos la tendencia:
 
@@ -163,7 +163,6 @@ legend("bottomright", col = "gold4", lty = 1, lwd = 2, bty = "n",
 
 Lo que refuerza lo que creíamos: Tiene tebdebcua creciente casi de manera general.
 
-#### Tendencia
 
 ```{r}
 # Quitamos la tendencia
@@ -191,7 +190,7 @@ tsdisplay(datos.ts4, col="purple", lwd=2)
 ```
 Parece que eliminamos la tendencia, ahora tratemos de verificar los ciclos
 
-#Ciclos o parte estacional
+## Ciclos o parte estacional
  Ahora, estimaremos la parte estacional. Tenemos que d = 4.
 Originalmente contábamos con 52 datos, pero ahora tenemos 48 (por los NA), 
 entonces $\frac{48}{4}=12$ ciclos.
@@ -242,7 +241,7 @@ legend("bottomright", col = c("darkblue","green"), lty = 1, lwd = 2, bty = "n",
 
 ¡Logramos identificar los componentes de la serie!
 
-## Missing data
+# 2. Missing data
 
 Suponga que las observaciones de 1971 Qtr1, 1973 Qtr2 y 1973 Qtr3, son
 datos faltantes NA, es decir, sustituya estas observaciones por NA.
@@ -565,7 +564,7 @@ for (indice in aux_indices3){
 }
 ```
 
-## Ajuste
+# 3. Ajuste
 
 Con los datos observados completos, ajuste un modelo ARIMA o SARIMA adecuado.
 
@@ -575,7 +574,7 @@ Obtenga dos o más posibles modelos, realice análisis de residuales y calcule m
 bondad de ajuste. Haga la comparación para decidir cuál modelo sería el más adecuado.
 
 
-### ¿Es estacionaria?
+## Estacionariedad
 
 En la primera parte vimos que si le aplicamos la transformación raíz cuadrada
 a la serie original, pasa la prueba para varianza constnte:
@@ -607,7 +606,7 @@ kpss.test(diff(diff(Serie_sq)))
 ```
 Pasa las dos pruebas si aplicamos dos diferencias; trabajaremos con esa.
 
-### Correlogramas
+## Correlogramas
 
 ```{r}
 Serie_est<-diff(diff(Serie_sq))
@@ -793,9 +792,9 @@ rownames(resultados)=c("","", "")
 
 Hagamos la comprobación de supuestos:
 
-### Normalidad
+## Normalidad
 
-#### ARIMA
+### ARIMA
 ```{r}
 #ARIMA
 qqnorm(ARIMA$residuals)
@@ -808,7 +807,7 @@ shapiro.test(ARIMA$residuals)
 jarque.bera.test(ARIMA$residuals)
 ```
 
-#### SARIMA
+### SARIMA
 ```{r}
 #SARIMA
 qqnorm(SARIMA$residuals)
@@ -821,7 +820,7 @@ shapiro.test(SARIMA$residuals)
 jarque.bera.test(SARIMA$residuals)
 ```
 Apenas pasamos Anderson-Darling
-#### SARIMA con drift
+### SARIMA con drift
 ```{r}
 #SARIMA con drift
 qqnorm(modelo_automatico$residuals)
@@ -836,9 +835,9 @@ jarque.bera.test(modelo_automatico$residuals)
 
 Parece que el SARIMA tiene p-values más grandes y se ajusta mejor al qq-plot.
 
-### Varianza constante
+## Varianza constante
 
-#### ARIMA
+### ARIMA
 ```{r}
 #ARIMA
 Y <- as.numeric(ARIMA$residuals)
@@ -846,7 +845,7 @@ X <- 1:length(ARIMA$residuals)
 bptest(Y ~ X)
 ```
 
-#### SARIMA
+### SARIMA
 ```{r}
 #SARIMA
 Y <- as.numeric(SARIMA$residuals)
@@ -854,7 +853,7 @@ X <- 1:length(SARIMA$residuals)
 bptest(Y ~ X)
 ```
 
-#### SARIMA con drift
+### SARIMA con drift
 ```{r}
 #SARIMA con drift
 Y <- as.numeric(modelo_automatico$residuals)
@@ -862,23 +861,23 @@ X <- 1:length(modelo_automatico$residuals)
 bptest(Y ~ X)
 ```
 
-### Media cero 
+## Media cero 
 
-#### ARIMA
+### ARIMA
 ```{r}
 t.test(ARIMA$residuals,mu=0)
 ```
-#### SARIMA
+### SARIMA
 ```{r}
 t.test(SARIMA$residuals,mu=0)
 ```
-#### SARIMA con drift
+### SARIMA con drift
 ```{r}
 t.test(modelo_automatico$residuals,mu=0)
 ```
-### Residuales no correlacionados
+## Residuales no correlacionados
 
-#### ARIMA
+### ARIMA
 ```{r}
 checkresiduals(ARIMA$residuals)
 ggtsdisplay(ARIMA$residuals,main="Residuales")
@@ -894,7 +893,9 @@ Box.test(ARIMA$residuals, lag =10) #
 #H1:Estan correlacionados de manera conjunta
 tsdiag(ARIMA)
 ```
-#### SARIMA
+
+### SARIMA
+
 ```{r}
 checkresiduals(SARIMA$residuals)
 ggtsdisplay(SARIMA$residuals,main="Residuales")
@@ -909,7 +910,9 @@ Box.test(SARIMA$residuals, lag =10)
 #H1:Estan correlacionados de manera conjunta
 tsdiag(SARIMA)
 ```
-#### SARIMA con drift
+
+### SARIMA con drift
+
 ```{r}
 checkresiduals(modelo_automatico$residuals)
 ggtsdisplay(modelo_automatico$residuals,main="Residuales")
@@ -923,9 +926,10 @@ Box.test(modelo_automatico$residuals, lag =10)
 #H1:Estan correlacionados de manera conjunta
 tsdiag(modelo_automatico)
 ```
-#### Significancia de los coeficientes
 
-#### ARIMA
+## Significancia de los coeficientes
+
+### ARIMA
 ```{r}
 ARIMA_int<-confint(ARIMA)
 ARIMA_int
@@ -939,7 +943,8 @@ sum(no_sign)
 #Porcentaje no significativos
 sum(no_sign)/k
 ```
-#### SARIMA
+
+### SARIMA
 ```{r}
 SARIMA_int<-confint(SARIMA)
 SARIMA_int
@@ -953,7 +958,8 @@ sum(no_sign)
 #Porcentaje no significativos
 sum(no_sign)/k
 ```
-#### SARIMA con drift
+
+### SARIMA con drift
 ```{r}
 SARIMA_DRIFT_int<-confint(modelo_automatico)
 SARIMA_DRIFT_int
@@ -975,12 +981,12 @@ elegimos el modelo que nosotros ajustamos: El SARIMA con drift
 
 $$\therefore \textbf{Elegimos el } SARIMA(2,0,1)\times(0,1,2)_{\left[4\right]}\textbf{ Con drift } 0.0421$$ 
 
-## Forecasting 
+# 4. Forecasting 
 
 Con el modelo estimado, pronostique $n_{new}=$ 8 (2 años) valores futuros (obtenga
 intervalos de predicción).
 
-## SARIMA(1,1,2)x(0,1,1)_[4]
+Usando el modelo mencionado anteiormente hacemos los pronosticos con la serie a la que le aplicamos la raíz cuadrada.
 
 ```{r}
 plot(forecast(modelo_automatico,h=8))
