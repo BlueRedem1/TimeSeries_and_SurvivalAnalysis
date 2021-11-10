@@ -161,7 +161,7 @@ legend("bottomright", col = "darkorange1", lty = 1, lwd = 2, bty = "n",
        legend = "Tendencia", cex = 1)
 ```
 
-Lo que refuerza lo que creíamos: Tiene tebdebcua creciente casi de manera general.
+Lo que refuerza lo que creíamos: Tiene tendencia creciente casi de manera general.
 
 
 ```{r}
