@@ -1138,8 +1138,11 @@ auto.arima parece ser el mejor candidato. Aunque podemos ver otro acercamiento:
 
 
 ```{r}
+adf.test(diff(diff(Serie_sq,lag=4),lag=4))
+kpss.test(diff(diff(Serie_sq,lag=4),lag=4))
 tsdisplay(diff(diff(Serie_sq,lag=4),lag=4))
 ```
+¡Dos diferencias con lag de 4 es estacionario!
 
 Tratemos de ajustar otro SARIMA manualmente; con el enfoque antes mencionado:
 
