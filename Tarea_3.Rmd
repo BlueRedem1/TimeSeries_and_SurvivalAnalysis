@@ -616,7 +616,7 @@ metodo_minimiza_Qr3_1973
 aux_indices3<-(sort.list(abs(Qr3_1973)))[1:5]
 i=1
 for (indice in aux_indices3){
-  print(Qr2_1973[indice])
+  print(Qr3_1973[indice])
   i=i+1
 }
 ```
