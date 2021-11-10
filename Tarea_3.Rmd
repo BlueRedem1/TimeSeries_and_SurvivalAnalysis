@@ -125,8 +125,8 @@ d = d[-1]
 d #Posibles periodos del ciclo 
 
 #Realizamos la grafica:
-col = c("dodgerblue1", "darkorange1", "brown")
-plot(Serie_sq, lwd = 3, xlab = "Tiempo", col = "gray0",
+col = c("cyan1", "aquamarine4", "deepskyblue1")
+plot(Serie_sq, lwd = 3, xlab = "Tiempo", col = "hotpink4",
      main = "Serie con varianza Homocedastica",
      ylab = "Numero", col.main = "burlywood")
 for (i in 1:3) {
@@ -153,11 +153,11 @@ Ahora, aislemos la tendencia:
 
 ```{r}
 tendencia = stats::filter(Serie_sq, rep(1/4, 4))
-plot(Serie_sq, lwd = 3, xlab = "Tiempo", col = "black",
+plot(Serie_sq, lwd = 3, xlab = "Tiempo", col = "firebrick2",
      main = "Tendencia",
      ylab = "Numero", col.main = "burlywood")
-lines(tendencia, col = "gold4", lwd = 4)
-legend("bottomright", col = "gold4", lty = 1, lwd = 2, bty = "n",
+lines(tendencia, col = "darkorange1", lwd = 4)
+legend("bottomright", col = "darkorange1", lty = 1, lwd = 2, bty = "n",
        legend = "Tendencia", cex = 1)
 ```
 
@@ -180,13 +180,13 @@ datos.ts4=ts(datosSinTendencia, frequency = 4, start=inicio,end=final)
 which(is.na(datos.ts4)==T)
 
 par(mfrow = c(3,1))
-plot(datos.ts4, col = "slateblue4", lwd = 2, ylab = " ", type = "l",
+plot(datos.ts4, col = "gold1", lwd = 2, ylab = " ", type = "l",
      main = "Serie de tiempo sin tendencia", xlab = "Tiempo")
 
 acf(datos.ts4[2:50])
 pacf(datos.ts4[2:50])
 par(mfrow = c(1,1))
-tsdisplay(datos.ts4, col="purple", lwd=2)
+tsdisplay(datos.ts4, col="darkorchid1", lwd=2)
 ```
 Parece que eliminamos la tendencia, ahora tratemos de verificar los ciclos
 
@@ -230,9 +230,9 @@ plot(Serie_sq, col=28, las=1, main="Serie con varianza constante", lwd=3, xlab="
 plot(componentes, col = 18, lwd = 3, las=1, main="Yt=tendencia+ciclos+aleatoria", xlab="",ylab="")
 
 par(mfrow = c(1,1))
-plot(Serie_sq,col="darkblue", las=1, lwd=3,main="Serie_ln", ylab="",xlab="")
-invisible(lines(componentes, type="l", lwd=3, col="green",lty=6))
-legend("bottomright", col = c("darkblue","green"), lty = 1, lwd = 2, bty = "n",
+plot(Serie_sq,col="deeppink", las=1, lwd=3,main="Serie_ln", ylab="",xlab="")
+invisible(lines(componentes, type="l", lwd=3, col="deepskyblue",lty=6))
+legend("bottomright", col = c("deeppink","deepskyblue"), lty = 1, lwd = 2, bty = "n",
        legend = c("Serie Homocedastica","Yt=T+C+A"), cex = 1)
 
 
@@ -275,6 +275,9 @@ Missing Value Imputation by Interpolation. Acepta 3 tipos:
 
 ```{r}
 Comparaciones=data.frame(Original)
+na_interpolation(Serie_2,option='linear')[29] #Primer dato imputado
+na_interpolation(Serie_2,option='linear')[38] #Segundo dato imputado
+na_interpolation(Serie_2,option='linear')[39] #Tercer dato imputado
 na_interpolation_lineal=na_interpolation(Serie_2,option='linear')[29]-Original[1]
 na_interpolation_lineal[2:3]=na_interpolation(Serie_2,option='linear')[38:39]-Original[2:3]
 Comparaciones['na_interpolation_lineal']=na_interpolation_lineal
@@ -283,7 +286,9 @@ Comparaciones['na_interpolation_lineal']=na_interpolation_lineal
 
  "spline" - for spline interpolation using spline
 ```{r}
-na_interpolation(Serie_2,option='spline')
+na_interpolation(Serie_2,option='spline')[29] #Primer dato imputado
+na_interpolation(Serie_2,option='spline')[38] #Segundo dato imputado
+na_interpolation(Serie_2,option='spline')[39] #Tercer dato imputado
 na_interpolation_spline=na_interpolation(Serie_2,option='spline')[29]-Original[1]
 na_interpolation_spline[2:3]=na_interpolation(Serie_2,option='spline')[38:39]-Original[2:3]
 Comparaciones['na_interpolation_spline']=na_interpolation_spline
@@ -291,7 +296,9 @@ Comparaciones['na_interpolation_spline']=na_interpolation_spline
 
  "stine" - for Stineman interpolation using stinterp
 ```{r}
-na_interpolation(Serie_2,option='stine')
+na_interpolation(Serie_2,option='stine')[29] #Primer dato imputado
+na_interpolation(Serie_2,option='stine')[38] #Segundo dato imputado
+na_interpolation(Serie_2,option='stine')[39] #Tercer dato imputado
 na_interpolation_stine=na_interpolation(Serie_2,option='stine')[29]-Original[1]
 na_interpolation_stine[2:3]=na_interpolation(Serie_2,option='stine')[38:39]-Original[2:3]
 Comparaciones['na_interpolation_stine']=na_interpolation_stine
@@ -305,7 +312,9 @@ Missing Value Imputation by Kalman Smoothing and State Space Models. Acepta los 
 \begin{enumerate}
  "auto.arima" - For using the state space representation of arima model (using auto.arima) (default choice)
 ```{r}
-na_kalman(Serie_2,model='auto.arima')
+na_kalman(Serie_2,model='auto.arima')[29] #Primer dato imputado
+na_kalman(Serie_2,model='auto.arima')[38] #Segundo dato imputado
+na_kalman(Serie_2,model='auto.arima')[39] #Tercer dato imputado
 na_kalman_auto.arima=na_kalman(Serie_2,model ='auto.arima')[29]-Original[1]
 na_kalman_auto.arima[2:3]=na_kalman(Serie_2,model='auto.arima')[38:39]-Original[2:3]
 Comparaciones['na_kalman_auto.arima']=na_kalman_auto.arima
@@ -313,7 +322,9 @@ Comparaciones['na_kalman_auto.arima']=na_kalman_auto.arima
 
  "StructTS" - For using a structural model fitted by maximum likelihood (using StructTS)
 ```{r}
-na_kalman(Serie_2,model='StructTS')
+na_kalman(Serie_2,model='StructTS')[29] #Primer dato imputado
+na_kalman(Serie_2,model='StructTS')[38] #Segundo dato imputado
+na_kalman(Serie_2,model='StructTS')[39] #Tercer dato imputado
 na_kalman_StructTS=na_kalman(Serie_2,model='StructTS')[29]-Original[1]
 na_kalman_StructTS[2:3]=na_kalman(Serie_2,model='StructTS')[38:39]-Original[2:3]
 Comparaciones['na_StructTS']=na_kalman_StructTS
@@ -326,7 +337,9 @@ Missing Value Imputation by Last Observation Carried Forward. Acepta los siguien
 
  "locf" - for Last Observation Carried Forward (default choice)
 ```{r}
-na_locf(Serie_2,option = 'locf')
+na_locf(Serie_2,option = 'locf')[29] #Primer dato imputado
+na_locf(Serie_2,option = 'locf')[38] #Segundo dato imputado
+na_locf(Serie_2,option = 'locf')[39] #Tercer dato imputado
 na_locf=na_locf(Serie_2,option='locf')[29]-Original[1]
 na_locf[2:3]=na_locf(Serie_2,option='locf')[38:39]-Original[2:3]
 Comparaciones['na_locf']=na_locf
@@ -334,7 +347,9 @@ Comparaciones['na_locf']=na_locf
 
  "nocb" - for Next Observation Carried Backward
 ```{r}
-na_locf(Serie_2,option = 'nocb')
+na_locf(Serie_2,option = 'nocb')[29] #Primer dato imputado
+na_locf(Serie_2,option = 'nocb')[38] #Segundo dato imputado
+na_locf(Serie_2,option = 'nocb')[39] #Tercer dato imputado
 na_locf_nocb=na_locf(Serie_2,option='nocb')[29]-Original[1]
 na_locf_nocb[2:3]=na_locf(Serie_2,option='nocb')[38:39]-Original[2:3]
 Comparaciones['na_locf_nocb']=na_locf_nocb
@@ -348,7 +363,9 @@ Value Imputation by Weighted Moving Average. Acepta los siguientes métodos:
 
  "simple" - Simple Moving Average (SMA)
 ```{r}
-na_ma(Serie_2,weighting = 'simple')
+na_ma(Serie_2,weighting = 'simple')[29] #Primer dato imputado
+na_ma(Serie_2,weighting = 'simple')[38] #Segundo dato imputado
+na_ma(Serie_2,weighting = 'simple')[39] #Tercer dato imputado
 na_ma_simple=na_ma(Serie_2,weighting='simple')[29]-Original[1]
 na_ma_simple[2:3]=na_ma(Serie_2,weighting='simple')[38:39]-Original[2:3]
 Comparaciones['na_ma_simple']=na_ma_simple
@@ -356,14 +373,18 @@ Comparaciones['na_ma_simple']=na_ma_simple
 
  "linear" - Linear Weighted Moving Average (LWMA)
 ```{r}
-na_ma(Serie_2,weighting = 'linear')
+na_ma(Serie_2,weighting = 'linear')[29] #Primer dato imputado
+na_ma(Serie_2,weighting = 'linear')[38] #Segundo dato imputado
+na_ma(Serie_2,weighting = 'linear')[39] #Tercer dato imputado
 na_ma_linear=na_interpolation(Serie_2,option='linear')[29]-Original[1]
 na_ma_linear[2:3]=na_interpolation(Serie_2,option='linear')[38:39]-Original[2:3]
 Comparaciones['na_ma_linear']=na_ma_linear
 ```
  "exponential" - Exponential Weighted Moving Average (EWMA) (default choice)
-```{r}
-na_ma(Serie_2,weighting = 'exponential')
+```{r} 
+na_ma(Serie_2,weighting = 'exponential')[29] #Primer Dato imputado
+na_ma(Serie_2,weighting = 'exponential')[38] #Segundo dato imputado
+na_ma(Serie_2,weighting = 'exponential')[39] #Tercer dato imputado
 na_ma_exponential=na_ma(Serie_2,weighting='exponential')[29]-Original[1]
 na_ma_exponential[2:3]=na_ma(Serie_2,weighting='exponential')[38:39]-Original[2:3]
 Comparaciones['na_exponential']=na_ma_exponential
@@ -376,35 +397,45 @@ Value Imputation by Mean Value. Acepta los siguientes métodos:
 
  "mean" - take the mean for imputation (default choice)
 ```{r}
-na_mean(Serie_2,option = 'mean')
+na_mean(Serie_2,option = 'mean')[29] #Primer dato imputado
+na_mean(Serie_2,option = 'mean')[38] #Segundo dato imputado
+na_mean(Serie_2,option = 'mean')[39] #Tercer dato imputado
 na_mean=na_mean(Serie_2,option='mean')[29]-Original[1]
 na_mean[2:3]=na_mean(Serie_2,option='mean')[38:39]-Original[2:3]
 Comparaciones['na_mean']=na_mean
 ```
  "median" - take the median for imputation
 ```{r}
-na_mean(Serie_2,option = 'median')
+na_mean(Serie_2,option = 'median')[29] #Primer dato imputado
+na_mean(Serie_2,option = 'median')[38] #Segundo dato imputado
+na_mean(Serie_2,option = 'median')[39] #Tercer dato imputado
 na_mean_median=na_mean(Serie_2,option='median')[29]-Original[1]
 na_mean_median[2:3]=na_mean(Serie_2,option='median')[38:39]-Original[2:3]
 Comparaciones['na_mean_median']=na_interpolation_lineal
 ```
  "mode" - take the mode for imputation
 ```{r}
-na_mean(Serie_2,option = 'mode')
+na_mean(Serie_2,option = 'mode')[29] #Primer dato imputado
+na_mean(Serie_2,option = 'mode')[38] #Segundo dato imputado
+na_mean(Serie_2,option = 'mode')[39] #Tercer dato imputado
 na_mean_mode=na_mean(Serie_2,option='mode')[29]-Original[1]
 na_mean_mode[2:3]=na_mean(Serie_2,option='mode')[38:39]-Original[2:3]
 Comparaciones['na_mean_mode']=na_mean_mode
 ```
  "harmonic" - take the harmonic mean
 ```{r}
-na_mean(Serie_2,option = 'harmonic')
+na_mean(Serie_2,option = 'harmonic')[29] #Primer dato imputado
+na_mean(Serie_2,option = 'harmonic')[38] #Segundo dato imputado
+na_mean(Serie_2,option = 'harmonic')[39] #Tercer dato imputado
 na_mean_harmonic=na_mean(Serie_2,option='harmonic')[29]-Original[1]
 na_mean_harmonic[2:3]=na_mean(Serie_2,option='harmonic')[38:39]-Original[2:3]
 Comparaciones['na_mean_harmonic']=na_mean_harmonic
 ```
  "geometric" - take the geometric mean
 ```{r}
-na_mean(Serie_2,option = 'geometric')
+na_mean(Serie_2,option = 'geometric')[29] #Primer dato imputado
+na_mean(Serie_2,option = 'geometric')[38] #Segundo dato imputado
+na_mean(Serie_2,option = 'geometric')[39] #Tercer dato imputado
 na_mean_geometric=na_mean(Serie_2,option='geometric')[29]-Original[1]
 na_mean_geometric[2:3]=na_mean(Serie_2,option='geometric')[38:39]-Original[2:3]
 Comparaciones['na_mean_geometric']=na_mean_geometric
@@ -415,7 +446,9 @@ Comparaciones['na_mean_geometric']=na_mean_geometric
 
 Missing Value Imputation by Random Sample
 ```{r}
-na_random(Serie_2)
+na_random(Serie_2)[29] #Primer dato imputado
+na_random(Serie_2)[38] #Segundo dato imputado
+na_random(Serie_2)[39] #Tercer dato imputado
 na_random=na_random(Serie_2)[29]-Original[1]
 na_random[2:3]=na_random(Serie_2)[38:39]-Original[2:3]
 Comparaciones['na_random']=na_random
@@ -427,7 +460,9 @@ Seasonally Decomposed Missing Value Imputation. Admite los siguiente métodos:
 
  "interpolation" - Imputation by Interpolation (default choice)
 ```{r}
-na_seadec(Serie_2,algorithm = 'interpolation')
+na_seadec(Serie_2,algorithm = 'interpolation')[29] #Primer dato imputado
+na_seadec(Serie_2,algorithm = 'interpolation')[38] #Segundo dato imputado
+na_seadec(Serie_2,algorithm = 'interpolation')[39] #Tercer dato imputado
 na_seadec_interpolation=na_seadec(Serie_2,algorithm='interpolation')[29]-Original[1]
 na_seadec_interpolation[2:3]=na_seadec(Serie_2,algorithm='interpolation')[38:39]-Original[2:3]
 Comparaciones['na_seadec_interpolation']=na_seadec_interpolation
@@ -435,35 +470,45 @@ Comparaciones['na_seadec_interpolation']=na_seadec_interpolation
 
  "locf" - Imputation by Last Observation Carried Forward
 ```{r}
-na_seadec(Serie_2,algorithm = 'locf')
+na_seadec(Serie_2,algorithm = 'locf')[29] #Primer dato imputado
+na_seadec(Serie_2,algorithm = 'locf')[38] #Segundo dato imputado
+na_seadec(Serie_2,algorithm = 'locf')[39] #Tercer dato imputado
 na_seadec_locf=na_seadec(Serie_2,algorithm='locf')[29]-Original[1]
 na_seadec_locf[2:3]=na_seadec(Serie_2,algorithm='locf')[38:39]-Original[2:3]
 Comparaciones['na_seadec_locf']=na_seadec_locf
 ```
  "mean" - Imputation by Mean Value
 ```{r}
-na_seadec(Serie_2,algorithm = 'mean')
+na_seadec(Serie_2,algorithm = 'mean')[29] #Primer dato imputado
+na_seadec(Serie_2,algorithm = 'mean')[38] #Segundo dato imputado
+na_seadec(Serie_2,algorithm = 'mean')[39] #Tercer dato imputado
 na_seadec_mean=na_seadec(Serie_2,algorithm = 'mean')[29]-Original[1]
 na_seadec_mean[2:3]=na_seadec(Serie_2,algorithm = 'mean')[38:39]-Original[2:3]
 Comparaciones['na_seadec_mean']=na_seadec_mean
 ```
  "random" - Imputation by Random Sample
 ```{r}
-na_seadec(Serie_2,algorithm = 'random')
+na_seadec(Serie_2,algorithm = 'random')[29] #Primer dato imputado
+na_seadec(Serie_2,algorithm = 'random')[38] #Segundo dato imputado
+na_seadec(Serie_2,algorithm = 'random')[39] #Tercer dato imputado
 na_seadec_random=na_seadec(Serie_2,algorithm = 'random')[29]-Original[1]
 na_seadec_random[2:3]=na_seadec(Serie_2,algorithm = 'random')[38:39]-Original[2:3]
 Comparaciones['na_seadec_random']=na_seadec_random
 ```
  "kalman" - Imputation by Kalman Smoothing and State Space Models
 ```{r}
-na_seadec(Serie_2,algorithm = 'kalman')
+na_seadec(Serie_2,algorithm = 'kalman')[29] #Primer dato imputado
+na_seadec(Serie_2,algorithm = 'kalman')[38] #Segundo dato imputado
+na_seadec(Serie_2,algorithm = 'kalman')[39] #Tercer dato imputado
 na_seadec_kalman=na_seadec(Serie_2,algorithm = 'kalman')[29]-Original[1]
 na_seadec_kalman[2:3]=na_seadec(Serie_2,algorithm = 'kalman')[38:39]-Original[2:3]
 Comparaciones['na_seadec_kalman']=na_seadec_kalman
 ```
  "ma" - Imputation by Weighted Moving Average
 ```{r}
-na_seadec(Serie_2,algorithm = 'ma')
+na_seadec(Serie_2,algorithm = 'ma')[29] #Primer dato imputado
+na_seadec(Serie_2,algorithm = 'ma')[38] #Segundo dato imputado
+na_seadec(Serie_2,algorithm = 'ma')[39] #Tercer dato imputado
 na_seadec_ma=na_seadec(Serie_2,algorithm = 'ma')[29]-Original[1]
 na_seadec_ma[2:3]=na_seadec(Serie_2,algorithm = 'ma')[38:39]-Original[2:3]
 Comparaciones['na_seadec_ma']=na_seadec_ma
@@ -475,7 +520,9 @@ Seasonally Splitted Missing Value Imputation. Admite los siguiente métodos:
 
  "interpolation" - Imputation by Interpolation (default choice)
 ```{r}
-na_seasplit(Serie_2,algorithm = 'interpolation')
+na_seasplit(Serie_2,algorithm = 'interpolation')[29] #Primer dato imputado
+na_seasplit(Serie_2,algorithm = 'interpolation')[38] #Segundo dato imputado
+na_seasplit(Serie_2,algorithm = 'interpolation')[39] #Tercer dato imputado
 na_seasplit_interpolation=na_seasplit(Serie_2,algorithm = 'interpolation')[29]-Original[1]
 na_seasplit_interpolation[2:3]=na_seasplit(Serie_2,algorithm = 'interpolation')[38:39]-Original[2:3]
 Comparaciones['na_seadec_interpolation']=na_seasplit_interpolation
@@ -483,35 +530,45 @@ Comparaciones['na_seadec_interpolation']=na_seasplit_interpolation
 
  "locf" - Imputation by Last Observation Carried Forward
 ```{r}
-na_seasplit(Serie_2,algorithm = 'locf')
+na_seasplit(Serie_2,algorithm = 'locf')[29] #Primer dato imputado
+na_seasplit(Serie_2,algorithm = 'locf')[38] #Segundo dato imputado
+na_seasplit(Serie_2,algorithm = 'locf')[39] #Tercer dato imputado
 na_seadec_locf=na_seasplit(Serie_2,algorithm = 'locf')[29]-Original[1]
 na_seadec_locf[2:3]=na_seasplit(Serie_2,algorithm = 'locf')[38:39]-Original[2:3]
 Comparaciones['na_seadec_locf']=na_seadec_locf
 ```
  "mean" - Imputation by Mean Value
 ```{r}
-na_seasplit(Serie_2,algorithm = 'mean')
+na_seasplit(Serie_2,algorithm = 'mean')[29] #Primer dato imputado
+na_seasplit(Serie_2,algorithm = 'mean')[38] #Segundo dato imputado
+na_seasplit(Serie_2,algorithm = 'mean')[39] #Tercer dato imputado
 na_seadec_mean=na_seasplit(Serie_2,algorithm = 'mean')[29]-Original[1]
 na_seadec_mean[2:3]=na_seasplit(Serie_2,algorithm = 'mean')[38:39]-Original[2:3]
 Comparaciones['na_seadec_mean']=na_seadec_mean
 ```
  "random" - Imputation by Random Sample
 ```{r}
-na_seasplit(Serie_2,algorithm = 'random')
+na_seasplit(Serie_2,algorithm = 'random')[29] #Primer dato imputado
+na_seasplit(Serie_2,algorithm = 'random')[38] #Segundo dato imputado
+na_seasplit(Serie_2,algorithm = 'random')[39] #Tercer dato imputado
 na_seadec_random=na_seasplit(Serie_2,algorithm = 'random')[29]-Original[1]
 na_seadec_random[2:3]=na_seasplit(Serie_2,algorithm = 'random')[38:39]-Original[2:3]
 Comparaciones['na_seadec_random']=na_seadec_random
 ```
  "kalman" - Imputation by Kalman Smoothing and State Space Models
 ```{r}
-na_seasplit(Serie_2,algorithm = 'kalman')
+na_seasplit(Serie_2,algorithm = 'kalman')[29] #Primer dato imputado
+na_seasplit(Serie_2,algorithm = 'kalman')[38] #Segundo dato imputado
+na_seasplit(Serie_2,algorithm = 'kalman')[39] #Tercer dato imputado
 na_seadec_kalman=na_seasplit(Serie_2,algorithm = 'kalman')[29]-Original[1]
 na_seadec_kalman[2:3]=na_seasplit(Serie_2,algorithm = 'kalman')[38:39]-Original[2:3]
 Comparaciones['na_seadec_kalman']=na_seadec_kalman
 ```
  "ma" - Imputation by Weighted Moving Average
 ```{r}
-na_seasplit(Serie_2,algorithm = 'ma')
+na_seasplit(Serie_2,algorithm = 'ma')[29] #Primer dato imputado
+na_seasplit(Serie_2,algorithm = 'ma')[38] #Segundo dato imputado
+na_seasplit(Serie_2,algorithm = 'ma')[39] #Tercer dato imputado
 na_seadec_ma=na_seasplit(Serie_2,algorithm = 'ma')[29]-Original[1]
 na_seadec_ma[2:3]=na_seasplit(Serie_2,algorithm = 'ma')[38:39]-Original[2:3]
 Comparaciones['na_seadec_ma']=na_seadec_ma
@@ -599,7 +656,7 @@ kpss.test(diff(Serie_sq))
 ```
 Se contradicen. Apliquemos otra diferencia
 ```{r}
-plot(diff(diff(Serie_sq)), col = "plum", lwd = 3, xlab = "Tiempo", ylab = " ",
+plot(diff(diff(Serie_sq)), col = "darkolivegreen2", lwd = 3, xlab = "Tiempo", ylab = " ",
      main = "Serie homoscedastica con dos diferencias" )
 adf.test(diff(diff(Serie_sq)))
 kpss.test(diff(diff(Serie_sq)))
@@ -664,7 +721,7 @@ Podemos estimar d y D como aquellos que hacen que
 $$Y_t=(1-B)^{d}(1-B^s)^D$$
 Sea estacionaria. Probemos con d=0 y D=1
 ```{r}
-plot(diff(Serie_sq,lag=4), col = "plum", lwd = 3, xlab = "Tiempo", ylab = " ",
+plot(diff(Serie_sq,lag=4), col = "darkred", lwd = 3, xlab = "Tiempo", ylab = " ",
      main = "Serie homoscedastica con una diferencia de lag=4" )
 adf.test(diff(Serie_sq,lag=4))
 kpss.test(diff(Serie_sq,lag=4))
@@ -882,7 +939,7 @@ Solo pasa Jarque-Bera
 ```{r}
 #SARIMA
 qqnorm(SARIMA$residuals)
-qqline(SARIMA$residuals, col="red", lwd=2)
+qqline(SARIMA$residuals, col="lightslateblue", lwd=2)
 #Prueba Anderson-Darling
 ad.test(SARIMA$residuals)
 #Prueba de Shapiro
@@ -897,7 +954,7 @@ Apenas pasamos Anderson-Darling
 ```{r}
 #SARIMA AUTOMÁTICO
 qqnorm(modelo_automatico$residuals)
-qqline(modelo_automatico$residuals, col="red", lwd=2)
+qqline(modelo_automatico$residuals, col="palevioletred1", lwd=2)
 #Prueba Anderson-Darling
 ad.test(modelo_automatico$residuals)
 #Prueba de Shapiro
@@ -912,7 +969,7 @@ pruebas las rechaza
 ```{r}
 #SARIMA2
 qqnorm(SARIMA2$residuals)
-qqline(SARIMA2$residuals, col="red", lwd=2)
+qqline(SARIMA2$residuals, col="mediumseagreen", lwd=2)
 #Prueba Anderson-Darling
 ad.test(SARIMA2$residuals)
 #Prueba de Shapiro
@@ -1201,7 +1258,7 @@ abline(h=-3*(var(modelo_automatico2$residuals)), col="purple",lwd=2)
 ```{r}
 #SARIMA AUTOMÁTICO
 qqnorm(modelo_automatico2$residuals)
-qqline(modelo_automatico2$residuals, col="red", lwd=2)
+qqline(modelo_automatico2$residuals, col="royalblue2", lwd=2)
 #Prueba Anderson-Darling
 ad.test(modelo_automatico2$residuals)
 #Prueba de Shapiro
@@ -1287,7 +1344,7 @@ abline(h=-3*(var(modelo_automatico2$residuals)), col="purple",lwd=2)
 ```{r}
 #SARIMA AUTOMÁTICO
 qqnorm(modelo_automatico2$residuals)
-qqline(modelo_automatico2$residuals, col="red", lwd=2)
+qqline(modelo_automatico2$residuals, col="tan3", lwd=2)
 #Prueba Anderson-Darling
 ad.test(modelo_automatico2$residuals)
 #Prueba de Shapiro
@@ -1369,7 +1426,7 @@ abline(h=-3*(var(modelo_automatico3$residuals)), col="purple",lwd=2)
 ```{r}
 #SARIMA AUTOMÁTICO
 qqnorm(modelo_automatico3$residuals)
-qqline(modelo_automatico3$residuals, col="red", lwd=2)
+qqline(modelo_automatico3$residuals, col="yellow2", lwd=2)
 #Prueba Anderson-Darling
 ad.test(modelo_automatico3$residuals)
 #Prueba de Shapiro
@@ -1449,13 +1506,15 @@ comparar_2=cbind("SARIMA",SARIMA$aic,BIC(SARIMA), mean(SARIMA$residuals),
                  mean(abs(SARIMA$residuals)),sqrt(mean((SARIMA$residuals)^2)),
                  length(SARIMA$coef))
 
-comparar_3=cbind("SARIMA AUTOMÁTICO",modelo_automatico$aic,BIC(modelo_automatico), mean(modelo_automatico$residuals),
+comparar_3=cbind("SARIMA AUTOMÁTICO",modelo_automatico$aic,BIC(modelo_automatico), 
+                 mean(modelo_automatico$residuals),
                  mean(abs(modelo_automatico$residuals)),sqrt(mean((modelo_automatico$residuals)^2)),
                  length(modelo_automatico$coef))
 comparar_4=cbind("SARIMA2",SARIMA2$aic,BIC(SARIMA2), mean(SARIMA2$residuals),
                  mean(abs(SARIMA2$residuals)),sqrt(mean((SARIMA2$residuals)^2)),
                  length(SARIMA2$coef))
-comparar_5=cbind("SARIMA AUTOMÁTICO2",modelo_automatico2$aic,BIC(modelo_automatico2), mean(modelo_automatico2$residuals),
+comparar_5=cbind("SARIMA AUTOMÁTICO2",modelo_automatico2$aic,BIC(modelo_automatico2), 
+                 mean(modelo_automatico2$residuals),
                  mean(abs(modelo_automatico2$residuals)),sqrt(mean((modelo_automatico2$residuals)^2)),
                  length(modelo_automatico2$coef))
 nombres=cbind("AJUSTE", "AIC", "BIC","ME","MAE", "RMSE","#Paramatros")
