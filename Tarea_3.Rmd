@@ -631,18 +631,12 @@ PACF_inferior<-sum(pauxacf$acf< -banda)
 superan_banda_pacf<-PACF_superior+PACF_inferior
 superan_banda_pacf
 ```
-Parece, a simple vista, que puede que tengamos un ARIMA(3,1,16). Sin embargo, no hemos
+Parece, a simple vista, que puede que tengamos un ARIMA(3,2,16). Sin embargo, no hemos
 considerado la parte de los ciclos aún.
-
-Veamos qué nos dice el ajuste con la función auto.arima:
-```{r}
-modelo_automatico<-auto.arima(Serie_sq)
-modelo_automatico
-```
 
 Veamos el ARIMA(3,2,16)...
 ```{r}
-ARIMA<-arima(Serie_sq,order=c(16,2,3))
+ARIMA<-arima(Serie_sq,order=c(3,2,16))
 ARIMA
 ```
 
@@ -741,11 +735,36 @@ plot(SARIMA$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="",
 abline(h=3*(var(SARIMA$residuals)), col="purple", lwd=2)
 abline(h=-3*(var(SARIMA$residuals)), col="purple",lwd=2)
 ```
-Parece que es un buen modelo, al menos en el sentido de que ajusta bien.
 
 Comparemos con el que ajusta R:
 
+
 ```{r}
+modelo_automatico<-auto.arima((diff(Serie_sq,lag=4)))
+modelo_automatico
+```
+Probemos con otra diferencia:
+```{r}
+adf.test(diff(diff(Serie_sq,lag=4)))
+kpss.test((diff(diff(Serie_sq,lag=4))))
+tsdisplay(diff(diff(Serie_sq,lag=4)))
+```
+Sí pasa la prueba; ahora intentemos ajustar con dichas diferencias
+
+```{r}
+modelo_automatico<-auto.arima((diff(diff(Serie_sq,lag=4))))
+modelo_automatico
+```
+
+Entonces es un SARIMA(1,1,0)x(0,1,1)[4]
+
+```{r}
+modelo_automatico<-arima(Serie_sq,order=c(1,1,0),seasonal=list(order=c(0,1,1),period=4))
+modelo_automatico
+```
+
+```{r}
+
 AUTOMATICO_ajuste <- Serie_sq - residuals(modelo_automatico)
 ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
 points(AUTOMATICO_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
@@ -754,17 +773,62 @@ plot(modelo_automatico$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="
 abline(h=3*(var(modelo_automatico$residuals)), col="purple", lwd=2)
 abline(h=-3*(var(modelo_automatico$residuals)), col="purple",lwd=2)
 ```
-Al menos de manera visual, parece que el modelo que nosotros propusimos le 
-ajusta mejor. No quitaremos ningún dato debido a que hay varios datos
-discrepantes, pero por muy poco. Sin embargo, el ajuste automático llega a 
-sobreestimar un poco las observaciones. Analizemos estos dos modelos:
+
+Tratemos de ajustar otro SARIMA manualmente; con el enfoque antes mencionado:
+
+Veamos el ACF
+```{r}
+k=length(diff(diff(Serie_sq,lag=4)))
+banda<-qnorm(0.95)/(sqrt(k))
+auxacf=acf(diff(diff(Serie_sq,lag=4)),plot = F)#MA(6)
+ACF_superior<-sum(auxacf$acf>banda)
+ACF_inferior<-sum(auxacf$acf< -banda)
+superan_banda_acf<-ACF_superior+ACF_inferior
+superan_banda_acf
+#Los que superan las bandas del acf son:
+which(abs(auxacf$acf) > banda)
+```
+Por lo que:
+$$q=1,Q=2$$
+
+Para el PACF:
+```{r}
+pauxacf=pacf(diff(diff(Serie_sq,lag=4)),plot = F)
+PACF_superior<-sum(pauxacf$acf>banda)
+PACF_inferior<-sum(pauxacf$acf< -banda)
+superan_banda_pacf<-PACF_superior+PACF_inferior
+superan_banda_pacf
+#Los que superan las bandas del pacf son:
+which(abs(pauxacf$acf) > banda)
+```
+Por lo que:
+$$p=1, P=3$$
+Entonces tenemos un modelo 
+
+$$SARIMA(1,1,1)\times(3,1,2)_{\left[4\right]}$$
+Ajustémoslo:
+
+```{r}
+SARIMA2<-arima(Serie_sq,order=c(1,1,1),seasonal=list(order=c(3,1,2),period=4), include.mean=F) 
+SARIMA2
+```
+
+```{r}
+SARIMA_ajuste2 <- Serie_sq - residuals(SARIMA2)
+ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
+points(SARIMA_ajuste2, type = "l", col ="orange", lty = 2, lwd=3)
+###Y ahora los residuales
+plot(SARIMA2$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
+abline(h=3*(var(SARIMA2$residuals)), col="purple", lwd=2)
+abline(h=-3*(var(SARIMA2$residuals)), col="purple",lwd=2)
+```
 
 Por el AIC y BIC
 ```{r}
-AIC<-c(SARIMA$aic,ARIMA$aic,modelo_automatico$aic)
-BIC<-c(SARIMA$bic,ARIMA$bic,modelo_automatico$bic)
-loglik<-c(SARIMA$loglik,ARIMA$loglik,modelo_automatico$loglik)
-Comparar<-data.frame('AIC'=AIC,'BIC'=BIC,'Loglik'=loglik,row.names = c('SARIMA','ARIMA','Automatico'))
+AIC<-c(SARIMA$aic,ARIMA$aic,modelo_automatico$aic, SARIMA2$aic)
+BIC<-c(BIC(SARIMA),BIC(ARIMA),BIC(modelo_automatico), BIC(SARIMA2))
+loglik<-c(SARIMA$loglik,ARIMA$loglik,modelo_automatico$loglik, SARIMA2$loglik)
+Comparar<-data.frame('AIC'=AIC,'BIC'=BIC,'Loglik'=loglik,row.names = c('SARIMA','ARIMA','Automatico', 'SARIMA2'))
 Comparar
 ```
 Comparemos los errores:
@@ -777,18 +841,25 @@ comparar_2=cbind("SARIMA",SARIMA$aic,BIC(SARIMA), mean(SARIMA$residuals),
                  mean(abs(SARIMA$residuals)),sqrt(mean((SARIMA$residuals)^2)),
                  length(SARIMA$coef))
 
-comparar_3=cbind("SARIMA con drift",modelo_automatico$aic,BIC(modelo_automatico), mean(modelo_automatico$residuals),
+comparar_3=cbind("SARIMA AUTOMÁTICO",modelo_automatico$aic,BIC(modelo_automatico), mean(modelo_automatico$residuals),
                  mean(abs(modelo_automatico$residuals)),sqrt(mean((modelo_automatico$residuals)^2)),
-                 length(modelo_automatico))
+                 length(modelo_automatico$coef))
+comparar_4=cbind("SARIMA2",SARIMA2$aic,BIC(SARIMA2), mean(SARIMA2$residuals),
+                 mean(abs(SARIMA2$residuals)),sqrt(mean((SARIMA2$residuals)^2)),
+                 length(SARIMA2$coef))
 nombres=cbind("AJUSTE", "AIC", "BIC","ME","MAE", "RMSE","#Paramatros")
 
-resultados<-rbind(comparar_,comparar_2,comparar_3)
+resultados<-rbind(comparar_,comparar_2,comparar_3, comparar_4)
 resultados<-as.table(resultados)
 colnames(resultados)=c("AJUSTE", "AIC", "BIC","ME","MAE", "RMSE","#Parametros")
-rownames(resultados)=c("","", "")
+rownames(resultados)=c("","", "","")
 
 (resultados)
 ```
+Parece que el SARIMA ajustado de manera automática es quien mejores indicadores tiene,
+después sería el segundo SARIMA que ajustamos nosotros, después el primer 
+SARIMA y finalmente, el ARIMA
+
 
 Hagamos la comprobación de supuestos:
 
@@ -806,6 +877,7 @@ shapiro.test(ARIMA$residuals)
 #Jarque-Bera Test
 jarque.bera.test(ARIMA$residuals)
 ```
+Solo pasa Jarque-Bera
 
 ### SARIMA
 ```{r}
@@ -819,10 +891,12 @@ shapiro.test(SARIMA$residuals)
 #Jarque-Bera Test. tseries
 jarque.bera.test(SARIMA$residuals)
 ```
+Solo pasa Anderson-Darling
+
 Apenas pasamos Anderson-Darling
-### SARIMA con drift
+### SARIMA AUTOMÁTICO
 ```{r}
-#SARIMA con drift
+#SARIMA AUTOMÁTICO
 qqnorm(modelo_automatico$residuals)
 qqline(modelo_automatico$residuals, col="red", lwd=2)
 #Prueba Anderson-Darling
@@ -832,8 +906,24 @@ shapiro.test(modelo_automatico$residuals)
 #Jarque-Bera Test. tseries
 jarque.bera.test(modelo_automatico$residuals)
 ```
+Pasa Anderson-Darling con un p-value no tan cerca de 00.05, pero las demás
+pruebas las rechaza
 
-Parece que el SARIMA tiene p-values más grandes y se ajusta mejor al qq-plot.
+### SARIMA2
+```{r}
+#SARIMA2
+qqnorm(SARIMA2$residuals)
+qqline(SARIMA2$residuals, col="red", lwd=2)
+#Prueba Anderson-Darling
+ad.test(SARIMA2$residuals)
+#Prueba de Shapiro
+shapiro.test(SARIMA2$residuals)
+#Jarque-Bera Test. tseries
+jarque.bera.test(SARIMA2$residuals)
+```
+No pasa ningún test.
+
+El modelo ajustado por auto.arima tiene el mejor ajuste acorde a las pruebas
 
 ## Varianza constante
 
@@ -844,6 +934,7 @@ Y <- as.numeric(ARIMA$residuals)
 X <- 1:length(ARIMA$residuals)
 bptest(Y ~ X)
 ```
+Lo pasa 
 
 ### SARIMA
 ```{r}
@@ -852,14 +943,27 @@ Y <- as.numeric(SARIMA$residuals)
 X <- 1:length(SARIMA$residuals)
 bptest(Y ~ X)
 ```
+Lo pasa
 
-### SARIMA con drift
+### SARIMA AUTOMÁTICO
 ```{r}
-#SARIMA con drift
+#SARIMA AUTOMÁTICO
 Y <- as.numeric(modelo_automatico$residuals)
 X <- 1:length(modelo_automatico$residuals)
 bptest(Y ~ X)
 ```
+Lo pasa
+
+### SARIMA2
+```{r}
+#SARIMA2
+Y <- as.numeric(SARIMA2$residuals)
+X <- 1:length(SARIMA2$residuals)
+bptest(Y ~ X)
+```
+Lo pasa
+
+Todos pasan las pruebas; el mayor p-value lo obtuvo el ARIMA
 
 ## Media cero 
 
@@ -867,21 +971,36 @@ bptest(Y ~ X)
 ```{r}
 t.test(ARIMA$residuals,mu=0)
 ```
+Lo pasa
+
 ### SARIMA
 ```{r}
 t.test(SARIMA$residuals,mu=0)
 ```
-### SARIMA con drift
+Lo pasa
+
+### SARIMA  AUTOMÁTICO
 ```{r}
 t.test(modelo_automatico$residuals,mu=0)
 ```
+Lo pasa 
+
+### SARIMA2
+```{r}
+t.test(SARIMA2$residuals,mu=0)
+```
+Lo pasa
+
+Todos pasan esta prueba
+
 ## Residuales no correlacionados
 
 ### ARIMA
 ```{r}
 checkresiduals(ARIMA$residuals)
 ggtsdisplay(ARIMA$residuals,main="Residuales")
-#Notamos que se "sale" en muchos lags por lo que:
+#No se sale en ningún lag
+
 #Box-Pierce test contrasta
 # Ho: Independencia vs. H1: Dependencia
 Box.test(ARIMA$residuals, lag =10) #
@@ -893,13 +1012,15 @@ Box.test(ARIMA$residuals, lag =10) #
 #H1:Estan correlacionados de manera conjunta
 tsdiag(ARIMA)
 ```
+Pasa las pruebas
+
 
 ### SARIMA
 
 ```{r}
 checkresiduals(SARIMA$residuals)
 ggtsdisplay(SARIMA$residuals,main="Residuales")
-#Notamos que se "sale" en muchos lags por lo que:
+#Se sale en un lag cerca de 8, por poco.
 #Box-Pierce test contrasta
 # Ho: Independencia vs. H1: Dependencia
 Box.test(SARIMA$residuals, lag =10) 
@@ -910,13 +1031,15 @@ Box.test(SARIMA$residuals, lag =10)
 #H1:Estan correlacionados de manera conjunta
 tsdiag(SARIMA)
 ```
+Pasa las pruebas
 
-### SARIMA con drift
+
+### SARIMA AUTOMÁTICO
 
 ```{r}
 checkresiduals(modelo_automatico$residuals)
 ggtsdisplay(modelo_automatico$residuals,main="Residuales")
-#Notamos que se "sale" en muchos lags por lo que:
+#Se sale cerca del lag 5
 #Box-Pierce test contrasta
 # Ho: Independencia vs. H1: Dependencia
 Box.test(modelo_automatico$residuals, lag =10) 
@@ -926,6 +1049,26 @@ Box.test(modelo_automatico$residuals, lag =10)
 #H1:Estan correlacionados de manera conjunta
 tsdiag(modelo_automatico)
 ```
+Pasa las pruebas
+
+### SARIMA2
+
+```{r}
+checkresiduals(SARIMA2$residuals)
+ggtsdisplay(SARIMA2$residuals,main="Residuales")
+#Se sale en el lag 5;
+#Box-Pierce test contrasta
+# Ho: Independencia vs. H1: Dependencia
+Box.test(SARIMA2$residuals, lag =10) 
+
+#De manera conjunta, con la prueba de Ljung y Box
+#H0:No estan correlacionados de manera conjunta 
+# vs 
+#H1:Estan correlacionados de manera conjunta
+tsdiag(SARIMA2)
+```
+Pasa los test
+
 
 ## Significancia de los coeficientes
 
@@ -959,7 +1102,7 @@ sum(no_sign)
 sum(no_sign)/k
 ```
 
-### SARIMA con drift
+### SARIMA AUTOMÁTICO
 ```{r}
 SARIMA_DRIFT_int<-confint(modelo_automatico)
 SARIMA_DRIFT_int
@@ -974,12 +1117,27 @@ sum(no_sign)
 sum(no_sign)/k
 ```
 
-Por la simplicidad del modelo (Al tener solo 6 coeficientes), ser el que poseeel menor 
-porcentaje de coeficientes no significativos y  además, pasar todos los tests. Incluyendo
-que es el modelo que minimiza el AIC y BIC y maximiza log-likelihood;
-elegimos el modelo que nosotros ajustamos: El SARIMA con drift
+### SARIMA2
+```{r}
+SARIMA2_int<-confint(SARIMA2)
+SARIMA2_int
+k=length(confint(SARIMA2))/2
+no_sign<-c()
+for(i in 1:k){
+  no_sign[i]<-(SARIMA2_int[i]<0 & SARIMA2_int[i+k]>0)
+}
+#No significativos
+sum(no_sign)
+#Porcentaje no significativos
+sum(no_sign)/k
+```
 
-$$\therefore \textbf{Elegimos el } SARIMA(2,0,1)\times(0,1,2)_{\left[4\right]}\textbf{ Con drift } 0.0421$$ 
+Por la simplicidad del modelo (Al tener solo 2 coeficientes), ser el que poseeel menor 
+porcentaje de coeficientes no significativos y  además, pasar todos los tests (En 
+normalidad pasó al menos Anderson-Darling) y tener los mejores índices, elegimos 
+el ajustado por auto.arima
+
+$$\therefore \textbf{Elegimos el } SARIMA(1,1,0)\times(1,1,0)_{\left[4\right]}$$ 
 
 # 4. Forecasting 
 
@@ -989,37 +1147,35 @@ intervalos de predicción).
 Usando el modelo mencionado anteiormente hacemos los pronosticos con la serie a la que le aplicamos la raíz cuadrada.
 
 ```{r}
-plot(forecast(modelo_automatico,h=8))
-inicio<-start(Serie_sq)
-final<-end(Serie_sq)
-SARIMA_forecast <- forecast(modelo_automatico, h=8)[4]$mean #Aquí están los predecidos
-SARIMA_forecast<-ts(data=SARIMA_forecast,start=final,end=final+2,frequency = 4)
-SARIMA_forecast_low <- forecast(modelo_automatico, h = 8)[5]$lower[9:16] #banda inferior al 95%
-SARIMA_forecast_low<-ts(data=SARIMA_forecast_low,start=final,end=final+2,frequency = 4)
-SARIMA_forecast_up <- forecast(modelo_automatico, h = 8)[6]$upper[9:16] #banda superior al 95%
-SARIMA_forecast_up<-ts(data=SARIMA_forecast_up,start=final,end=final+2,frequency = 4)
-ts.plot(Serie_sq, xlim=c(inicio[1],final[1]+2.5),ylim=c(3,6.5),  main="Predicción en raíz")
-points(SARIMA_forecast, type = "l", col = 3)
-points(SARIMA_forecast_low, type = "l", col ="blue", lty = 2)
-points(SARIMA_forecast_up, type = "l", col ="blue", lty = 2)
+inicio<-start(Serie_sq)[1]
+final<-end(Serie_sq)[1]
+SARIMA_forecast <- predict(modelo_automatico, n.ahead =8)$pred
+SARIMA_forecast_se <- predict(modelo_automatico, n.ahead = 8)$se
+lower<-SARIMA_forecast - qnorm(0.975)*SARIMA_forecast_se
+upper<-SARIMA_forecast + qnorm(0.975)*SARIMA_forecast_se
+ts.plot(Serie_sq, xlim=c(inicio,final+2),ylim=c(3,7),  main="Prediccion")
+points(SARIMA_forecast, type = "l", col = 2)
+points(lower, type = "l", col ="blue", lty = 2)
+points(upper, type = "l", col ="blue", lty = 2)
 
-
-par(mfrow=c(3,1))
+par(mfrow=c(2,2))
 plot(ARIMA, col="red", main="ARIMA")
 plot(SARIMA, col="red", main="SARIMA")
-plot(forecast(modelo_automatico), main="SARIMA con drift")
+plot(modelo_automatico, main="SARIMA AUTOMÁTICO")
+plot(SARIMA2, col="red", main="SARIMA2")
 
 par(mfrow=c(1,1))
 ```
 Entonces, usando la transformación inversa que es elevar al cuadrado, tenemos:
 ```{r}
-Predicciones_raiz<-data.frame('Puntual'=SARIMA_forecast,'Banda_inf'=SARIMA_forecast_low,
-                              'Banda_sup'=SARIMA_forecast_up)
+Predicciones_raiz<-data.frame('Puntual'=SARIMA_forecast,'Banda_inf'=lower,
+                              'Banda_sup'=upper)
 Predicciones_raiz
 Predicciones_normales<-Predicciones_raiz**2
+Predicciones_normales
 ts.plot(Serie, xlim=c(inicio[1],final[1]+2.5),ylim=c(9,50),  main="Predicción normal")
 points(SARIMA_forecast**2, type = "l", col = 3)
-points(SARIMA_forecast_low**2, type = "l", col ="blue", lty = 2)
-points(SARIMA_forecast_up**2, type = "l", col ="blue", lty = 2)
+points(lower**2, type = "l", col ="blue", lty = 2)
+points(upper**2, type = "l", col ="blue", lty = 2)
 ```
 
