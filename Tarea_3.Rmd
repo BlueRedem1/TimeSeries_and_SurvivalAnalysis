@@ -621,6 +621,18 @@ for (indice in aux_indices3){
 }
 ```
 
+En promedio, el método de kalman con el modelo StructTS y el de Kalman con el auto.arima
+logran tener las mejores estimaciones al aparecer siempre entre los 5 primeros
+y casi juntos en los 3 casos, por lo que podríamos decir que estas son las dos mejores
+opciones para imputar datos, en nuestro caso. Ambas son con el método de Kalman pero
+a través de distintos modelos (StructTS y auto.arima)
+
+
+Aunque de manera individual, para el trimestre 1 de 1971; el mejor es el seadec
+usando la media. Para el segundo trimestre de 1973 es el seadec por medias móviles ponderadas (ma) y para el tercer trimestre de 1972 fue el seadec por interpolación. Los 3 coinciden en 
+que usan el Seasonally Decomposed Value Imputation, pero hacen la imputación a 
+través de distintos métodos (media, medias móviles y medias móviles ponderadas (ma) )
+
 # 3. Ajuste
 
 Con los datos observados completos, ajuste un modelo ARIMA o SARIMA adecuado.
@@ -707,8 +719,6 @@ plot(ARIMA$residuals, type="p", col="blue", ylim=c(-0.15,0.15), ylab="", xlab=""
 abline(h=3*(var(ARIMA$residuals)), col="purple", lwd=3)
 abline(h=-3*(var(ARIMA$residuals)), col="purple",lwd=3)
 ```
-¡Tenemos muchísimos datos discrepantes!
-Estamos sobreajustando los datos
 
 Ahora atacaremos el problema con un SARIMA(p,d,q)x(P,D,Q), usando la estrategia
 definida en la página 180 de Introduction to Time Series and Forecasting de
