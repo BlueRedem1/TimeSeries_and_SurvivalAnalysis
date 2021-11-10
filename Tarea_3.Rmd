@@ -1131,29 +1131,66 @@ sum(no_sign)
 sum(no_sign)/k
 ```
 
-Por la simplicidad del modelo (Al tener solo 2 coeficientes), ser el que poseeel menor 
+Por la simplicidad del modelo (Al tener solo 2 coeficientes), ser el que posee el menor 
 porcentaje de coeficientes no significativos y  además, pasar todos los tests (En 
-normalidad pasó al menos Anderson-Darling) y tener los mejores índices, elegimos 
-el ajustado por auto.arima
+normalidad pasó al menos Anderson-Darling) y tener los mejores índices, el ajustado por
+auto.arima parece ser el mejor candidato. Aunque podemos ver otro acercamiento:
 
-$$\therefore \textbf{Elegimos el } SARIMA(1,1,0)\times(1,1,0)_{\left[4\right]}$$ 
-¿Ajustará mejor si le quitamos el coeficiente no significativo?
 
 ```{r}
-modelo_automatico2<-arima(Serie_sq,order=c(0,1,0),seasonal=list(order=c(0,1,1),period=4))
+tsdisplay(diff(diff(Serie_sq,lag=4),lag=4))
+```
+
+Tratemos de ajustar otro SARIMA manualmente; con el enfoque antes mencionado:
+
+Veamos el ACF
+```{r}
+k=length(diff(diff(Serie_sq,lag=4),lag=4))
+banda<-qnorm(0.95)/(sqrt(k))
+auxacf=acf(diff(diff(Serie_sq,lag=4),lag=4),plot = F)#MA(6)
+ACF_superior<-sum(auxacf$acf>banda)
+ACF_inferior<-sum(auxacf$acf< -banda)
+superan_banda_acf<-ACF_superior+ACF_inferior
+superan_banda_acf
+#Los que superan las bandas del acf son:
+which(abs(auxacf$acf) > banda)
+```
+Por lo que:
+$$q=2,Q=2$$
+
+Para el PACF:
+```{r}
+pauxacf=pacf(diff(diff(Serie_sq,lag=4),lag=4),plot = F)
+PACF_superior<-sum(pauxacf$acf>banda)
+PACF_inferior<-sum(pauxacf$acf< -banda)
+superan_banda_pacf<-PACF_superior+PACF_inferior
+superan_banda_pacf
+#Los que superan las bandas del pacf son:
+which(abs(pauxacf$acf) > banda)
+```
+Por lo que:
+$$p=3, P=0$$
+
+Aunque, en el ACF y PACF del SARIMA(1,1,1)x(3,1,2)[4], en el lag=4 en el ACF parece que es por
+muy poco que pasa la banda, y en el lag=12 en el PACF se queda un poco por debajo de
+la banda, así que trataremos de reducir en un grado P y Q en dicho modelo para ver si 
+de esa manera mejorra un poco el ajuste; haciendo un modelo SARIMA(1,1,1)x(2,1,1)[4]
+
+```{r}
+modelo_automatico2<-arima(Serie_sq,order=c(3,0,2),seasonal=list(order=c(0,2,2),period=4))
 modelo_automatico2
 ```
 
 ### Gráfica 
 
 ```{r}
-AUTOMATICO_ajuste <- Serie_sq - residuals(modelo_automatico)
+AUTOMATICO2_ajuste <- Serie_sq - residuals(modelo_automatico2)
 ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
-points(AUTOMATICO_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
+points(AUTOMATICO2_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
 ###Y ahora los residuales
-plot(modelo_automatico$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
-abline(h=3*(var(modelo_automatico$residuals)), col="purple", lwd=2)
-abline(h=-3*(var(modelo_automatico$residuals)), col="purple",lwd=2)
+plot(modelo_automatico2$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
+abline(h=3*(var(modelo_automatico2$residuals)), col="purple", lwd=2)
+abline(h=-3*(var(modelo_automatico2$residuals)), col="purple",lwd=2)
 ```
 
 ### Normalidad
@@ -1217,18 +1254,189 @@ sum(no_sign)
 sum(no_sign)/k
 ```
 
-¡Pasa todos los tests y al parecer ajusta bien!
+¡Pasa todos los tests de buena manera! Pero... Tenemos problemas en la significancia
+de los parámetros.
+
+Tratemos de modificar un poco: Dado que en el PACF, en el lag=3, tenemos (de manera
+gráfica), que se queda debajo de la banda de confianza (aunque las consideramos 
+en el test que hicimos para ver si superaban o no las bandas), disminuimos $p$ de $3$ 
+a $2$ y ajustamos:
+
+```{r}
+modelo_automatico2<-arima(Serie_sq,order=c(2,0,2),seasonal=list(order=c(0,2,2),period=4))
+modelo_automatico2
+```
+
+### Gráfica 
+
+```{r}
+AUTOMATICO2_ajuste <- Serie_sq - residuals(modelo_automatico2)
+ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
+points(AUTOMATICO2_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
+###Y ahora los residuales
+plot(modelo_automatico2$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
+abline(h=3*(var(modelo_automatico2$residuals)), col="purple", lwd=2)
+abline(h=-3*(var(modelo_automatico2$residuals)), col="purple",lwd=2)
+```
+
+### Normalidad
+
+```{r}
+#SARIMA AUTOMÁTICO
+qqnorm(modelo_automatico2$residuals)
+qqline(modelo_automatico2$residuals, col="red", lwd=2)
+#Prueba Anderson-Darling
+ad.test(modelo_automatico2$residuals)
+#Prueba de Shapiro
+shapiro.test(modelo_automatico2$residuals)
+#Jarque-Bera Test. tseries
+jarque.bera.test(modelo_automatico2$residuals)
+```
+
+### Varianza constante
+
+```{r}
+#SARIMA AUTOMÁTICO
+Y <- as.numeric(modelo_automatico2$residuals)
+X <- 1:length(modelo_automatico2$residuals)
+bptest(Y ~ X)
+```
+
+### Media 0 
+
+```{r}
+t.test(modelo_automatico2$residuals,mu=0)
+```
+
+### Residuales no correlacionados
+
+```{r}
+checkresiduals(modelo_automatico2$residuals)
+ggtsdisplay(modelo_automatico2$residuals,main="Residuales")
+#Se sale cerca del lag 5
+#Box-Pierce test contrasta
+# Ho: Independencia vs. H1: Dependencia
+Box.test(modelo_automatico2$residuals, lag =10) 
+#De manera conjunta, con la prueba de Ljung y Box
+#H0:No estan correlacionados de manera conjunta 
+# vs 
+#H1:Estan correlacionados de manera conjunta
+tsdiag(modelo_automatico2)
+```
+
+### Coeficiente Significativo
+
+```{r}
+SARIMA_DRIFT_int<-confint(modelo_automatico2)
+SARIMA_DRIFT_int
+k=length(confint(modelo_automatico2))/2
+no_sign<-c()
+for(i in 1:k){
+  no_sign[i]<-(SARIMA_DRIFT_int[i]<0 & SARIMA_DRIFT_int[i+k]>0)
+}
+#No significativos
+sum(no_sign)
+#Porcentaje no significativos
+sum(no_sign)/k
+```
+¡Solo uno de los parámetros no es significativo!
+
+¿Y si disminuimos $Q$ en una unidad, dado que en el ACF, en en lag=4 se ve (gráficamente)
+que está muy pegado a la banda? Veamos:
+
+```{r}
+modelo_automatico3<-arima(Serie_sq,order=c(2,0,2),seasonal=list(order=c(0,2,1),period=4))
+modelo_automatico3
+```
+
+### Gráfica 
+
+```{r}
+AUTOMATICO3_ajuste <- Serie_sq - residuals(modelo_automatico3)
+ts.plot(Serie_sq, lwd=3, main="Comparación ", ylab="", xlab="")
+points(AUTOMATICO3_ajuste, type = "l", col ="orange", lty = 2, lwd=3)
+###Y ahora los residuales
+plot(modelo_automatico3$residuals, type="p", col="blue", ylim=c(-.15,.15), ylab="", xlab="", main="Datos discrepantes", las=1, lwd=3)
+abline(h=3*(var(modelo_automatico3$residuals)), col="purple", lwd=2)
+abline(h=-3*(var(modelo_automatico3$residuals)), col="purple",lwd=2)
+```
+
+### Normalidad
+
+```{r}
+#SARIMA AUTOMÁTICO
+qqnorm(modelo_automatico3$residuals)
+qqline(modelo_automatico3$residuals, col="red", lwd=2)
+#Prueba Anderson-Darling
+ad.test(modelo_automatico3$residuals)
+#Prueba de Shapiro
+shapiro.test(modelo_automatico3$residuals)
+#Jarque-Bera Test. tseries
+jarque.bera.test(modelo_automatico3$residuals)
+```
+
+### Varianza constante
+
+```{r}
+#SARIMA AUTOMÁTICO
+Y <- as.numeric(modelo_automatico3$residuals)
+X <- 1:length(modelo_automatico3$residuals)
+bptest(Y ~ X)
+```
+
+### Media 0 
+
+```{r}
+t.test(modelo_automatico3$residuals,mu=0)
+```
+
+### Residuales no correlacionados
+
+```{r}
+checkresiduals(modelo_automatico3$residuals)
+ggtsdisplay(modelo_automatico3$residuals,main="Residuales")
+#Se sale cerca del lag 5
+#Box-Pierce test contrasta
+# Ho: Independencia vs. H1: Dependencia
+Box.test(modelo_automatico3$residuals, lag =10) 
+#De manera conjunta, con la prueba de Ljung y Box
+#H0:No estan correlacionados de manera conjunta 
+# vs 
+#H1:Estan correlacionados de manera conjunta
+tsdiag(modelo_automatico3)
+```
+
+### Coeficiente Significativo
+
+```{r}
+SARIMA_DRIFT_int<-confint(modelo_automatico3)
+SARIMA_DRIFT_int
+k=length(confint(modelo_automatico3))/2
+no_sign<-c()
+for(i in 1:k){
+  no_sign[i]<-(SARIMA_DRIFT_int[i]<0 & SARIMA_DRIFT_int[i+k]>0)
+}
+#No significativos
+sum(no_sign)
+#Porcentaje no significativos
+sum(no_sign)/k
+```
+
+Esto empeoró los resultados... Nos quedamos con el ajuste anterior
 
 Solo queda ver los indicadores:
 
 ```{r}
-AIC<-c(SARIMA$aic,ARIMA$aic,modelo_automatico$aic, SARIMA2$aic, modelo_automatico$aic)
-BIC<-c(BIC(SARIMA),BIC(ARIMA),BIC(modelo_automatico), BIC(SARIMA2), BIC(modelo_automatico))
-loglik<-c(SARIMA$loglik,ARIMA$loglik,modelo_automatico$loglik, SARIMA2$loglik, modelo_automatico$loglik)
+AIC<-c(SARIMA$aic,ARIMA$aic,modelo_automatico$aic, SARIMA2$aic, modelo_automatico2$aic)
+BIC<-c(BIC(SARIMA),BIC(ARIMA),BIC(modelo_automatico), BIC(SARIMA2), BIC(modelo_automatico2))
+loglik<-c(SARIMA$loglik,ARIMA$loglik,modelo_automatico$loglik, SARIMA2$loglik, modelo_automatico2$loglik)
 Comparar<-data.frame('AIC'=AIC,'BIC'=BIC,'Loglik'=loglik,row.names = c('SARIMA','ARIMA','Automatico', 'SARIMA2','Automático 2'))
 Comparar
 ```
+Tiene el mayor AIC y menor LogLik, pero no tiene el mayor BIC.
+
 Comparemos los errores:
+
 ```{r}
 comparar_=cbind("ARIMA",ARIMA$aic,BIC(ARIMA), mean(ARIMA$residuals),
                 mean(abs(ARIMA$residuals)),sqrt(mean((ARIMA$residuals)^2)),
@@ -1256,6 +1464,13 @@ rownames(resultados)=c("","", "","","")
 
 (resultados)
 ```
+
+Tiene menos parámetros que el promedio, su ME es menor al promedio en valor absoluto,
+así como el menor MAE y RMSE. Su AIC no es el mejor, ni su BIC, pero aunado a que es 
+el que mayor coeficientes significativos tiene (solo 1 no lo es) y que pasa todos los 
+supuestos, elegimos este modelo
+
+$$\therefore \textbf{Elegimos el SARIMA }(2,0,2)\times(0,2,2)_{\left[4\right]}$$
 
 # 4. Forecasting 
 
