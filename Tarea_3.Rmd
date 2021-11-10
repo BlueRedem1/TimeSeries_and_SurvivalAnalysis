@@ -1138,6 +1138,13 @@ normalidad pasó al menos Anderson-Darling) y tener los mejores índices, elegim
 el ajustado por auto.arima
 
 $$\therefore \textbf{Elegimos el } SARIMA(1,1,0)\times(1,1,0)_{\left[4\right]}$$ 
+¿Ajustará mejor si le quitamos el coeficiente no significativo?
+
+```{r}
+modelo_automatico2<-arima(Serie_sq,order=c(0,1,0),seasonal=list(order=c(0,1,1),period=4))
+modelo_automatico2
+```
+
 
 # 4. Forecasting 
 
