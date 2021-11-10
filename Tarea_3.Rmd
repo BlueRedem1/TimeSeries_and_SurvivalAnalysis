@@ -1217,6 +1217,46 @@ sum(no_sign)
 sum(no_sign)/k
 ```
 
+¡Pasa todos los tests y al parecer ajusta bien!
+
+Solo queda ver los indicadores:
+
+```{r}
+AIC<-c(SARIMA$aic,ARIMA$aic,modelo_automatico$aic, SARIMA2$aic, modelo_automatico$aic)
+BIC<-c(BIC(SARIMA),BIC(ARIMA),BIC(modelo_automatico), BIC(SARIMA2), BIC(modelo_automatico))
+loglik<-c(SARIMA$loglik,ARIMA$loglik,modelo_automatico$loglik, SARIMA2$loglik, modelo_automatico$loglik)
+Comparar<-data.frame('AIC'=AIC,'BIC'=BIC,'Loglik'=loglik,row.names = c('SARIMA','ARIMA','Automatico', 'SARIMA2','Automático 2'))
+Comparar
+```
+Comparemos los errores:
+```{r}
+comparar_=cbind("ARIMA",ARIMA$aic,BIC(ARIMA), mean(ARIMA$residuals),
+                mean(abs(ARIMA$residuals)),sqrt(mean((ARIMA$residuals)^2)),
+                length(ARIMA$coef))
+
+comparar_2=cbind("SARIMA",SARIMA$aic,BIC(SARIMA), mean(SARIMA$residuals),
+                 mean(abs(SARIMA$residuals)),sqrt(mean((SARIMA$residuals)^2)),
+                 length(SARIMA$coef))
+
+comparar_3=cbind("SARIMA AUTOMÁTICO",modelo_automatico$aic,BIC(modelo_automatico), mean(modelo_automatico$residuals),
+                 mean(abs(modelo_automatico$residuals)),sqrt(mean((modelo_automatico$residuals)^2)),
+                 length(modelo_automatico$coef))
+comparar_4=cbind("SARIMA2",SARIMA2$aic,BIC(SARIMA2), mean(SARIMA2$residuals),
+                 mean(abs(SARIMA2$residuals)),sqrt(mean((SARIMA2$residuals)^2)),
+                 length(SARIMA2$coef))
+comparar_5=cbind("SARIMA AUTOMÁTICO2",modelo_automatico2$aic,BIC(modelo_automatico2), mean(modelo_automatico2$residuals),
+                 mean(abs(modelo_automatico2$residuals)),sqrt(mean((modelo_automatico2$residuals)^2)),
+                 length(modelo_automatico2$coef))
+nombres=cbind("AJUSTE", "AIC", "BIC","ME","MAE", "RMSE","#Paramatros")
+
+resultados<-rbind(comparar_,comparar_2,comparar_3, comparar_4, comparar_5)
+resultados<-as.table(resultados)
+colnames(resultados)=c("AJUSTE", "AIC", "BIC","ME","MAE", "RMSE","#Parametros")
+rownames(resultados)=c("","", "","","")
+
+(resultados)
+```
+
 # 4. Forecasting 
 
 Con el modelo estimado, pronostique $n_{new}=$ 8 (2 años) valores futuros (obtenga
