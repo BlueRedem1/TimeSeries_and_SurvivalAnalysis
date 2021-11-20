@@ -1,0 +1,621 @@
+---
+title: "Proyecto"
+author: "Eduardo"
+date: "11/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+Cargamos librerías 
+```{r,echo=FALSE,message=FALSE}
+library(readr)
+library(tsbox)
+library(lmtest)
+library(xts)
+library(tidyquant)
+library(dplyr)
+library(MASS)
+library(imputeTS)
+library(LambertW)
+library(QRM)
+library(timeSeries)
+library(fGarch)
+library(nortest)
+library(tseries)
+library(forecast)
+library(zoo)
+library(FinTS)
+library(TSA)
+library(e1071)
+library(rugarch)
+library(sn)
+library(goftest)
+library(rmgarch)
+library(xts)
+library(readxl)
+library(readr)
+library(timeSeries)
+```
+
+# Carga y manejo de los datos: De precios a rendimientos
+
+Trabajaremos con los redimientos logarítmicos de la acción de América Móvil
+desde 2000 hasta este año.
+Dado que los fines de semana (y días feriados) no abren los mercados (siendo 
+un aproximado de 253 los días laborales), consideraremos los rendimientos semanales
+```{r}
+inicio="2008-01-01"
+final="2021-11-18"
+activo='AMXL.MX'
+dirty_data <- tq_get(activo, from = inicio,to = final, get = "stock.prices")
+#Nos quedamos solo con date y close, que son las fechas y el precio de cierre
+datos<-dirty_data[c('date','close')]
+#Le ponemos nombres en mayúscula al inicio, esto solo con fines estéticos
+colnames(datos)<-(c('Date','Close'))
+#Pasamos a tipo fecha la columna de Date. Viendo nuestros datos vemos que 
+#están en formato YYYY-mm-dd
+datos$Date<-as.Date(datos$Date,format='%Y-%m-%d')
+#Pasamos los datos de cierre a numéricos
+datos$Close<-as.numeric(datos$Close)
+#¿Hay na? 
+sum(is.na(datos$Close))
+#¿Cuáles?
+datos[is.na(datos$Close)==T,]
+#El único NA es el 24 de diciembre de 2012; dada la dinámica de la serie, pensamos
+#que podría ser porque fue un día en el que permaneció cerrado (cayó en lunes),
+#o quizás no operó. Por lo que decidimos quitar ese dato en lugar de estimarlo
+#Quitamos los na 
+datos<-na.omit(datos)
+#reseteamos índices
+row.names(datos)<-NULL
+#Calculamos los rendimientos logarítmicos diarios
+Rendimientos<-diff(log(datos$Close),lag = 1)
+#Hacemos un dataframe para los rendimientos logarítmicos. Nótese que se toma a 
+#partir de la segunda fecha disponible ya que, para la primera fecha no tenemos
+#manera de calcular su rendimiento lagarítmico al ser nuestro punto de inicio
+df<-data.frame(x=datos$Date[2:nrow(datos)],y=Rendimientos)
+#Graficamos los rendimientos logarítmicos
+par(cex.axis = 0.6, cex.lab = .8, cex.main = 1, cex.sub = 1, mgp = c(1.5,0.5, 0))
+plot(x=datos$Date[2:nrow(datos)],y=Rendimientos,col="blue",type="l",
+     ylab='Rendimiento',xlab=" ",lwd = 0.5, font = 1, font.lab =1,
+     main = 'Rendimientos logarítmicos diarios de AMXL.MX',cex.main=1)
+```
+#Análisis descriptivo
+## Media
+Parece que la media se mantiene constante, siendo esta casi idénticamente 0, pues la 
+serie oscila alrededor de esta cantidad
+```{r}
+mean(Rendimientos)
+```
+
+## Tendencia
+No parece tener tendencia, pues todos los valores oscilan alrededor del 0 entre -0.1
+y 0.1, al parecer
+##  Varianza
+Podemos ver  que, de manera gráfica e intuitiva, la serie de tiempo es estable a lo largo del tiempo en cuanto a su media, sin embargo la varianza no parece ser estable, lo cual
+es propio de las series de tiempo, ya que hay periodos con mayor y menor volatilidad,
+los primeros en periodos de estrés (Como antes de 2010 por los efectos de la crisis de
+2008, que es cuando  inicia la serie), o inicios del 2020 por la pandemia ocasionada
+por el COVID-19
+## Periodicidad
+No parecen haber ciclos, al menos de manera gráfica. Parece tener un comportamiento
+irregular  causado de manera aleatoria.
+
+##ACF 
+```{r}
+acf(Rendimientos,main='Rendimientos',lag=50)
+```
+
+##PACF
+```{r}
+pacf(Rendimientos,lag=50)
+```
+No hay una correlación fuerte entre estos rendimientos; de manera significativa, solo en el lag 3 y 8 se sale de las bandas de confianza tanto del ACF como del PACF de manera significativa. Proponemos un ARMA(2,2) para modelar esta parte, aunque intentaremos también
+con un AR(2). 
+
+## ¿Existe un efecto ARCH?
+```{r}
+Box.test(Rendimientos^2,lag=12,type='Ljung')
+ArchTest(Rendimientos)
+```
+
+```{r}
+acf(Rendimientos^2,main="RENDIMIENTOS^2")
+pacf(Rendimientos^2,main="Rendimientos^2")
+```
+Con los rendimientos al cuadrado sí vemos una correlación muy grande y marcada
+## ¿Es estacionaria la serie?
+```{r}
+adf.test(Rendimientos)
+kpss.test(Rendimientos)
+```
+¡Sí es!
+
+# Modelación vía ARMA-GARCH
+
+Creemos que el ajuste más apropiado será el de un TGARCH o un EGARCH por lo 
+que se comenta en la parte anterior del trabajo, pero aún así intentemos con 
+todos los modelos y vayamos descartando. Nuestro primer enfoque será el de 
+cuántos coeficientes son significativos
+
+## Con un GARCH estándar
+```{r}
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit1_1=ugarchfit(spec=spec,data=Rendimientos)
+fit1_1 #Todos significativos
+
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit1_2=ugarchfit(spec=spec,data=Rendimientos)
+fit1_2 #Todos significativos
+
+# ¡DESCARTADOS!
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(2,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit1_3=ugarchfit(spec=spec,data=Rendimientos)
+fit1_3 #Alpha 2 no significativa para nada. Mu tampoco
+
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(2,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit1_4=ugarchfit(spec=spec,data=Rendimientos)
+fit1_4 #Alpha 2 para nada significativa, mu tampoco
+```
+De aquí tomamos en cuenta ARMA(1,1)-GARCH(1,1) y ARMA(1,1)-GARCH(1,2)
+## Con un EGARCH
+```{r}
+spec=ugarchspec(variance.model=list(model="eGARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit2_1=ugarchfit(spec=spec,data=Rendimientos)
+fit2_1 #Mu no significativa, Alpha 1 casi no significativa
+
+spec=ugarchspec(variance.model=list(model="eGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit2_2=ugarchfit(spec=spec,data=Rendimientos)
+fit2_2 #Alpha 1 y Gamma 1 no significativa
+
+#RECHAZADÍSIMO
+spec=ugarchspec(variance.model=list(model="eGARCH",garchOrder=c(2,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit2_3=ugarchfit(spec=spec,data=Rendimientos)
+fit2_3 #alpha 2, alpha 1, ma1, ar1 y mu no significativos
+
+spec=ugarchspec(variance.model=list(model="eGARCH",garchOrder=c(2,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit2_4=ugarchfit(spec=spec,data=Rendimientos)
+fit2_4 #Alpha 1, gamma 2 y mu no significativos
+```
+De aquí tomamos en cuenta ARMA(1,1)-EGARCH(1,1) y tal vez ARMA(1,1)-EGARCH(1,2)
+
+## Con un TGARCH
+```{r}
+spec=ugarchspec(variance.model=list(model="fGARCH",submodel="TGARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit3_1=ugarchfit(spec=spec,data=Rendimientos)
+fit3_1 #Todos significativos, menos Mu
+
+spec=ugarchspec(variance.model=list(model="fGARCH",submodel="TGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit3_2=ugarchfit(spec=spec,data=Rendimientos)
+fit3_2 #eta 1 no significativo
+
+spec=ugarchspec(variance.model=list(model="fGARCH",submodel="TGARCH",garchOrder=c(2,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit3_3=ugarchfit(spec=spec,data=Rendimientos)
+fit3_3 #alpha 2 y eta 2 no significativos, tampoco mu
+
+spec=ugarchspec(variance.model=list(model="fGARCH",submodel="TGARCH",garchOrder=c(2,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit4_4=ugarchfit(spec=spec,data=Rendimientos)
+fit4_4 #eta 1, eta 2 y mu no significativos
+```
+De aquí tomamos en cuenta ARMA(1,1)-TGARCH(1,1) y tal vez ARMA(1,1)-TGARCH(1,2)
+## Con un APARCH
+```{r}
+spec=ugarchspec(variance.model=list(model="apARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit4_1=ugarchfit(spec=spec,data=Rendimientos)
+fit4_1 #gamma 1, mu y omega no significativos
+
+spec=ugarchspec(variance.model=list(model="apARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit4_2=ugarchfit(spec=spec,data=Rendimientos)
+fit4_2 #Gamma 1, omega y mu no significativos
+
+#RECHAZADÍSIMO
+spec=ugarchspec(variance.model=list(model="apARCH",garchOrder=c(2,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit4_3=ugarchfit(spec=spec,data=Rendimientos)
+fit4_3 #mu, alpha 2, gamma 1 y gamma 2 no significativos para nada
+
+spec=ugarchspec(variance.model=list(model="apARCH",garchOrder=c(2,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit4_4=ugarchfit(spec=spec,data=Rendimientos)
+fit4_4 # Omega, Mu y Gamma 1 no significativos
+```
+De aquí no es bueno considerar alguno, todos tienen muchos no significativos
+## Con un GJR-GARCH
+```{r}
+spec=ugarchspec(variance.model=list(model="gjrGARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit5_1=ugarchfit(spec=spec,data=Rendimientos)
+fit5_1 #gamma 1 y mu no significativos
+
+spec=ugarchspec(variance.model=list(model="gjrGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit5_2=ugarchfit(spec=spec,data=Rendimientos)
+fit5_2 #gamma 1 y mu no significativos
+
+#RECHAZADÍSIMO
+spec=ugarchspec(variance.model=list(model="gjrGARCH",garchOrder=c(2,1)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit5_3=ugarchfit(spec=spec,data=Rendimientos)
+fit5_3 #Gamma 2, gamma 1, mu, alha 1 y alpha 2 no significativos
+
+#No converge :c
+spec=ugarchspec(variance.model=list(model="gjrGARCH",garchOrder=c(2,2)),
+                   mean.model=list(armaOrder=c(1,1)))
+fit5_4=ugarchfit(spec=spec,data=Rendimientos)
+fit5_4
+```
+De aquí tomamos en cuenta, quizás ARMA(1,1)-GJR-GARCH(1.1)
+
+Entonces nuestros candidatos son, reduciendo únicamente a los que presentaron
+todos sus parámetros significativos (excepto Mu, ya que este es normal que salga
+0 dado que representa la estimación de la media y, como vimos, es casi idénticamente 
+cero), tenemos:\\
+ARMA(1,1)-GARCH(1,1) y ARMA(1,1)-GARCH(1,2)\\
+ARMA(1,1)-EGARCH(1,1)\\
+ARMA(1,1)-TGARCH(1,1)\\
+
+Veamos sus criterios:
+
+```{r}
+fit1_1
+Modelo1_1=list('Akaike'=-5.4179,'Bayes'=-5.4073,'Shibata'=-5.4179,'Hannan-Quinn'=-5.4141)
+fit1_2
+Modelo1_2=list('Akaike'=-5.4199,'Bayes'=-5.4075,'Shibata'=-5.4199,'Hannan-Quinn'=-5.4155)
+fit2_1
+Modelo2_1=list('Akaike'=-5.4236,'Bayes'=-5.4112,'Shibata'=-5.4236,'Hannan-Quinn'=-5.4191)
+fit3_1
+Modelo3_1=list('Akaike'=-5.4209,'Bayes'=-5.4086,'Shibata'=-5.4210,'Hannan-Quinn'=-5.4165)
+rbind(Modelo1_1,Modelo1_2,Modelo2_1,Modelo3_1)
+```
+Vemos que todos los criterios poseen casi el mismo indicador, por lo que es indiferente
+bajo este criterio.
+
+## Análisis de residuales
+
+### Primer modelo
+```{r}
+res1<-fit1_1@fit$residuals
+t.test(res1,mu = 0)
+#Pasa media=0
+adf.test(res1)
+kpss.test(res1)
+#Pasa estacionariedad
+jarque.bera.test(res1)
+shapiro.test(res1)
+ad.test(res1)
+#No es normal
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.6487,
+                                                                      'Lag[2*(p+q)+(p+q)-1][5]'=0.9647,
+                                                                      'Lag[4*(p+q)+(p+q)-1][9]'=0.9875))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.12322,"ar1"= 0.41497,"ma1" =0.43449,"omega" = 0.36670,
+                                  "alpha1"= 0.25001,"beta1"  =0.08707))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo
+```
+Pasa todos los supuestos menos la normalidad
+## Segundo modelo
+```{r}
+res2<-fit1_2@fit$residuals
+t.test(res2,mu = 0)
+#Pasa media=0
+adf.test(res2)
+kpss.test(res2)
+#Pasa estacionariedad
+jarque.bera.test(res2)
+shapiro.test(res2)
+ad.test(res2)
+#No es normal
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.9997,
+                                                                      'Lag[2*(p+q)+(p+q)-1][8]'=0.9981,
+                                                                      'Lag[4*(p+q)+(p+q)-1][14]'=0.9956))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.09917,"ar1"= 0.40154,"ma1" =0.42512,"omega" = 0.95673,
+                                  "alpha1"= 0.22415,"beta1"  =0.07835,"beta2"= 0.07720))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo
+```
+
+## Tercer modelo
+```{r}
+res3<-fit3_1@fit$residuals
+t.test(res3,mu = 0)
+#Pasa media=0
+adf.test(res3)
+kpss.test(res3)
+#Pasa estacionariedad
+jarque.bera.test(res3)
+shapiro.test(res3)
+ad.test(res3)
+#No es normal
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.5643,
+                                                                      'Lag[2*(p+q)+(p+q)-1][5]'=0.9563,
+                                                                      'Lag[4*(p+q)+(p+q)-1][9]'=0.9842))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.09583,"ar1"= 0.48170,"ma1" =0.50021,"omega" = .07318,
+                                  "alpha1"= 0.28264,"beta1"  =0.12542,"eta11"= 0.32696))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo
+```
+
+## Cuarto modelo
+```{r}
+res4<-fit4_1@fit$residuals
+t.test(res4,mu = 0)
+#Pasa media=0
+adf.test(res4)
+kpss.test(res4)
+#Pasa estacionariedad
+jarque.bera.test(res4)
+shapiro.test(res4)
+ad.test(res4)
+#No es normal
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.6306,
+                                                                      'Lag[2*(p+q)+(p+q)-1][5]'=0.9668,
+                                                                      'Lag[4*(p+q)+(p+q)-1][9]'=0.9885))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.08175,"ar1"= 0.47051,"ma1" =0.49182,"omega" = 0.05486,
+                                  "alpha1"= 0.24993,"beta1"  =0.09974,"gamma1"= 0.35930,"delta"= 0.05839))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo,
+#aunque delta casi no lo es 
+
+```
+
+Todos los modelos pasan todos los supuestos a exepción de la distribución: Hagamos una
+modificación probando nuevas distribuciones
+
+### Cambiando el GARCH(1,1)
+```{r}
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='sstd')
+sstdfit1_1=ugarchfit(spec=spec,data=Rendimientos)
+sstdfit1_1 #mu, ar1, ma1, omega no significativos
+
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='std')
+stdfit1_1=ugarchfit(spec=spec,data=Rendimientos)
+stdfit1_1 #mu, omega y alpha 1 no significativos
+
+#Candidata
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,1)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='snorm')
+snormfit1_1=ugarchfit(spec=spec,data=Rendimientos)
+snormfit1_1 #Todos significativos menos mu
+```
+Una candidata sería la normal sesgada\\
+```{r}
+res1_1<-snormfit1_1@fit$residuals
+t.test(res1_1,mu = 0)
+#Pasa media=0
+adf.test(res1_1)
+kpss.test(res1_1)
+#Pasa estacionariedad
+goftest::ad.test(res1_1,null=psn,alpha=0.977597,estimated = T)
+#No es normal sesgada
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.6700,
+                                                                      'Lag[2*(p+q)+(p+q)-1][5]'=0.9663,
+                                                                      'Lag[4*(p+q)+(p+q)-1][9]'=0.9875))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.19044,"ar1"= 0.05168,"ma1" =0.04255,"omega" = 0.36932,
+                                  "alpha1"= 0.24693,"beta1"  =0.08108,'skew'=0.20991))
+#el coeficiente del ma1 no pasa la prueba de Nyblom
+```
+### Veamos el GARCH(1,2)
+
+```{r}
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='sstd')
+sstdfit1_2=ugarchfit(spec=spec,data=Rendimientos)
+sstdfit1_2  #mu, ar1,ma1, omega y alpha 1 no significativos
+
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='std')
+stdfit1_2=ugarchfit(spec=spec,data=Rendimientos)
+stdfit1_2 #mu, ar1,ma1 y omega no significativos
+
+#Candidata 
+spec=ugarchspec(variance.model=list(model="sGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='snorm')
+snormfit1_2=ugarchfit(spec=spec,data=Rendimientos)
+snormfit1_2 #Todos significativos menos mu
+```
+Una candidata sería la normal sesgada, nuevamente\\
+
+```{r}
+res2_1<-snormfit1_2@fit$residuals
+t.test(res2_1,mu = 0)
+#Pasa media=0
+adf.test(res2_1)
+kpss.test(res2_1)
+#Pasa estacionariedad
+goftest::ad.test(res2_1,null=psn,alpha=0.979694,estimated = T)
+#No es normal sesgada
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.9409,
+                                                                      'Lag[2*(p+q)+(p+q)-1][8]'=0.9982,
+                                                                      'Lag[4*(p+q)+(p+q)-1][14]'=0.9961))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.16340,"ar1"= 0.06374,"ma1" =0.05261,"omega" = 0.99503,
+                                  "alpha1"= 0.22314,"beta1"  =0.07463,"beta2"= 0.07361,'skew'=0.21034))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo
+``` 
+### Veamos el EGARCH(1,2)
+```{r}
+#CANDIDATO 
+spec=ugarchspec(variance.model=list(model="eGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='sstd')
+sstdfit2_1=ugarchfit(spec=spec,data=Rendimientos)
+sstdfit2_1  #mu no significativo
+
+#CANDIDATA
+spec=ugarchspec(variance.model=list(model="eGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='std')
+stdfit2_1=ugarchfit(spec=spec,data=Rendimientos)
+stdfit2_1 #mu no significativo
+
+spec=ugarchspec(variance.model=list(model="eGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='snorm')
+snormfit2_1=ugarchfit(spec=spec,data=Rendimientos)
+snormfit2_1 #alpha 1 y mu no significativos
+```
+Bajo la t de student y la t de student sesgada parece una buena alternativa
+```{r}
+res3_1<-sstdfit2_1@fit$residuals
+t.test(res3_1,mu = 0)
+#Pasa media=0
+adf.test(res3_1)
+kpss.test(res3_1)
+#Pasa estacionariedad
+ks.test.t(res3_1)
+#Sí es t de student
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.9134717,
+                                                                      'Lag[2*(p+q)+(p+q)-1][8]'=0.0010246,
+                                                                      'Lag[4*(p+q)+(p+q)-1][14]'=0.0003792))
+#NO pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.04549,"ar1"= 0.31349,"ma1" =0.31559,"omega" = 0.06044,
+                                  "alpha1"= 0.56366,"beta1"  =0.05197,"beta2"= 0.05224,
+                                  'gamma1'=0.34937,'skew'=0.27406 ,'shape'=0.07214))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo
+```
+
+```{r}
+res3_2<-stdfit2_1@fit$residuals
+t.test(res3_2,mu = 0)
+#Pasa media=0
+adf.test(res3_2)
+kpss.test(res3_2)
+#Pasa estacionariedad
+ks.test.t(res3_2)
+#Sí es t de student
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.7599,
+                                                                      'Lag[2*(p+q)+(p+q)-1][8]'=0.9947,
+                                                                      'Lag[4*(p+q)+(p+q)-1][14]'=0.9958))
+#NO pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.04732,"ar1"= 0.32884,"ma1" =0.33113,"omega" = 0.05885,
+                                  "alpha1"= 0.55706,"beta1"  =0.05109,"beta2"= 0.05135,
+                                  'gamma1'=0.34792,'shape'=0.07031))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo a excepción de mu
+```
+Suena a un buen modelo. Cumple todo, a excepción de que mu no pasa Nyblom
+
+### Veamos el TGARCH(1,2)
+```{r}
+#CANDIDATO 
+spec=ugarchspec(variance.model=list(model="fGARCH",submodel="TGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='sstd')
+sstdfit3_1=ugarchfit(spec=spec,data=Rendimientos)
+sstdfit3_1  #mu no significativo
+
+#CANDIDATA
+spec=ugarchspec(variance.model=list(model="fGARCH",submodel="TGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='std')
+stdfit3_1=ugarchfit(spec=spec,data=Rendimientos)
+stdfit3_1 #mu no significativo
+
+#CANDIDATA
+spec=ugarchspec(variance.model=list(model="fGARCH",submodel="TGARCH",garchOrder=c(1,2)),
+                   mean.model=list(armaOrder=c(1,1)),distribution.model='snorm')
+snormfit3_1=ugarchfit(spec=spec,data=Rendimientos)
+snormfit3_1 #mu no significativo
+
+```
+¡Los tres son candidatos!
+
+```{r}
+res4_1<-sstdfit3_1@fit$residuals
+t.test(res4_1,mu = 0)
+#Pasa media=0
+adf.test(res4_1)
+kpss.test(res4_1)
+#Pasa estacionariedad
+ks.test.t(res4_1)
+#Es t sesgada
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.8661,
+                                                                      'Lag[2*(p+q)+(p+q)-1][8]'=0.9668,
+                                                                      'Lag[4*(p+q)+(p+q)-1][14]'=0.9970))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.06282,"ar1"= 0.06014,"ma1" =0.05753,"omega" = 0.05119,
+                                  "alpha1"= 0.14925,"beta1"  =0.06512,"beta2"= 0.06345,"eta11"= 0.61617,
+                                  'skew'=0.31481,'shape'=0.09670))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo,
+
+```
+¡Cumple todos los supuestos!
+```{r}
+res4_2<-stdfit3_1@fit$residuals
+t.test(res4_2,mu = 0)
+#Pasa media=0
+adf.test(res4_2)
+kpss.test(res4_2)
+#Pasa estacionariedad
+ks.test.t(res4_2)
+#Es t
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.8630,
+                                                                      'Lag[2*(p+q)+(p+q)-1][8]'=0.9988,
+                                                                      'Lag[4*(p+q)+(p+q)-1][14]'=0.9969))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.06359,"ar1"= 0.06099,"ma1" =0.05805,"omega" = 0.05190,
+                                  "alpha1"= 0.14683,"beta1"  =0.06405,"beta2"= 0.06241,"eta11"= 0.61069,
+                                  'shape'=0.09556))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo,
+
+```
+¡Cumple todos los supuestos!
+```{r}
+res4_3<-snormfit3_1@fit$residuals
+t.test(res4_3,mu = 0)
+#Pasa media=0
+adf.test(res4_3)
+kpss.test(res4_3)
+#Pasa estacionariedad
+goftest::ad.test(res4_3,null=psn,tau=0.971156,estimated = T)
+#No es normal sesgada
+list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.8991,
+                                                                      'Lag[2*(p+q)+(p+q)-1][8]'=0.9959,
+                                                                      'Lag[4*(p+q)+(p+q)-1][14]'=0.9919))
+#Pasa la no correlación
+list('Nyblom stability test'=list('mu'=0.09268,"ar1"= 0.38962,"ma1" =0.40935,"omega" = 0.05626,
+                                  "alpha1"= 0.22194,"beta1"  =0.09415,"beta2"= 0.09312,"eta11"= 0.52460,
+                                  'skew'=0.17194))
+#Además pasa la prueba de Nyblom por lo que los coeficientes son estables a lo largo del tiempo,
+
+```
+
+## ¿Cuál elegir?
+Si somos estrictos y nos quedamos únicamente con aquellos modelos que pasan
+todos los supuestos, estamos entre el TGARCH(1,2) con distribución t de student
+o t de student sesgada. Veamos sus indicadores
+
+```{r}
+Sesgadot=list('Akaike'=-5.5443,'Bayes'=-5.5266,'Shibata'=-5.5443,'Hannan-Quinn'=-5.5380)
+tst=list('Akaike'=-5.5448,'Bayes'=-5.5289,'Shibata'=-5.5448,'Hannan-Quinn'=-5.5391)
+cbind(Sesgadot,tst)
+```
+Por lo tanto, al tener mejores indicadores, seleccionamos el modelo ARMA(1,1)-TGARCH(1,2) con distribución t de student.
+
+```{r}
+modelo_final=stdfit3_1
+```
+
+#Forecasting
+
+```{r}
+#Pronosticamos 12 días
+pred=ugarchforecast(modelo_final,n.ahead=12)
+plot(pred)
+#Selección 1 y después 0 para hacer la gráfica
+```
