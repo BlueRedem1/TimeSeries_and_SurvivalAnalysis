@@ -114,8 +114,7 @@ acf(Rendimientos,main='Rendimientos',lag=50)
 ```{r}
 pacf(Rendimientos,lag=50)
 ```
-No hay una correlación fuerte entre estos rendimientos; de manera significativa, solo en el lag 3 y 8 se sale de las bandas de confianza tanto del ACF como del PACF de manera significativa. Proponemos un ARMA(2,2) para modelar esta parte, aunque intentaremos también
-con un AR(2). 
+No hay una correlación fuerte entre estos rendimientos; de manera significativa, solo en el lag 3 y 8 se sale de las bandas de confianza tanto del ACF como del PACF de manera significativa. Proponemos un ARMA(1,1)
 
 ## ¿Existe un efecto ARCH?
 ```{r}
@@ -504,7 +503,7 @@ ks.test.t(res3_2)
 list('Weighted Ljung-Box Test on Standardized Squared Residuals'=list('Lag[1] '=0.7599,
                                                                       'Lag[2*(p+q)+(p+q)-1][8]'=0.9947,
                                                                       'Lag[4*(p+q)+(p+q)-1][14]'=0.9958))
-#NO pasa la no correlación
+#Pasa la no correlación
 list('Nyblom stability test'=list('mu'=0.04732,"ar1"= 0.32884,"ma1" =0.33113,"omega" = 0.05885,
                                   "alpha1"= 0.55706,"beta1"  =0.05109,"beta2"= 0.05135,
                                   'gamma1'=0.34792,'shape'=0.07031))
