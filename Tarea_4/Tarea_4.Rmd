@@ -1,0 +1,17 @@
+---
+title: "Tarea 4"
+author: "Yisus"
+date: "2/12/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r pressure2, echo=FALSE, out.width = '210%'}
+knitr::include_graphics("CARATULA.PNG")
+```
+
+## R Markdown
+
