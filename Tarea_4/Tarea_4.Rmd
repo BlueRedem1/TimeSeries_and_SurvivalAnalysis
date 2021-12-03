@@ -1,7 +1,4 @@
 ---
-title: "Tarea 4"
-author: "Yisus"
-date: "2/12/2021"
 output: pdf_document
 ---
 
@@ -13,5 +10,6 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::include_graphics("CARATULA.PNG")
 ```
 
-## R Markdown
+\newpage
+
 
