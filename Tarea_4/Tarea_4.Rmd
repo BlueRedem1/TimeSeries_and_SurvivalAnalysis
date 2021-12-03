@@ -12,4 +12,202 @@ knitr::include_graphics("CARATULA.PNG")
 
 \newpage
 
+1. Resuelva lo siguiente:
 
+a) Suponga que la función de riesgo de asociada a un tiempo de supervivencia es una función lineal $h(t) = a + bt$ donde $ a > 0$ y $b \in \mathbb{R}$. Obtenga: $S(t)$, $F(t)$, $f(t)$, $h(t)$, y la media, mediana y moda de la distribución. Grafique las funciones.
+
+b) Supongo que una función de supervivencia está definida por $S(t) = exp(-t^{\gamma})$ para $0 \leq t$. Obtenga su función de densidad $f(t)$ y su función de riesgo $h(t).$
+
+\textbf{Solución}
+
+a) Sea $h(t) = a + bt$
+
+Como \begin{align*}H(t) &= \int_{0}^{t} h(u)du\\
+\implies H(t) &= \int_{0}^{t}a + bu du = au|_{0}^{t} + \frac{bu^{2}}{2}|_{0}^{t} = at + \frac{bt{^2}}{2}
+\end{align*}
+
+Veamos $S(t)$,
+$$S(t) = e^{\int_{0}^{t}h(u)du} = e^{-H(t)} = e^{-(at + \frac{bt^{2}}{2})}$$
+
+Ahora,veamos $F(t)$, como \begin{align*}S(t) &= 1 - F(t)\\ 
+\implies F(t) &= 1 - S(t) = 1 - e^{-(at + \frac{bt^{2}}{2})}
+\end{align*}
+
+Por otro lado, como \begin{align*}F'(t) &= f(t)\\
+&\implies \frac{d\left(1 - e^{-\left(at + \frac{bt^{2}}{2}\right)}\right)}{dt} = f(t) = -\left(-\left(a + \frac{2bt}{2}\right) e^{\left(at + \frac{bt^{2}}{2} \right)} \right) = (a + bt) e ^{-\left(at + \frac{bt^{2}}{2}\right)}
+\end{align*}
+
+De manera alternativa, 
+$$f(t) = h(t) e^{\int_{0}^{t}h(u)du} = h(t)S(t) = (a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)}$$
+Veamos la media:
+
+$$ \int_{0}^{\infty} t(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)dt}$$ 
+Haciendo cambio de variable, sea $u = \frac{bt^{2}}{2}+at \implies du= (a + bt)dt, \quad \text{despejando t}$
+
+\begin{align*}
+\frac{bt^{2}}{2} + at -u = 0 &\implies \frac{a + \sqrt{a^{2}-4\left(\frac{b}{2}\right)(-u)}}{2\left(\frac{b}{2}\right)} = x\\
+&\text{(Nos quedamos con el signo positivo por el soporte)}\\
+&\implies \frac{a + \sqrt{a^{2} + 2bu}}{b} = x\\
+&\implies \mathbb{E}(X) = \int_{0}^{\infty}\left[\frac{a + \sqrt{a^{2} + 2bu}}{b}\right] e^{-u}du\\
+&= \frac{a}{b}\int_{0}^{\infty} e^{-u} du + \frac{1}{b} \int_{0}^{\infty}\sqrt{a^{2}+2bu} e^{-u}du\\
+&= -\frac{a}{b} e^{-u}|_{0}^{\infty} + \frac{1}{b} \int_{0}^{\infty}\sqrt{a^{2}+2bu} e^{-u}du\\
+&= -\frac{a}{b} \left[ \lim_{u \rightarrow \infty} e^{-u}-e^{0}\right] + \frac{1}{b} \int_{0}^{\infty}\sqrt{a^{2}+2bu} e^{-u}du\\
+&= -\frac{a}{b} \left[0 - 1\right] + \frac{1}{b} \int_{0}^{\infty}\sqrt{a^{2}+2bu} e^{-u}du\\
+&= \frac{a}{b} + \frac{1}{b} \int_{0}^{\infty}\sqrt{a^{2}+2bu} e^{-u}du\quad (1)\\
+\end{align*}
+
+Sea \begin{align*}y &=\frac{(a^{2}+2bu)^{\frac{3}{2}}}{3b}\\ 
+\implies dy &= \sqrt{a^{2}+2bu}du\\
+\implies 3by &= (a^{2}+2bu)^{\frac{3}{2}}\\
+\implies (3by)^{\frac{3}{2}} &= a^{2} + 2bu\\
+\implies \frac{(3by)^{\frac{3}{2}}-a^{2}}{2b} &= u\\
+\end{align*}
+
+Dado lo anterior, continuamos desarrollando donde nos quedamos en (1)
+
+\begin{align*}
+&= \frac{1}{b} \int_{\frac{a^{3}}{b}}^{\infty} e^{-\left[\frac{(3by)^{\frac{3}{2}}-a^{2}}{2b}\right]}dy\\
+&= \frac{1}{b} \int_{\frac{a^{3}}{b}}^{\infty} e^{-\frac{(3by)^{\frac{3}{2}}}{2b}}e^{\frac{a^{2}}{2b}}dy\\
+&= \frac{1}{b} e^{\frac{a^{2}}{2b}} \int_{\frac{a^{3}}{b}}^{\infty} e^{-\frac{(3by)^{\frac{3}{2}}}{2b}} dy\\
+\therefore \mathbb{E}[X] &= \frac{a}{b} + \frac{1}{b} e^{\frac{a^{2}}{2b}}\int_{\frac{a^{3}}{b}}^{\infty} e^{-\frac{(3by)^{\frac{3}{2}}}{2b}} dy\\
+\end{align*}
+
+Lo dejamos expresado solamente, debido a que no se puede integrar.
+
+Ahora veamos la moda:
+
+**
+
+\begin{align*}
+& (a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)}\\
+&= a e^{-\left(at + \frac{bt^{2}}{2}\right)} + bt e^{-\left(at + \frac{bt^{2}}{2}\right)}\\
+\frac{df(t)}{df} &= a(-a - bt)e^{-(at + \frac{bt^{2}}{2})} + b\left(e^{-at + \frac{bt^{2}}{2}} + t\left[(-a - bt)e^{\left(at + \frac{bt^{2}}{2}\right)}\right]\right)\\
+&= -(a^{2} + abt)e^{-(at + \frac{bt^{2}}{2})} + be^{-at + \frac{bt^{2}}{2}} - bt(a + bt)e^{-(at + \frac{bt^{2}}{2})}\\
+&= e^{-(at + \frac{bt^{2}}{2})}(-a^{2}-abt + b - bat - b^{2}t^{2})\\
+&= -e^{-(at + \frac{bt^{2}}{2})}(a^{2}+ abt - b + bat + b^{2}t^{2})\\
+&= -e^{-(at + \frac{bt^{2}}{2})}(a^{2} + 2abt + b^{2}t^{2}-b) \quad (2)
+\end{align*}
+
+Igualando a cero, como $e^{-x} > 0 \quad \forall x;$
+
+\begin{align*}
+(2) = 0 \quad &\text{si y solo si}\quad a^{2} + 2abt + b^{2}t^{2} - b = 0\\
+\implies x &= \frac{-2ab \pm \sqrt{(2ab)^{2} - 4(b^{2})(a^{2}-b)}}{2b^{2}}\\
+&= - \frac{a}{b} \pm \frac{1}{2b}\sqrt{4a^{2}b^{2} - 4a^{2}b^{2} + 4b}\\
+&= - \frac{a}{b} + \frac{1}{2b}\sqrt{4b}\\
+t &=  - \frac{a}{b} + \frac{2}{2b}\sqrt{b} \quad \text{si b > 0}\\
+t &=  - \frac{a}{b} + \frac{1}{\sqrt{b}} > 0\\
+&\text{si y solo si} \quad \frac{1}{\sqrt{b}} > \frac{a}{b}\\
+&\text{si y solo si} \quad \sqrt{b} > a\\
+&\text{si y solo si} \quad b > a^{2}\\
+& a^{2} + 2abt + b^{2}t^{2} - b > 0
+\end{align*}
+
+**
+\begin{align*}
+& - e^{-\left(at + \frac{bt^{2}}{2}\right)}(a^{2} + 2abt + b^{2}t^{2} - b)\\
+&= a^{2}(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)} + 2ab\left(t(a + bt)e^{-(at + \frac{bt^{2}}{2})} - e^{-\left(at + \frac{bt^{2}}{2}\right)}\right)\\
+& + b^{2}\left(t^{2}(a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)} - 2t e^{-\left(at + \frac{bt^{2}}{2}\right)}\right) - b(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)}\\
+&= e^{-\left(at + \frac{bt^{2}}{2}\right)}\left(a^{3} + a^{2}bt + 2a^{2}bt + 2ab^{2}t^{2} - 2ab + ab^{2}t^{2} + b^{3}t^{3} - t - ab - b^{2}t\right)\\
+**\\
+&= a^{3} + 2a^{2}bt + 2a^{2}bt +3ab^{2}t^{2} + b^{3}t^{3} - 3b^{2}t * 3ab\\
+**\\
+&= (a + bt)(a^{2} + 2abt + b(bt^{2}-3))\\
+t &= -\frac{a}{b} + \frac{1}{\sqrt{b}} \implies bt = -a + \sqrt{b} \implies 2abt = -a^{2} + 2a\sqrt{b}\\
+b^{2}t^{2} &= b^{2}\left(\frac{a^{2}}{b^{2}}-\frac{2a}{b^{\frac{3}{2}}} + \frac{1}{b}\right) = a^{2} - 2a\sqrt{b} + b\\
+&= (a + \sqrt{b} - a)(a^{2} - 2a^{2} + 2a\sqrt{b} + a^{2} - 2a\sqrt{b} + b - 3b)\\
+&= (\sqrt{b})(-2b) = -2b^{\frac{3}{2}} < 0\\
+&\therefore \text{Es un máximo como *}
+\end{align*}
+
+\begin{align*}
+& a^{2} + 2abt + b^{2}t^{2} - b < a^{2} + 2a\\
+& - a^{2} - 2abt - b(bt^{2}-1)\\
+& < -2abt - b^{2}t^{2}+b\\
+& < -2abt + b\\
+& < -2abt\\
+& < 0
+\end{align*}
+
+Entonces, si $b < 0$ siempre es decreciente, por lo que su máximo es en $t=0$ (donde empieza). Lo mismo si $b < a^{2};$ ya que alcanza su máximo en un t < 0; Por lo que de ahí decrece, entonces su máximo sería en $t = 0.$
+
+$$(2b^{\frac{3}{2}}-a)(a^{2} - 4ab^{\frac{3}{2}} + 4b^{3} - 3b) $$
+$$2 a^{2}b^{\frac{3}{2}} - 8ab^{3} + 8b^{\frac{a}{2}} - 6b^{\frac{5}{2}} - a^{3} + 4a^{2}b^{\frac{3}{2}} - 4ab^{3} + 3ab$$
+$$ ba^{2}b^{\frac{3}{2}} - 12 ab^{3} + 8b^{\frac{a}{2}} - 6b^{\frac{5}{2}} + 3ab - a^{3}$$
+
+$$ ln(0.5) = -at$$
+$$-a^{-1}ln(0.5) = t$$
+\begin{align*}
+1 - e^{-(at + \frac{bt^{2}}{2})} = .05 &\Leftrightarrow 0.5 = e^-{at + \frac{bt^{2}}{2}}\\
+&\Leftrightarrow ln(.05) = -at -\frac{bt^{2}}{2}\\
+&\Leftrightarrow - ln(0.5) = at + \frac{bt^{2}}{2}\\
+&\Leftrightarrow \frac{b}{2}\left(t^{2} + \frac{2at}{b}\right) = -ln (0.5)\\
+&\Leftrightarrow \frac{b}{2}\left(t^{2} + \frac{2at}{b} + \left(\frac{a}{b}\right)^{2}-\left(\frac{a}{b}\right)^{2}\right) = ln(2)\\
+&\Leftrightarrow \frac{b}{2}\left(\left(t + \frac{a}{b}\right)^{2} - \left(\frac{a}{b}\right)^{2}\right) = ln(2)\\
+&\Leftrightarrow \left(t + \frac{a}{b}\right)^{2} - \left(\frac{a}{b}\right)^{2} = \frac{2ln(2)}{b}\\
+&\Leftrightarrow \left(t + \frac{a}{b}\right)^{2} = \frac{2ln(2)}{b} + \frac{a^{2}}{b^{2}}\\
+&\Leftrightarrow t + \frac{a}{b} = \sqrt{\frac{2bln(2) + a^{2}}{b^{2}}}\\
+&\Leftrightarrow t = \frac{\sqrt{a^{2}+2bln(2)}{b}}{b} - \frac{a}{b}\\
+&\Leftrightarrow t = \frac{-a + \sqrt{a^{2}+2bln(2)}}{b}\\
+\therefore \quad \text{La media es} \quad t &= \frac{-a + \sqrt{a^{2}+2bln(2)}}{b}
+\end{align*}
+
+Ahora, como $t > 0$, solo está definido si:
+\begin{align*}
+-a + \sqrt{a^{2}+2bln(2)} > 0 \Leftrightarrow \sqrt{a^{2} + 2bln(2)} > a
+\end{align*}
+
+Pero, $ln(2) > 0$; $2 > 0$, entonces necesitamos que $b > 0!$, ya que, de lo contrario $\sqrt{a^{2} + 2bln(2)} < a$. Ahora, si $b = 0$, se reduce a una exponencial con $\lambda = a$. Si $b < 0$, el soporte debería ser $(0, \frac{a}{-b})$; ya que si $b<0$ y $t > \frac{a}{-b}$; $at + \frac{bx^{2}}{2}$ es decreciente.
+
+Veamos que:
+
+\begin{align*}
+at + \frac{bt^{2}}{2} = 0 &\Leftrightarrow t(a + \frac{bt}{2}) = 0\\
+&\Leftrightarrow t = 0 \quad \text{ó} \quad a+ \frac{bt}{2} = 0\\
+&\Leftrightarrow \frac{bt}{2} = -a\\
+&\Leftrightarrow t = \frac{-2a}{b}
+\end{align*}
+
+
+b) Sabemos que $S(t) = exp(-t^{\gamma})$, entonces obtendremos las funciones que se nos piden.
+
+Función de densidad:
+
+\begin{align*}
+S(t) = exp(-t^{\gamma}) &\implies F(x)= 1 - e^{r^{\gamma}}\\
+&\implies f(x) = - e^{-t^{\gamma}}*\left(-\gamma t^{\gamma -1}\right)\\
+&= \gamma t^{\gamma -1} e^{-t^{\gamma}}\\
+&\therefore \quad \text{la función de densidad es} =\gamma t^{\gamma -1} e^{-t^{\gamma}}_\blacksquare\\
+&\text{Ahora obtenemos la función de riesgo}\\
+&\implies h(t) = \frac{\gamma t^{\gamma -1} e^{-t^{\gamma}}}{ e^{-t^{\gamma}}}\\
+&= \gamma t^{\gamma -1}\\
+&\therefore \quad \text{la función de riesgo es}  = \gamma t^{\gamma -1}_\blacksquare
+\end{align*}
+
+2. Resume las siguientes distribuciones: Exponencial, Weibull, Log-Normal, Gamma, Gompertz, Log-Logística, Geométrica. (Hint: Ver capítulo 7 del libro: Kleinbaum, D. & Klein, M. (2005) Survival Analysis. A Self-Learning Text. Springer.)
+
+a) ¿Qué distribuciones describen una tasa de riesgo constante? 
+b) ¿Qué distribuciones describen una tasa de riesgo creciente? Identifica sus diferencias.
+c) ¿Qué distribuciones describen una tasa de riesgo decreciente? Identifica sus diferencias.
+d) Con R grafique las funciones $S(t)$ y $h(t)$ dando valores fijos para los parámetros de las funciones. (Hint: Revisa la sección 2.4 del libro: Moore, D.F. (2016) Applied Survival Analysis Using R. Use R! Springer.)
+
+\textbf{Solución}
+
+a)
+
+
+
+
+b)
+
+
+
+
+
+c)
+
+
+
+
+
+d)
