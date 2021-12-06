@@ -168,7 +168,152 @@ at + \frac{bt^{2}}{2} = 0 &\Leftrightarrow t(a + \frac{bt}{2}) = 0\\
 &\Leftrightarrow t = \frac{-2a}{b}
 \end{align*}
 
+Grafiquemos:
 
+\\
+Cargamos librerías:
+```{r}
+library(ggplot2)
+library(ggfortify)
+library(flexsurv)
+```
+
+## Función de riesgo
+
+```{r}
+Riesgo.1<-function(x,a=10,b=20){
+  return(a+b*x)
+}
+Riesgo.2<-function(x,a=10,b=-20){
+  return(a+b*x)
+}
+Riesgo.3<-function(x,a=10,b=5){
+  return(a+b*x)
+}
+p <- ggplot() + xlim(0,100)
+p + geom_function(fun=Riesgo.1, mapping = aes(color="b=20")
+                  ) +
+  geom_function(fun=Riesgo.2, mapping = aes(color="b=-20")
+  ) +
+  geom_function(fun=Riesgo.3, mapping = aes(color="b=5")
+  ) +
+  scale_color_manual(name = "Funciones de riesgo",
+                     values = c("red", "green", "blue"), # Color specification
+                     labels = c("a=10,b=-20", "a=10,b=20", "a=10,b=5"))+
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Podemos observar un comportamiento lineal de la función de riesgo, evidentemente. 
+La pendiente está determinada por el valor de b, como se muestra en la imagen
+
+## Función de riesgo acumulado 
+
+```{r}
+p <- ggplot() + xlim(0,2)
+Riesgo_Acumulado.1<-function(x,a=10,b=20){
+  return(a*x+(b*x^2)/2)
+}
+Riesgo_Acumulado.2<-function(x,a=10,b=-20){
+  return(a*x+(b*x^2)/2)
+}
+Riesgo_Acumulado.3<-function(x,a=10,b=5){
+  return(a*x+(b*x^2)/2)
+}
+p + geom_function(fun=Riesgo_Acumulado.1, mapping = aes(color="b=20")
+                  ) +
+  geom_function(fun=Riesgo_Acumulado.2, mapping = aes(color="b=-20")
+  ) +
+  geom_function(fun=Riesgo_Acumulado.3, mapping = aes(color="b=5")
+  ) +
+  scale_color_manual(name = "Fun. de riesgo acum",
+                     values = c("red", "green", "blue"), # Color specification
+                     labels = c("a=10,b=-20", "a=10,b=20", "a=10,b=5"))+
+  labs(y= "H(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en H(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Podemos ver un comportamiento del tipo parabólico conforme t se hace más grande. 
+Vemos que en el caso de b negativa
+## Sobrevivencia 
+```{r}
+p <- ggplot() + xlim(0,1)
+Sobrevivencia.1<-function(x,a=10,b=20){
+  return(exp(-(a*x+(b*x^2)/2)))
+}
+Sobrevivencia.2<-function(x,a=10,b=-20){
+  return(exp(-(a*x+(b*x^2)/2)))
+}
+Sobrevivencia.3<-function(x,a=10,b=5){
+  return(exp(-(a*x+(b*x^2)/2)))
+}
+p + geom_function(fun=Sobrevivencia.1, mapping = aes(color="b=20")
+                  ) +
+  geom_function(fun=Sobrevivencia.2, mapping = aes(color="b=-20")
+  ) +
+  geom_function(fun=Sobrevivencia.3, mapping = aes(color="b=5")
+  ) +
+  scale_color_manual(name = "Sobrevivencia",
+                     values = c("red", "green", "blue"), # Color specification
+                     labels = c("a=10,b=-20", "a=10,b=20", "a=10,b=5"))+
+  labs(y= "H(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Aquí viene un punto de conflicto que tuvimos: Y es que creemos que b debe ser 
+un parámetro tal que $b\in\mathbb{R}^{+}$, ya que de lo contrario, notamos este
+comportamiento no deseado en la función de sobrevivencia.
+```{r}
+Distribucion.1<-function(x,a=10,b=20){
+  return(1-exp(-(a*x+(b*x^2)/2)))
+}
+Distribucion.2<-function(x,a=10,b=-20){
+  return(1-exp(-(a*x+(b*x^2)/2)))
+}
+Distribucion.3<-function(x,a=10,b=5){
+  return(1-exp(-(a*x+(b*x^2)/2)))
+}
+p + geom_function(fun=Distribucion.1, mapping = aes(color="b=20")
+                  ) +
+  geom_function(fun=Distribucion.2, mapping = aes(color="b=-20")
+  ) +
+  geom_function(fun=Distribucion.3, mapping = aes(color="b=5")
+  ) +
+  scale_color_manual(name = "Distribución",
+                     values = c("red", "green", "blue"), # Color specification
+                     labels = c("a=10,b=-20", "a=10,b=20", "a=10,b=5"))+
+  labs(y= "H(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en F(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Lo mismo que en la gráfica anterior: b debría ser positivo, para evitar este comportamiento.
+Vemos que mientras b sea más grande, más rápido converge a 1 
+```{r}
+p<- ggplot() +xlim(0,1)
+Densidad.1<-function(x,a=10,b=20){
+  return((a+b*x)*exp(-(a*x+(b*x^2)/2)))
+}
+Densidad.2<-function(x,a=10,b=-20){
+  return((a+b*x)*exp(-(a*x+(b*x^2)/2)))
+}
+Densidad.3<-function(x,a=10,b=5){
+  return((a+b*x)*exp(-(a*x+(b*x^2)/2)))
+}
+p + geom_function(fun=Densidad.1, mapping = aes(color="b=20")
+                  ) +
+  geom_function(fun=Densidad.2, mapping = aes(color="b=-20")
+  ) +
+  geom_function(fun=Densidad.3, mapping = aes(color="b=5")
+  ) +
+  scale_color_manual(name = "Densidad",
+                     values = c("red", "green", "blue"), # Color specification
+                     labels = c("a=10,b=-20", "a=10,b=20", "a=10,b=5"))+
+  labs(y= "H(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en f(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Comienza en $a$, y después decrece hasta alcanzar 0, pero si b es negativo, entonces
+alcanza valores negativos, por eso también creemos que $b$ debería ser positivo.
 b) Sabemos que $S(t) = exp(-t^{\gamma})$, entonces obtendremos las funciones que se nos piden.
 
 Función de densidad:
