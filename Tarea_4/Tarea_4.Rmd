@@ -193,21 +193,126 @@ d) Con R grafique las funciones $S(t)$ y $h(t)$ dando valores fijos para los par
 
 \textbf{Solución}
 
-a)
+De acuerdo con la bibliografía consultada y lo visto en clases sería:
+
+a) Exponencial, Weibull con $\rho = 1$, la geométrica y la Gamma.
+
+Exponencial; con 
+\begin{align*}
+S(t) &= e^{\lambda x}\\
+f(x) &= \lambda e^{-\lambda x}\\
+h(t) = \frac{f(x)}{S(t)} &\implies h(t) = \frac{\lambda e^{\lambda x}}{e^{-\lambda x}}\\
+&= \lambda
+\end{align*}
+Geométrica con:
+\begin{align*}
+S(t) &= (1 - \rho)^{K-1} \quad (\text{para la que tiene el soporte en } \mathbb{N}\setminus\{0\})\\
+f(t) &= (1 - \rho)^{K-1}\rho\\
+\implies h(t) &= \frac{(1 - \rho)^{K-1}\rho}{(1 - \rho)^{K-1}} = \rho \rightarrow \text{constante}\\
+S(t) &= (1 - \rho)^{K} \quad (\text{para la que tiene el soporte en } \mathbb{N}\\
+f(t) &= (1 - \rho)^{K}\rho\\
+\implies h(t) &= \frac{(1 - \rho)^{K}\rho}{(1 - \rho)^{K}} = \rho \rightarrow \text{constante}
+\end{align*}
+Por lo que la exponencial es buena para modelar riesgos constantes continuas, y la geométrica riesgos constantes discretos. Hay que aclarar que la Exponencial es un caso particular de la Weibull (Donde $\rho = 1$) y, como el libro nos comenta que la Weibull es un caso particular de la Gamma Generalizada, por ende, la exponencial lo es.
+
+b) La Weibull, la Log-Normal, la Log-Logistica, La Gompertz y La Gamma.
+
+La Weibull cuando $\gamma > 1$, con 
+\begin{align*}
+S(t) &= e^{\lambda t^{\gamma}}\\
+f(t) &= \gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}\\
+\implies h(t) &= \frac{\gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}}{e^{-\lambda t^{\gamma}}} = \gamma \lambda t^{\gamma - 1}
+\end{align*}
+
+Como $\gamma > 1 \implies \gamma - 1 >0 \implies t^{\gamma - 1}$ es creciente.\\
+
+La Log-Normal 
+\begin{align*}
+S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)\\
+\end{align*}
+donde $\phi(k)$ es la función de distribución de una $Normal(0,1)$ evaluada en $x = k$
+\begin{align*}
+h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)}
+\end{align*}
 
 
+Aquí es "parcialmente" ya que, en clase vimos que cuando $t$ es pequeña, comienza muy cerca de cero y va creciendo hasta alcanzar un máximo, para después decrecer.\
 
+La Log-logística con $\gamma > 1$; de manera parcial. Ya que crece hasta alcanzar un máximo, pero luego decae
+\begin{align*}
+S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
+h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
+\end{align*}
 
-b)
+La Gompertz cuando $\varphi > 1$; inicia cerca de cero y eventualmente crece hasta infinito
+\begin{align*}
+S(t) &= e^{- \left(\frac{\lambda}{ln(\varphi)} \left(\varphi^{t} - 1\right)\right)}\\
+h(t) &= \lambda \varphi^{t}
+\end{align*}
 
+Gamma, cuando $K > 1$
+\begin{align*}
+S(t) &= 1 - GI(K, \lambda t)
+\end{align*}
 
+Donde $GI(K, \lambda t)$ = $\frac{1}{\Gamma(K)} \int_{0}^{\lambda t} u^{K - 1} e^{-u} du$
 
+\begin{align*}
+h(t) = \frac{\frac{\lambda^{K} t^{K - 1} e^{-\lambda t}}{\Gamma (k)}}{1 - GI(K, \lambda t)}
+\end{align*}
 
+Los riesgos son nulos en un inciso, para positivamente crecer hasta hacerse constantes (Ya que en elm límite en el límite converge a $\alpha$)
 
-c)
+c) La log-logística, la Weibull, la log-normal, la Gompertz y la Gamma.
 
+La log-logística, con $\gamma \leq 1$; Aunque si $\gamma > 1$ (primero crece muy rápido hasta alcanzar un máximo para después decrecer).
 
+\begin{align*}
+S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
+h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
+\end{align*}
 
+La Weibull cuando $\gamma < 1$ con 
+\begin{align*}
+S(t) &= e^{-\lambda t^{\gamma}}\\
+f(t) &= \gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}\\
+\implies h(t) &= \frac{\gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}}{e^{-\lambda t^{\gamma}}} = \gamma \lambda t^{\lambda - 1}
+\end{align*}
+como $\gamma < 1 \implies \gamma - 1 < 0 \implies t^{\gamma - 1}$ es creciente.
 
+La Log-Normal 
+\begin{align*}
+S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)\\
+\end{align*}
+donde $\phi(k)$ es la función de distribución de una $Normal(0,1)$ evaluada en $x = K$
+\begin{align*}
+h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)}
+\end{align*}
+
+Cuando $\gamma \leq 1$ es monótona decreciente;\\
+Cuando $\gamma > 1$; es "parcialmente" ya que, en clase vimos que: 
+\begin{center}
+Cuando t es pequeña, comienza muy cerca de cero y va decreciendo hasta alcanzar un máximo, para después decrecer
+\end{center}
+
+La Gompertz cuando $\varphi > 1$; modela riesgos que 
+\begin{align*}
+S(t) &= e^{- \left(\frac{\lambda}{ln(\varphi)} \left(\varphi^{t} - 1\right)\right)}\\
+h(t) &= \lambda \varphi^{t}
+\end{align*}
+
+La Gamma, cuando $K < 1$
+\begin{align*}
+S(t) &= 1 -GI)(K, \lambda t)
+\end{align*}
+
+Donde $GI(K, \lambda t)$ = $\frac{1}{\Gamma(K)} \int_{0}^{\lambda t} u^{K - 1} e^{-u} du$
+
+\begin{align*}
+h(t) = \frac{\frac{\lambda^{K} t^{K - 1} e^{-\lambda t}}{\Gamma (k)}}{1 - GI(K, \lambda t)}
+\end{align*}
+
+Los riesgos son grandes en un inicio, para posteriormente decrecer hasta hacerse constantes (Ya que el límite converge a $\alpha$).
 
 d)
+
