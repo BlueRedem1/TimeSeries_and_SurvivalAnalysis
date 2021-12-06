@@ -453,6 +453,108 @@ f(t) &= (1 - \rho)^{K}\rho\\
 \end{align*}
 Por lo que la exponencial es buena para modelar riesgos constantes continuas, y la geométrica riesgos constantes discretos. Hay que aclarar que la Exponencial es un caso particular de la Weibull (Donde $\rho = 1$) y, como el libro nos comenta que la Weibull es un caso particular de la Gamma Generalizada, por ende, la exponencial lo es.
 
+Grafiquemos 
+
+## Exponencial
+```{r}
+Riesgo_Exp_1<-function(x,lambda=0.5){
+  return (lambda)
+}
+Riesgo_Exp_2<-function(x,lambda=1){
+  return (lambda)
+}
+Riesgo_Exp_3<-function(x,lambda=5){
+  return (lambda)
+}
+p<- ggplot() + xlim(0,10)
+p + geom_function(fun=Riesgo_Exp_1, mapping = aes(color="lambda = 0.5")
+                  ) +
+  geom_function(fun=Riesgo_Exp_2, mapping = aes(color="lambda = 1")
+  ) +
+  geom_function(fun=Riesgo_Exp_3, mapping = aes(color="lambda = 5")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de lambda en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+Supervivencia_Exp_1<-function(x,lambda=0.5){
+  return (exp(-lambda*x))
+}
+Supervivencia_Exp_2<-function(x,lambda=1){
+  return (exp(-lambda*x))
+}
+Supervivencia_Exp_3<-function(x,lambda=5){
+  return (exp(-lambda*x))
+}
+p + geom_function(fun=Supervivencia_Exp_1, mapping = aes(color="lambda = 0.5")
+                  ) +
+  geom_function(fun=Supervivencia_Exp_2, mapping = aes(color="lambda = 1")
+  ) +
+  geom_function(fun=Supervivencia_Exp_3, mapping = aes(color="lambda = 5")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de lambda en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Geométrica 
+
+```{r}
+Riesgo_Geom_1<-function(x,p=0.25){
+  return (p)
+}
+Riesgo_Geom_2<-function(x,p=0.5){
+  return (p)
+}
+Riesgo_Geom_3<-function(x,p=0.75){
+  return (p)
+}
+p<- ggplot(data.frame(seq(0,20))) 
+p + geom_function(fun=Riesgo_Exp_1, mapping = aes(color="p = 0.25")
+                  ) +
+  geom_function(fun=Riesgo_Exp_2, mapping = aes(color="p = 0.5")
+  ) +
+  geom_function(fun=Riesgo_Exp_3, mapping = aes(color="p = 0.75")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de p en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+Supervivencia_Geom_1<-function(x,p=0.25){
+  return ((1-p)^(floor(x)))
+}
+Prim<-seq(0,20)
+Prim<-lapply(Prim,Supervivencia_Geom_1)
+
+
+Supervivencia_Geom_2<-function(x,p=0.5){
+  return ((1-p)^(floor(x)))
+}
+Seg<-seq(0,20)
+Prim<-lapply(Seg,Supervivencia_Geom_1)
+
+
+Supervivencia_Geom_3<-function(x,p=0.75){
+  return ((1-p)^(floor(x)))
+}
+Ter<-seq(0,20)
+
+p<- ggplot(data.frame(seq(0,10))) +xlim(0,10)
+p + stat_function(fun=Supervivencia_Geom_1, geom='step',mapping = aes(color="p = 0.25")
+                  ) +
+  stat_function(fun=Supervivencia_Geom_2, geom='step',mapping = aes(color="p = 0.5")
+  ) +
+  stat_function(fun=Supervivencia_Geom_3, geom='step', mapping = aes(color="p = 0.75")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de p en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
 
 b) La Weibull, la Log-Normal, la Log-Logistica, La Gompertz y La Gamma.
 
