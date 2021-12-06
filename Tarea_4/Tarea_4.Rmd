@@ -256,7 +256,7 @@ p + geom_function(fun=Sobrevivencia.1, mapping = aes(color="b=310")
   scale_color_manual(name = "Sobrevivencia",
                      values = c("red", "green", "blue"), # Color specification
                      labels = c("a=10,b=-10", "a=10,b=310", "a=10,b=5"))+
-  labs(y= "H(t)", x = "t")+
+  labs(y= "S(t)", x = "t")+
   ggtitle("Gráfica para diferentes valores de b en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -288,7 +288,7 @@ p + geom_function(fun=Distribucion.1, mapping = aes(color="b=310")
   scale_color_manual(name = "Distribución",
                      values = c("red", "green", "blue"), # Color specification
                      labels = c("a=10,b=-10", "a=10,b=310", "a=10,b=5"))+
-  labs(y= "H(t)", x = "t")+
+  labs(y= "F(t)", x = "t")+
   ggtitle("Gráfica para diferentes valores de b en F(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -320,7 +320,7 @@ p + geom_function(fun=Densidad.1, mapping = aes(color="b=310")
   scale_color_manual(name = "Densidad",
                      values = c("red", "green", "blue"), # Color specification
                      labels = c("a=10,b=-10", "a=10,b=310", "a=10,b=5"))+
-  labs(y= "H(t)", x = "t")+
+  labs(y= "f(t)", x = "t")+
   ggtitle("Gráfica para diferentes valores de b en f(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -348,6 +348,79 @@ S(t) = exp(-t^{\gamma}) &\implies F(x)= 1 - e^{r^{\gamma}}\\
 &= \gamma t^{\gamma -1}\\
 &\therefore \quad \text{la función de riesgo es}  = \gamma t^{\gamma -1}_\blacksquare
 \end{align*}
+
+Grafiquemos 
+
+##Sobrevivencia
+```{r}
+p<- ggplot() + xlim(0,5)
+Sobrevivencia_1<-function(x,gamma=0.5){
+  return(exp(-x^(gamma)))
+}
+Sobrevivencia_2<-function(x,gamma=1){
+  return(exp(-x^(gamma)))
+}
+Sobrevivencia_3<-function(x,gamma=2){
+  return(exp(-x^(gamma)))
+}
+p + geom_function(fun=Sobrevivencia_1, mapping = aes(color="gamma = 0.5")
+                  ) +
+  geom_function(fun=Sobrevivencia_2, mapping = aes(color="gamma = 1")
+  ) +
+  geom_function(fun=Sobrevivencia_3, mapping = aes(color="gamma = 2")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Después de t=1, mientras más pequeño sea el parámetro gamma, menos decae la sobrevivencia
+##Densidad
+```{r}
+p<- ggplot() + xlim(0,5)
+Densidad_1<-function(x,gamma=0.5){
+  return(gamma*x^(gamma-1)*exp(-x^(gamma)))
+}
+Densidad_2<-function(x,gamma=1){
+  return(gamma*x^(gamma-1)*exp(-x^(gamma)))
+}
+Densidad_3<-function(x,gamma=2){
+  return(gamma*x^(gamma-1)*exp(-x^(gamma)))
+}
+p + geom_function(fun=Densidad_1, mapping = aes(color="gamma = 0.5")
+                  ) +
+  geom_function(fun=Densidad_2, mapping = aes(color="gamma = 1")
+  ) +
+  geom_function(fun=Densidad_3, mapping = aes(color="gamma = 2")
+  ) +
+  labs(y= "d(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en d(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Podemos ver que si gamma>1, entonces tiene un comportamiento primero creciente hasta alcanzar un máximo, para después decaer. En
+otro caso, siempre es decreciente
+## Riesgo
+```{r}
+Riesgo_1<-function(x,gamma=0.5){
+  gamma*x^(gamma-1)
+}
+Riesgo_2<-function(x,gamma=1){
+  gamma*x^(gamma-1)
+}
+Riesgo_3<-function(x,gamma=2){
+  gamma*x^(gamma-1)
+}
+p + geom_function(fun=Riesgo_1, mapping = aes(color="gamma = 0.5")
+                  ) +
+  geom_function(fun=Riesgo_2, mapping = aes(color="gamma = 1")
+  ) +
+  geom_function(fun=Riesgo_3, mapping = aes(color="gamma = 2")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de b en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Si gamma=1, es un riesgo constante, si gamma<1, es decreciente, y si gamma>1 es creciente 
+
 
 2. Resume las siguientes distribuciones: Exponencial, Weibull, Log-Normal, Gamma, Gompertz, Log-Logística, Geométrica. (Hint: Ver capítulo 7 del libro: Kleinbaum, D. & Klein, M. (2005) Survival Analysis. A Self-Learning Text. Springer.)
 
@@ -379,6 +452,7 @@ f(t) &= (1 - \rho)^{K}\rho\\
 \implies h(t) &= \frac{(1 - \rho)^{K}\rho}{(1 - \rho)^{K}} = \rho \rightarrow \text{constante}
 \end{align*}
 Por lo que la exponencial es buena para modelar riesgos constantes continuas, y la geométrica riesgos constantes discretos. Hay que aclarar que la Exponencial es un caso particular de la Weibull (Donde $\rho = 1$) y, como el libro nos comenta que la Weibull es un caso particular de la Gamma Generalizada, por ende, la exponencial lo es.
+
 
 b) La Weibull, la Log-Normal, la Log-Logistica, La Gompertz y La Gamma.
 
