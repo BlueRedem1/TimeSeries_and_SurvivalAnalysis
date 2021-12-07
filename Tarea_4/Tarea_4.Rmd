@@ -809,21 +809,21 @@ La Log-logística con $\gamma > 1$; de manera parcial. Ya que crece hasta alcanz
 \begin{align*}
 S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
 ```{r}
-Riesgo_Log_1<-function(x,lambda=3,gamma=1.25){
+Supervivencia_Log_1<-function(x,lambda=3,gamma=1.25){
   return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
 }
-Riesgo_Log_2<-function(x,lambda=3,gamma=5){
+Supervivencia_Log_2<-function(x,lambda=3,gamma=5){
   return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
 }
-Riesgo_Log_3<-function(x,lambda=3,gamma=10.75){
+Supervivencia_Log_3<-function(x,lambda=3,gamma=10.75){
   return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
 }
 p<- ggplot()+xlim(0,6) 
-p + geom_function(fun=Riesgo_Log_1, mapping = aes(color=" gamma= 1.25")
+p + geom_function(fun=Supervivencia_Log_1, mapping = aes(color=" gamma= 1.25")
                   ) +
-  geom_function(fun=Riesgo_Log_2, mapping = aes(color="gamma = 5")
+  geom_function(fun=Supervivencia_Log_2, mapping = aes(color="gamma = 5")
   ) +
-  geom_function(fun=Riesgo_Log_3, mapping = aes(color="gamma = 10.75")
+  geom_function(fun=Supervivencia_Log_3, mapping = aes(color="gamma = 10.75")
   ) +
   labs(y= "h(t)", x = "t")+
   ggtitle("Gráfica para diferentes valores de gamma en h(t)")+
@@ -833,21 +833,21 @@ p + geom_function(fun=Riesgo_Log_1, mapping = aes(color=" gamma= 1.25")
 h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
 \end{align*}
 ```{r}
-Supervivencia_Log_1<-function(x,lambda=3,gamma=1.25){
+Riesgo_Log_1<-function(x,lambda=3,gamma=1.25){
   return (1/(1+lambda*x^(gamma)))
 }
-Supervivencia_Log_2<-function(x,lambda=3,gamma=5){
+Riesgo_Log_2<-function(x,lambda=3,gamma=5){
   return (1/(1+lambda*x^(gamma)))
 }
-Supervivencia_Log_3<-function(x,lambda=3,gamma=10.75){
+Riesgo_Log_3<-function(x,lambda=3,gamma=10.75){
   return (1/(1+lambda*x^(gamma)))
 }
 p<- ggplot()+xlim(0,6) 
-p + geom_function(fun=Supervivencia_Log_1, mapping = aes(color=" gamma= 1.25")
+p + geom_function(fun=Riesgo_Log_1, mapping = aes(color=" gamma= 1.25")
                   ) +
-  geom_function(fun=Supervivencia_Log_2, mapping = aes(color="gamma = 5")
+  geom_function(fun=Riesgo_Log_2, mapping = aes(color="gamma = 5")
   ) +
-  geom_function(fun=Supervivencia_Log_3, mapping = aes(color="gamma = 10.75")
+  geom_function(fun=Riesgo_Log_3, mapping = aes(color="gamma = 10.75")
   ) +
   labs(y= "S(t)", x = "t")+
   ggtitle("Gráfica para diferentes valores de gamma en S(t)")+
@@ -862,8 +862,51 @@ La log-logística, con $\gamma \leq 1$; Aunque si $\gamma > 1$ (primero crece mu
 
 \begin{align*}
 S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
+```{r}
+Supervivencia_Log_1<-function(x,lambda=3,gamma=0.25){
+  return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
+}
+Supervivencia_Log_2<-function(x,lambda=3,gamma=0.5){
+  return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
+}
+Supervivencia_Log_3<-function(x,lambda=3,gamma=0.75){
+  return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
+}
+p<- ggplot()+xlim(0,6) 
+p + geom_function(fun=Supervivencia_Log_1, mapping = aes(color=" gamma= 0.25")
+                  ) +
+  geom_function(fun=Supervivencia_Log_2, mapping = aes(color="gamma = 0.5")
+  ) +
+  geom_function(fun=Supervivencia_Log_3, mapping = aes(color="gamma = 0.75")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de gamma en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
 h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
 \end{align*}
+```{r}
+Riesgo_Log_1<-function(x,lambda=3,gamma=0.25){
+  return (1/(1+lambda*x^(gamma)))
+}
+Riesgo_Log_2<-function(x,lambda=3,gamma=0.5){
+  return (1/(1+lambda*x^(gamma)))
+}
+Riesgo_Log_3<-function(x,lambda=3,gamma=0.75){
+  return (1/(1+lambda*x^(gamma)))
+}
+p<- ggplot()+xlim(0,6) 
+p + geom_function(fun=Riesgo_Log_1, mapping = aes(color=" gamma= 0.25")
+                  ) +
+  geom_function(fun=Riesgo_Log_2, mapping = aes(color="gamma = 0.5")
+  ) +
+  geom_function(fun=Riesgo_Log_3, mapping = aes(color="gamma = 0.75")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de gamma en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
 La Weibull cuando $\gamma < 1$ con 
 \begin{align*}
