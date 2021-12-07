@@ -558,6 +558,8 @@ p + stat_function(fun=Supervivencia_Geom_1, geom='step',mapping = aes(color="p =
 
 b) La Weibull, la Log-Normal, la Log-Logistica, La Gompertz y La Gamma.
 
+## Weibull
+
 La Weibull cuando $\gamma > 1$, con 
 \begin{align*}
 S(t) &= e^{\lambda t^{\gamma}}\\
@@ -565,42 +567,292 @@ f(t) &= \gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}\\
 \implies h(t) &= \frac{\gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}}{e^{-\lambda t^{\gamma}}} = \gamma \lambda t^{\gamma - 1}
 \end{align*}
 
+```{r}
+Riesgo_Wei_1<-function(x,gamma=1.25,lambda=1){
+  return (gamma*lambda*x^(gamma-1))
+}
+Riesgo_Wei_2<-function(x,gamma=5.5,lambda=1){
+  return (gamma*lambda*x^(gamma-1))
+}
+Riesgo_Wei_3<-function(x,gamma=10.75,lambda=1){
+  return (gamma*lambda*x^(gamma-1))
+}
+p<- ggplot(data.frame(seq(0,20))) 
+p + geom_function(fun=Riesgo_Wei_1, mapping = aes(color="gamma = 1.25")
+                  ) +
+  geom_function(fun=Riesgo_Wei_2, mapping = aes(color="gamma = 5.5")
+  ) +
+  geom_function(fun=Riesgo_Wei_3, mapping = aes(color="gamma = 10.75")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de gamma en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Notamos que con valores pequeños de gamma, crece bastante lento, como a la velocidad de un logaritmo. Sin embargo, si 
+gamma es grande, se dispara el valor
+
+
 Como $\gamma > 1 \implies \gamma - 1 >0 \implies t^{\gamma - 1}$ es creciente.\\
+```{r}
+Supervivencia_Wei_1<-function(x,gamma=1.25,lambda=1){
+  return (exp(-(lambda*x^(gamma))))
+}
+Supervivencia_Wei_2<-function(x,gamma=5.5,lambda=1){
+  return (exp(-(lambda*x^(gamma))))
+}
+Supervivencia_Wei_3<-function(x,gamma=10.75,lambda=1){
+  return (exp(-(lambda*x^(gamma))))
+}
+p<- ggplot(data.frame(seq(0,20))) 
+p + geom_function(fun=Supervivencia_Wei_1, mapping = aes(color="gamma = 1.25")
+                  ) +
+  geom_function(fun=Supervivencia_Wei_2, mapping = aes(color="gamma = 5.5")
+  ) +
+  geom_function(fun=Supervivencia_Wei_3, mapping = aes(color="gamma = 10.75")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de gamma en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Y decrece a menor velocidad si gamma es pequeño.
 
-La Log-Normal 
-\begin{align*}
-S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)\\
-\end{align*}
-donde $\phi(k)$ es la función de distribución de una $Normal(0,1)$ evaluada en $x = k$
-\begin{align*}
-h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)}
-\end{align*}
-
-
-Aquí es "parcialmente" ya que, en clase vimos que cuando $t$ es pequeña, comienza muy cerca de cero y va creciendo hasta alcanzar un máximo, para después decrecer.\
-
-La Log-logística con $\gamma > 1$; de manera parcial. Ya que crece hasta alcanzar un máximo, pero luego decae
-\begin{align*}
-S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
-h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
-\end{align*}
-
+## Gompertz 
 La Gompertz cuando $\varphi > 1$; inicia cerca de cero y eventualmente crece hasta infinito
 \begin{align*}
 S(t) &= e^{- \left(\frac{\lambda}{ln(\varphi)} \left(\varphi^{t} - 1\right)\right)}\\
 h(t) &= \lambda \varphi^{t}
 \end{align*}
+```{r}
+Riesgo_Gom_1<-function(x,phi=2.25,lambda=5){
+  return (lambda*phi^(x))
+}
+Riesgo_Gom_2<-function(x,phi=5.5,lambda=5){
+  return (lambda*phi^(x))
+}
+Riesgo_Gom_3<-function(x,phi=10.75,lambda=5){
+  return (lambda*phi^(x))
+}
+p<- ggplot(data.frame(seq(0,20))) 
+p + geom_function(fun=Riesgo_Gom_1, mapping = aes(color="phi = 2.25")
+                  ) +
+  geom_function(fun=Riesgo_Gom_2, mapping = aes(color="phi = 5.5")
+  ) +
+  geom_function(fun=Riesgo_Gom_3, mapping = aes(color="phi = 10.75")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de phi en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Conforme phi aumenta, el riesgo también 
+
+```{r}
+Supervivencia_Gom_1<-function(x,phi=2.25,lambda=5){
+  return (exp(-((lambda/(log(phi)))*(phi^(x)-1))))
+}
+Supervivencia_Gom_2<-function(x,phi=5.5,lambda=5){
+  return (exp(-((lambda/(log(phi)))*(phi^(x)-1))))
+}
+Supervivencia_Gom_3<-function(x,phi=10.75,lambda=5){
+  return (exp(-((lambda/(log(phi)))*(phi^(x)-1))))
+}
+p<- ggplot(data.frame(seq(0,20))) 
+p + geom_function(fun=Supervivencia_Gom_1, mapping = aes(color="phi = 2.25")
+                  ) +
+  geom_function(fun=Supervivencia_Gom_2, mapping = aes(color="phi = 5.5")
+  ) +
+  geom_function(fun=Supervivencia_Gom_3, mapping = aes(color="phi = 10.75")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de phi en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Conforme phi es más pequeña, decrece menos la función de supervivencia
+
+##Gamma
 
 Gamma, cuando $K > 1$
 \begin{align*}
 S(t) &= 1 - GI(K, \lambda t)
 \end{align*}
 
+```{r}
+Riesgo_Gamma_1<-function(x,k=1.25,lambda=10){
+  return (hgamma(x, shape=k, rate = lambda, log = FALSE))
+}
+Riesgo_Gamma_2<-function(x,k=5,lambda=10){
+  return (hgamma(x, shape=k, rate = lambda, log = FALSE))
+}
+Riesgo_Gamma_3<-function(x,k=10.75,lambda=10){
+  return (hgamma(x, shape=k, rate = lambda, log = FALSE))
+}
+p<- ggplot()+xlim(0,10) 
+p + geom_function(fun=Riesgo_Gamma_1, mapping = aes(color="k = 1.25")
+                  ) +
+  geom_function(fun=Riesgo_Gamma_2, mapping = aes(color="k = 5")
+  ) +
+  geom_function(fun=Riesgo_Gamma_3, mapping = aes(color="k = 10.75")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de k en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+Supervivencia_Gamma_1<-function(x,k=1.25,lambda=10){
+  return (1-pgamma(x, shape=k, rate = lambda, log = FALSE))
+}
+Supervivencia_Gamma_2<-function(x,k=5,lambda=10){
+  return (1-pgamma(x, shape=k, rate = lambda, log = FALSE))
+}
+Supervivencia_Gamma_3<-function(x,k=10.75,lambda=10){
+  return (1-pgamma(x, shape=k, rate = lambda, log = FALSE))
+}
+p<- ggplot()+xlim(0,10) 
+p + geom_function(fun=Supervivencia_Gamma_1, mapping = aes(color="k = 1.25")
+                  ) +
+  geom_function(fun=Supervivencia_Gamma_2, mapping = aes(color="k = 5")
+  ) +
+  geom_function(fun=Supervivencia_Gamma_3, mapping = aes(color="k = 10.75")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de k en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+Conforme k crece, decae más lentamente la función de supervivencia
+
 Donde $GI(K, \lambda t)$ = $\frac{1}{\Gamma(K)} \int_{0}^{\lambda t} u^{K - 1} e^{-u} du$
 
 \begin{align*}
 h(t) = \frac{\frac{\lambda^{K} t^{K - 1} e^{-\lambda t}}{\Gamma (k)}}{1 - GI(K, \lambda t)}
 \end{align*}
+
+### Las siguientes son de manera PARCIAL ya que crecen y decrecen
+
+##Log-Normal
+La Log-Normal 
+\begin{align*}
+S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)\\
+\end{align*}
+donde $\phi(k)$ es la función de distribución de una $Normal(0,1)$ evaluada en $x = k$
+```{r}
+Riesgo_LNorm_1<-function(x,mu=0,sigma=10){
+  return (hlnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Riesgo_LNorm_2<-function(x,mu=5,sigma=10){
+  return (hlnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Riesgo_LNorm_3<-function(x,mu=10.75,sigma=10){
+  return (hlnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Riesgo_LNorm_5<-function(x,mu=5,sigma=5){
+  return (hlnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Riesgo_LNorm_6<-function(x,mu=5,sigma=15){
+  return (hlnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+p<- ggplot()+xlim(0,0.25) 
+p + geom_function(fun=Riesgo_LNorm_1, mapping = aes(color="mu = 1")
+                  ) +
+  geom_function(fun=Riesgo_LNorm_2, mapping = aes(color="mu = 5")
+  ) +
+  geom_function(fun=Riesgo_LNorm_3, mapping = aes(color="mu = 10.75")
+  ) +
+  geom_function(fun=Riesgo_LNorm_5, mapping = aes(color="sigma = 5")
+  ) +
+  geom_function(fun=Riesgo_LNorm_6, mapping = aes(color="sigma = 15")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de mu y sigma en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+\begin{align*}
+h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)}
+\end{align*}
+```{r}
+Supervivencia_LNorm_1<-function(x,mu=0,sigma=10){
+  return (plnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Supervivencia_LNorm_2<-function(x,mu=5,sigma=10){
+  return (plnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Supervivencia_LNorm_3<-function(x,mu=10.75,sigma=10){
+  return (plnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Supervivencia_LNorm_4<-function(x,mu=5,sigma=5){
+  return (plnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+Supervivencia_LNorm_5<-function(x,mu=5,sigma=15){
+  return (plnorm(x, meanlog = mu, sdlog = sigma, log = FALSE))
+}
+p<- ggplot()+xlim(0,5) 
+p + geom_function(fun=Supervivencia_LNorm_1, mapping = aes(color="mu = 1")
+                  ) +
+  geom_function(fun=Supervivencia_LNorm_2, mapping = aes(color="mu = 5")
+  ) +
+  geom_function(fun=Supervivencia_LNorm_3, mapping = aes(color="mu = 10.75")
+  ) +
+  geom_function(fun=Supervivencia_LNorm_4, mapping = aes(color="sigma = 5")
+  ) +
+  geom_function(fun=Supervivencia_LNorm_5, mapping = aes(color="sigma = 15")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de mu y sigma en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+Aquí es "parcialmente" ya que, en clase vimos que cuando $t$ es pequeña, comienza muy cerca de cero y va creciendo hasta alcanzar un máximo, para después decrecer.\
+
+##Log-logística
+La Log-logística con $\gamma > 1$; de manera parcial. Ya que crece hasta alcanzar un máximo, pero luego decae
+\begin{align*}
+S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
+```{r}
+Riesgo_Log_1<-function(x,lambda=3,gamma=1.25){
+  return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
+}
+Riesgo_Log_2<-function(x,lambda=3,gamma=5){
+  return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
+}
+Riesgo_Log_3<-function(x,lambda=3,gamma=10.75){
+  return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
+}
+p<- ggplot()+xlim(0,6) 
+p + geom_function(fun=Riesgo_Log_1, mapping = aes(color=" gamma= 1.25")
+                  ) +
+  geom_function(fun=Riesgo_Log_2, mapping = aes(color="gamma = 5")
+  ) +
+  geom_function(fun=Riesgo_Log_3, mapping = aes(color="gamma = 10.75")
+  ) +
+  labs(y= "h(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de gamma en h(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
+\end{align*}
+```{r}
+Supervivencia_Log_1<-function(x,lambda=3,gamma=1.25){
+  return (1/(1+lambda*x^(gamma)))
+}
+Supervivencia_Log_2<-function(x,lambda=3,gamma=5){
+  return (1/(1+lambda*x^(gamma)))
+}
+Supervivencia_Log_3<-function(x,lambda=3,gamma=10.75){
+  return (1/(1+lambda*x^(gamma)))
+}
+p<- ggplot()+xlim(0,6) 
+p + geom_function(fun=Supervivencia_Log_1, mapping = aes(color=" gamma= 1.25")
+                  ) +
+  geom_function(fun=Supervivencia_Log_2, mapping = aes(color="gamma = 5")
+  ) +
+  geom_function(fun=Supervivencia_Log_3, mapping = aes(color="gamma = 10.75")
+  ) +
+  labs(y= "S(t)", x = "t")+
+  ggtitle("Gráfica para diferentes valores de gamma en S(t)")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
 Los riesgos son nulos en un inciso, para positivamente crecer hasta hacerse constantes (Ya que en elm límite en el límite converge a $\alpha$)
 
