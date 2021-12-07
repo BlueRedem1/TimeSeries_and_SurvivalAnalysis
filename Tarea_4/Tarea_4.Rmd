@@ -12,7 +12,9 @@ knitr::include_graphics("CARATULA.PNG")
 
 \newpage
 
-1. Resuelva lo siguiente:
+## Ejercicio 1 
+
+Resuelva lo siguiente:
 
 a) Suponga que la función de riesgo de asociada a un tiempo de supervivencia es una función lineal $h(t) = a + bt$ donde $ a > 0$ y $b \in \mathbb{R}$. Obtenga: $S(t)$, $F(t)$, $f(t)$, $h(t)$, y la media, mediana y moda de la distribución. Grafique las funciones.
 
@@ -27,10 +29,10 @@ Como \begin{align*}H(t) &= \int_{0}^{t} h(u)du\\
 \end{align*}
 
 Veamos $S(t)$,
-$$S(t) = e^{\int_{0}^{t}h(u)du} = e^{-H(t)} = e^{-(at + \frac{bt^{2}}{2})}$$
+$$S(t) = e^{\int_{0}^{t}h(u)du} = e^{-H(t)} = e^{-(at + \frac{bt^{2}}{2})}\quad_\blacksquare$$
 
 Ahora,veamos $F(t)$, como \begin{align*}S(t) &= 1 - F(t)\\ 
-\implies F(t) &= 1 - S(t) = 1 - e^{-(at + \frac{bt^{2}}{2})}
+\implies F(t) &= 1 - S(t) = 1 - e^{-(at + \frac{bt^{2}}{2})} \quad _\blacksquare
 \end{align*}
 
 Por otro lado, como \begin{align*}F'(t) &= f(t)\\
@@ -38,8 +40,11 @@ Por otro lado, como \begin{align*}F'(t) &= f(t)\\
 \end{align*}
 
 De manera alternativa, 
-$$f(t) = h(t) e^{\int_{0}^{t}h(u)du} = h(t)S(t) = (a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)}$$
-Veamos la media:
+$$f(t) = h(t) e^{\int_{0}^{t}h(u)du} = h(t)S(t) = (a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)}\quad _\blacksquare$$
+
+## Media
+
+Veamos la media: 
 
 $$ \int_{0}^{\infty} t(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)dt}$$ 
 Haciendo cambio de variable, sea $u = \frac{bt^{2}}{2}+at \implies du= (a + bt)dt, \quad \text{despejando t}$
@@ -69,14 +74,16 @@ Dado lo anterior, continuamos desarrollando donde nos quedamos en (1)
 &= \frac{1}{b} \int_{\frac{a^{3}}{b}}^{\infty} e^{-\left[\frac{(3by)^{\frac{3}{2}}-a^{2}}{2b}\right]}dy\\
 &= \frac{1}{b} \int_{\frac{a^{3}}{b}}^{\infty} e^{-\frac{(3by)^{\frac{3}{2}}}{2b}}e^{\frac{a^{2}}{2b}}dy\\
 &= \frac{1}{b} e^{\frac{a^{2}}{2b}} \int_{\frac{a^{3}}{b}}^{\infty} e^{-\frac{(3by)^{\frac{3}{2}}}{2b}} dy\\
-\therefore \mathbb{E}[X] &= \frac{a}{b} + \frac{1}{b} e^{\frac{a^{2}}{2b}}\int_{\frac{a^{3}}{b}}^{\infty} e^{-\frac{(3by)^{\frac{3}{2}}}{2b}} dy\\
+\therefore \mathbb{E}[X] &= \frac{a}{b} + \frac{1}{b} e^{\frac{a^{2}}{2b}}\int_{\frac{a^{3}}{b}}^{\infty} e^{-\frac{(3by)^{\frac{3}{2}}}{2b}} dy \quad _\blacksquare
 \end{align*}
 
 Lo dejamos expresado solamente, debido a que no se puede integrar.
 
+## Moda
+
 Ahora veamos la moda:
 
-**
+Derivamos
 
 \begin{align*}
 & (a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)}\\
@@ -100,43 +107,34 @@ t &=  - \frac{a}{b} + \frac{1}{\sqrt{b}} > 0\\
 &\text{si y solo si} \quad \frac{1}{\sqrt{b}} > \frac{a}{b}\\
 &\text{si y solo si} \quad \sqrt{b} > a\\
 &\text{si y solo si} \quad b > a^{2}\\
-& a^{2} + 2abt + b^{2}t^{2} - b > 0
-\end{align*}
-
-**
-\begin{align*}
+& a^{2} + 2abt + b^{2}t^{2} - b > 0\\
 & - e^{-\left(at + \frac{bt^{2}}{2}\right)}(a^{2} + 2abt + b^{2}t^{2} - b)\\
 &= a^{2}(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)} + 2ab\left(t(a + bt)e^{-(at + \frac{bt^{2}}{2})} - e^{-\left(at + \frac{bt^{2}}{2}\right)}\right)\\
 & + b^{2}\left(t^{2}(a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)} - 2t e^{-\left(at + \frac{bt^{2}}{2}\right)}\right) - b(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)}\\
 &= e^{-\left(at + \frac{bt^{2}}{2}\right)}\left(a^{3} + a^{2}bt + 2a^{2}bt + 2ab^{2}t^{2} - 2ab + ab^{2}t^{2} + b^{3}t^{3} - t - ab - b^{2}t\right)\\
-**\\
 &= a^{3} + 2a^{2}bt + 2a^{2}bt +3ab^{2}t^{2} + b^{3}t^{3} - 3b^{2}t * 3ab\\
-**\\
+\text{Factorizando}\\
 &= (a + bt)(a^{2} + 2abt + b(bt^{2}-3))\\
 t &= -\frac{a}{b} + \frac{1}{\sqrt{b}} \implies bt = -a + \sqrt{b} \implies 2abt = -a^{2} + 2a\sqrt{b}\\
 b^{2}t^{2} &= b^{2}\left(\frac{a^{2}}{b^{2}}-\frac{2a}{b^{\frac{3}{2}}} + \frac{1}{b}\right) = a^{2} - 2a\sqrt{b} + b\\
 &= (a + \sqrt{b} - a)(a^{2} - 2a^{2} + 2a\sqrt{b} + a^{2} - 2a\sqrt{b} + b - 3b)\\
 &= (\sqrt{b})(-2b) = -2b^{\frac{3}{2}} < 0\\
-&\therefore \text{Es un máximo como *}
+&\therefore \text{Es un máximo.}
 \end{align*}
 
+¿Qué pasa si $b < 0$?
 \begin{align*}
-& a^{2} + 2abt + b^{2}t^{2} - b < a^{2} + 2a\\
-& - a^{2} - 2abt - b(bt^{2}-1)\\
+-(a^{2} + 2abt + b^{2}t^{2} - b)&= -a^{2} - 2abt - b(bt^{2} - 1)\\
 & < -2abt - b^{2}t^{2}+b\\
 & < -2abt + b\\
 & < -2abt\\
-& < 0
+& < 0 \quad \text{siempre es decreciente máximo en t=0}
 \end{align*}
 
-Entonces, si $b < 0$ siempre es decreciente, por lo que su máximo es en $t=0$ (donde empieza). Lo mismo si $b < a^{2};$ ya que alcanza su máximo en un t < 0; Por lo que de ahí decrece, entonces su máximo sería en $t = 0.$
+Entonces, si $b < 0$ siempre es decreciente, por lo que su máximo es en $t=0$ (donde empieza). Lo mismo si $b < a^{2};$ ya que alcanza su máximo en un $t < 0$; Por lo que de ahí decrece, entonces su máximo sería en $t = 0. \quad _\blacksquare$
 
-$$(2b^{\frac{3}{2}}-a)(a^{2} - 4ab^{\frac{3}{2}} + 4b^{3} - 3b) $$
-$$2 a^{2}b^{\frac{3}{2}} - 8ab^{3} + 8b^{\frac{a}{2}} - 6b^{\frac{5}{2}} - a^{3} + 4a^{2}b^{\frac{3}{2}} - 4ab^{3} + 3ab$$
-$$ ba^{2}b^{\frac{3}{2}} - 12 ab^{3} + 8b^{\frac{a}{2}} - 6b^{\frac{5}{2}} + 3ab - a^{3}$$
+## Mediana: 
 
-$$ ln(0.5) = -at$$
-$$-a^{-1}ln(0.5) = t$$
 \begin{align*}
 1 - e^{-(at + \frac{bt^{2}}{2})} = .05 &\Leftrightarrow 0.5 = e^-{at + \frac{bt^{2}}{2}}\\
 &\Leftrightarrow ln(.05) = -at -\frac{bt^{2}}{2}\\
@@ -149,7 +147,7 @@ $$-a^{-1}ln(0.5) = t$$
 &\Leftrightarrow t + \frac{a}{b} = \sqrt{\frac{2bln(2) + a^{2}}{b^{2}}}\\
 &\Leftrightarrow t = \frac{\sqrt{a^{2}+2bln(2)}{b}}{b} - \frac{a}{b}\\
 &\Leftrightarrow t = \frac{-a + \sqrt{a^{2}+2bln(2)}}{b}\\
-\therefore \quad \text{La media es} \quad t &= \frac{-a + \sqrt{a^{2}+2bln(2)}}{b}
+\therefore \quad \text{La media es} \quad t &= \frac{-a + \sqrt{a^{2}+2bln(2)}}{b} \quad _\blacksquare
 \end{align*}
 
 Ahora, como $t > 0$, solo está definido si:
@@ -167,6 +165,10 @@ at + \frac{bt^{2}}{2} = 0 &\Leftrightarrow t(a + \frac{bt}{2}) = 0\\
 &\Leftrightarrow \frac{bt}{2} = -a\\
 &\Leftrightarrow t = \frac{-2a}{b}
 \end{align*}
+
+\newpage
+
+## Gráficas
 
 Grafiquemos:
 
@@ -234,7 +236,8 @@ p + geom_function(fun=Riesgo_Acumulado.1, mapping = aes(color="b=310")
   theme(plot.title = element_text(hjust = 0.5))
 ```
 Podemos ver un comportamiento del tipo parabólico conforme t se hace más grande. 
-Vemos que en el caso de b negativa
+Vemos que en el caso de b negativa.
+
 ## Sobrevivencia 
 ```{r}
 p <- ggplot() + xlim(0,1)
@@ -262,13 +265,15 @@ p + geom_function(fun=Sobrevivencia.1, mapping = aes(color="b=310")
 ```
 
 Pero veamos el comportamiento de b negativo, que describimos teóricamente:
+
 ```{r}
 p <- ggplot() + xlim(0,2)
 p + geom_function(fun=Sobrevivencia.2, mapping = aes(color="b=-10")
                   )
 ```
 Es el comportamiento que describíamos, que dado cierto punto, cuando es negativa, deja de 
-ser función de distribución, por lo que se debe limitar el soporte a lo obtenido anteriormente
+ser función de distribución, por lo que se debe limitar el soporte a lo obtenido anteriormente.
+
 ```{r}
 Distribucion.1<-function(x,a=10,b=310){
   return(1-exp(-(a*x+(b*x^2)/2)))
@@ -292,14 +297,15 @@ p + geom_function(fun=Distribucion.1, mapping = aes(color="b=310")
   ggtitle("Gráfica para diferentes valores de b en F(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-Vemos que mientras b sea más grande, más rápido converge a 1. Veamos más a detalle cuando b es negativo
+Vemos que mientras b sea más grande, más rápido converge a 1. Veamos más a detalle cuando b es negativo.
+
 ```{r}
 p <- ggplot() + xlim(0,2)
 p + geom_function(fun=Distribucion.2, mapping = aes(color="b=-10")
                   )
 ```
+Lo mismo que en la gráfica anterior: si b es negativo se debería topar el soporte, para evitar este comportamiento.
 
-Lo mismo que en la gráfica anterior: si b es negativo se debería topar el soporte, para evitar este comportamiento
 ```{r}
 p<- ggplot() +xlim(0,1)
 Densidad.1<-function(x,a=10,b=310){
@@ -326,6 +332,7 @@ p + geom_function(fun=Densidad.1, mapping = aes(color="b=310")
 ```
 Aquí vemos reflejados los datos obtenidos teóricamente.
 Veamos más a detalle cuando b es negativo
+
 ```{r}
 p <- ggplot() + xlim(0,2)
 p + geom_function(fun=Densidad.2, mapping = aes(color="b=-10")
@@ -342,11 +349,11 @@ Función de densidad:
 S(t) = exp(-t^{\gamma}) &\implies F(x)= 1 - e^{r^{\gamma}}\\
 &\implies f(x) = - e^{-t^{\gamma}}*\left(-\gamma t^{\gamma -1}\right)\\
 &= \gamma t^{\gamma -1} e^{-t^{\gamma}}\\
-&\therefore \quad \text{la función de densidad es} =\gamma t^{\gamma -1} e^{-t^{\gamma}}_\blacksquare\\
+&\therefore \quad \text{la función de densidad es} =\gamma t^{\gamma -1} e^{-t^{\gamma}}\quad _\blacksquare\\
 &\text{Ahora obtenemos la función de riesgo}\\
 &\implies h(t) = \frac{\gamma t^{\gamma -1} e^{-t^{\gamma}}}{ e^{-t^{\gamma}}}\\
 &= \gamma t^{\gamma -1}\\
-&\therefore \quad \text{la función de riesgo es}  = \gamma t^{\gamma -1}_\blacksquare
+&\therefore \quad \text{la función de riesgo es}  = \gamma t^{\gamma -1}\quad _\blacksquare
 \end{align*}
 
 Grafiquemos 
@@ -373,7 +380,8 @@ p + geom_function(fun=Sobrevivencia_1, mapping = aes(color="gamma = 0.5")
   ggtitle("Gráfica para diferentes valores de b en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-Después de t=1, mientras más pequeño sea el parámetro gamma, menos decae la sobrevivencia
+Después de t=1, mientras más pequeño sea el parámetro gamma, menos decae la sobrevivencia.
+
 ##Densidad
 ```{r}
 p<- ggplot() + xlim(0,5)
@@ -397,7 +405,8 @@ p + geom_function(fun=Densidad_1, mapping = aes(color="gamma = 0.5")
   theme(plot.title = element_text(hjust = 0.5))
 ```
 Podemos ver que si gamma>1, entonces tiene un comportamiento primero creciente hasta alcanzar un máximo, para después decaer. En
-otro caso, siempre es decreciente
+otro caso, siempre es decreciente.
+
 ## Riesgo
 ```{r}
 Riesgo_1<-function(x,gamma=0.5){
@@ -419,10 +428,11 @@ p + geom_function(fun=Riesgo_1, mapping = aes(color="gamma = 0.5")
   ggtitle("Gráfica para diferentes valores de b en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-Si gamma=1, es un riesgo constante, si gamma<1, es decreciente, y si gamma>1 es creciente 
+Si gamma=1, es un riesgo constante, si gamma<1, es decreciente, y si gamma>1 es creciente.
 
+## Ejercicio 2
 
-2. Resume las siguientes distribuciones: Exponencial, Weibull, Log-Normal, Gamma, Gompertz, Log-Logística, Geométrica. (Hint: Ver capítulo 7 del libro: Kleinbaum, D. & Klein, M. (2005) Survival Analysis. A Self-Learning Text. Springer.)
+Resume las siguientes distribuciones: Exponencial, Weibull, Log-Normal, Gamma, Gompertz, Log-Logística, Geométrica. (Hint: Ver capítulo 7 del libro: Kleinbaum, D. & Klein, M. (2005) Survival Analysis. A Self-Learning Text. Springer.)
 
 a) ¿Qué distribuciones describen una tasa de riesgo constante? 
 b) ¿Qué distribuciones describen una tasa de riesgo creciente? Identifica sus diferencias.
@@ -435,7 +445,7 @@ De acuerdo con la bibliografía consultada y lo visto en clases sería:
 
 a) Exponencial, Weibull con $\rho = 1$, la geométrica y la Gamma.
 
-Exponencial; con 
+Exponencial, con;
 \begin{align*}
 S(t) &= e^{\lambda x}\\
 f(x) &= \lambda e^{-\lambda x}\\
@@ -477,6 +487,7 @@ p + geom_function(fun=Riesgo_Exp_1, mapping = aes(color="lambda = 0.5")
   ggtitle("Gráfica para diferentes valores de lambda en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Veamos que para cualquier valor de lambda, el riesgo es constante.
 
 ```{r}
 Supervivencia_Exp_1<-function(x,lambda=0.5){
@@ -498,6 +509,8 @@ p + geom_function(fun=Supervivencia_Exp_1, mapping = aes(color="lambda = 0.5")
   ggtitle("Gráfica para diferentes valores de lambda en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+Después del valor más pequeño de lambda, mientras más grande sea el parámetro gamma, va decreciendo más pegado a 0.
 
 ## Geométrica 
 
@@ -522,6 +535,8 @@ p + geom_function(fun=Riesgo_Exp_1, mapping = aes(color="p = 0.25")
   ggtitle("Gráfica para diferentes valores de p en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+Veamos que para cualquier valor de p, el riesgo es constante.
 
 ```{r}
 Supervivencia_Geom_1<-function(x,p=0.25){
@@ -554,7 +569,7 @@ p + stat_function(fun=Supervivencia_Geom_1, geom='step',mapping = aes(color="p =
   ggtitle("Gráfica para diferentes valores de p en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
+mientras que el valor p vaya aumentando, el comportamiento será decreciente más pegado a 0.
 
 b) La Weibull, la Log-Normal, la Log-Logistica, La Gompertz y La Gamma.
 
@@ -589,7 +604,7 @@ p + geom_function(fun=Riesgo_Wei_1, mapping = aes(color="gamma = 1.25")
   theme(plot.title = element_text(hjust = 0.5))
 ```
 Notamos que con valores pequeños de gamma, crece bastante lento, como a la velocidad de un logaritmo. Sin embargo, si 
-gamma es grande, se dispara el valor
+gamma es grande, se dispara el valor.
 
 
 Como $\gamma > 1 \implies \gamma - 1 >0 \implies t^{\gamma - 1}$ es creciente.\\
@@ -617,11 +632,13 @@ p + geom_function(fun=Supervivencia_Wei_1, mapping = aes(color="gamma = 1.25")
 Y decrece a menor velocidad si gamma es pequeño.
 
 ## Gompertz 
+
 La Gompertz cuando $\varphi > 1$; inicia cerca de cero y eventualmente crece hasta infinito
 \begin{align*}
 S(t) &= e^{- \left(\frac{\lambda}{ln(\varphi)} \left(\varphi^{t} - 1\right)\right)}\\
 h(t) &= \lambda \varphi^{t}
 \end{align*}
+
 ```{r}
 Riesgo_Gom_1<-function(x,phi=2.25,lambda=5){
   return (lambda*phi^(x))
@@ -643,7 +660,7 @@ p + geom_function(fun=Riesgo_Gom_1, mapping = aes(color="phi = 2.25")
   ggtitle("Gráfica para diferentes valores de phi en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-Conforme phi aumenta, el riesgo también 
+Conforme phi aumenta, el riesgo también .
 
 ```{r}
 Supervivencia_Gom_1<-function(x,phi=2.25,lambda=5){
@@ -666,9 +683,9 @@ p + geom_function(fun=Supervivencia_Gom_1, mapping = aes(color="phi = 2.25")
   ggtitle("Gráfica para diferentes valores de phi en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-Conforme phi es más pequeña, decrece menos la función de supervivencia
+Conforme phi es más pequeña, decrece menos la función de supervivencia.
 
-##Gamma
+## Gamma
 
 Gamma, cuando $K > 1$
 \begin{align*}
@@ -696,6 +713,7 @@ p + geom_function(fun=Riesgo_Gamma_1, mapping = aes(color="k = 1.25")
   ggtitle("Gráfica para diferentes valores de k en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Conforme el valor de k aumenta, es creciente de manera más lenta.
 
 ```{r}
 Supervivencia_Gamma_1<-function(x,k=1.25,lambda=10){
@@ -718,7 +736,7 @@ p + geom_function(fun=Supervivencia_Gamma_1, mapping = aes(color="k = 1.25")
   ggtitle("Gráfica para diferentes valores de k en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-Conforme k crece, decae más lentamente la función de supervivencia
+Conforme k crece, decae más lentamente la función de supervivencia.
 
 Donde $GI(K, \lambda t)$ = $\frac{1}{\Gamma(K)} \int_{0}^{\lambda t} u^{K - 1} e^{-u} du$
 
@@ -728,7 +746,7 @@ h(t) = \frac{\frac{\lambda^{K} t^{K - 1} e^{-\lambda t}}{\Gamma (k)}}{1 - GI(K, 
 
 ### Las siguientes son de manera PARCIAL ya que crecen y decrecen
 
-##Log-Normal
+## Log-Normal
 La Log-Normal 
 \begin{align*}
 S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)\\
@@ -765,6 +783,7 @@ p + geom_function(fun=Riesgo_LNorm_1, mapping = aes(color="mu = 1")
   ggtitle("Gráfica para diferentes valores de mu y sigma en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Conforme los valores de mu y sigma, el comportamiento decrece hasta un punto, crece hasta un máximo y posteriormente decrece.
 
 \begin{align*}
 h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)}
@@ -804,10 +823,11 @@ p + geom_function(fun=Supervivencia_LNorm_1, mapping = aes(color="mu = 1")
 
 Aquí es "parcialmente" ya que, en clase vimos que cuando $t$ es pequeña, comienza muy cerca de cero y va creciendo hasta alcanzar un máximo, para después decrecer.\
 
-##Log-logística
+## Log-logística
 La Log-logística con $\gamma > 1$; de manera parcial. Ya que crece hasta alcanzar un máximo, pero luego decae
 \begin{align*}
 S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
+\end{align*}
 ```{r}
 Supervivencia_Log_1<-function(x,lambda=3,gamma=1.25){
   return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
@@ -829,7 +849,9 @@ p + geom_function(fun=Supervivencia_Log_1, mapping = aes(color=" gamma= 1.25")
   ggtitle("Gráfica para diferentes valores de gamma en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Conforme el valor va aumentando, la función es creciente hasta alcanzar un máximo para posteriormente decaer.
 
+\begin{align*}
 h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
 \end{align*}
 ```{r}
@@ -853,6 +875,7 @@ p + geom_function(fun=Riesgo_Log_1, mapping = aes(color=" gamma= 1.25")
   ggtitle("Gráfica para diferentes valores de gamma en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Conforme el valor de gamma aumenta, la función decrece hasta pegarse al eje de las x´s.
 
 Los riesgos son nulos en un inciso, para positivamente crecer hasta hacerse constantes (Ya que en elm límite en el límite converge a $\alpha$)
 
@@ -862,6 +885,8 @@ La log-logística, con $\gamma \leq 1$; Aunque si $\gamma > 1$ (primero crece mu
 
 \begin{align*}
 S(t) &= \frac{1}{1 + \lambda t^{\gamma}}\\
+\end{align*}
+
 ```{r}
 Supervivencia_Log_1<-function(x,lambda=3,gamma=0.25){
   return ((gamma*lambda*x^(gamma-1))/(1+lambda*x^(gamma)))
@@ -884,8 +909,12 @@ p + geom_function(fun=Supervivencia_Log_1, mapping = aes(color=" gamma= 0.25")
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+Mientras el valor de gamma sea más grande va decreciento lentamente.
+
+\begin{align*}
 h(t) &= \frac{\gamma \lambda t^{\gamma - 1}}{1 + \lambda t^{\gamma}}
 \end{align*}
+
 ```{r}
 Riesgo_Log_1<-function(x,lambda=3,gamma=0.25){
   return (1/(1+lambda*x^(gamma)))
@@ -907,6 +936,7 @@ p + geom_function(fun=Riesgo_Log_1, mapping = aes(color=" gamma= 0.25")
   ggtitle("Gráfica para diferentes valores de gamma en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Mientras el valor de gamma sea más grande va decreciento lentamente, y en el punto 1, el valor del más grande al pequeño se pega al eje x.
 
 La Weibull cuando $\gamma < 1$ con 
 \begin{align*}
@@ -914,6 +944,7 @@ S(t) &= e^{-\lambda t^{\gamma}}\\
 f(t) &= \gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}\\
 \implies h(t) &= \frac{\gamma \lambda t^{\gamma - 1} e^{-\lambda t^{\gamma}}}{e^{-\lambda t^{\gamma}}} = \gamma \lambda t^{\lambda - 1}
 \end{align*}
+
 ```{r}
 Riesgo_Wei_1<-function(x,gamma=0.25,lambda=1){
   return (gamma*lambda*x^(gamma-1))
@@ -935,6 +966,7 @@ p + geom_function(fun=Riesgo_Wei_1, mapping = aes(color="gamma = 0.25")
   ggtitle("Gráfica para diferentes valores de gamma en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Mientras el valor de gamma sea más pequeño va decreciento lentamente, y porteriormente, al cruzarse, el valor del más pequeño al grande se pega al eje x.
 
 como $\gamma < 1 \implies \gamma - 1 < 0 \implies t^{\gamma - 1}$ es decreciente.
 
@@ -959,6 +991,7 @@ p + geom_function(fun=Riesgo_Wei_1, mapping = aes(color="gamma = 0.25")
   ggtitle("Gráfica para diferentes valores de gamma en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Mientras el valor de gamma sea más pequeño va decreciento lentamente, y porteriormente, al cruzarse, el valor del más pequeño al grande se pega al eje x.
 
 La Log-Normal 
 \begin{align*}
@@ -1000,6 +1033,8 @@ p + geom_function(fun=Riesgo_LNorm_1, mapping = aes(color="mu = 1")
   ggtitle("Gráfica para diferentes valores de mu y sigma en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Conforme los valores de mu y sigma, el comportamiento decrece hasta un punto, crece hasta un máximo y posteriormente decrece.
+
 
 ```{r}
 Supervivencia_LNorm_1<-function(x,mu=0,sigma=10){
@@ -1032,6 +1067,7 @@ p + geom_function(fun=Supervivencia_LNorm_1, mapping = aes(color="mu = 1")
   ggtitle("Gráfica para diferentes valores de mu y sigma en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Aquí es "parcialmente" ya que, en clase vimos que cuando $t$ es pequeña, comienza muy cerca de cero y va creciendo hasta alcanzar un máximo, para después decrecer.\
 
 La Gompertz cuando $\varphi < 1$; modela riesgos que inician en $\lambda$ y decrecen hasta llegar a $0$
 \begin{align*}
@@ -1060,6 +1096,7 @@ p + geom_function(fun=Riesgo_Gom_1, mapping = aes(color="phi = 0.25")
   ggtitle("Gráfica para diferentes valores de phi en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Mientras el valor de phi sea más grande, decrece de manera más lenta.
 
 ```{r}
 Supervivencia_Gom_1<-function(x,phi=0.25,lambda=5){
@@ -1082,6 +1119,7 @@ p + geom_function(fun=Supervivencia_Gom_1, mapping = aes(color="phi = 0.25")
   ggtitle("Gráfica para diferentes valores de phi en S(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Mientras el valor de phi sea más grande se acerca a 0, y el valor más pequeño decrece de manera más lenta.
 
 La Gamma, cuando $K < 1$
 \begin{align*}
@@ -1109,12 +1147,14 @@ p + geom_function(fun=Riesgo_Gamma_1, mapping = aes(color="k = 0.25")
   ggtitle("Gráfica para diferentes valores de k en h(t)")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+Mientras el valor de phi sea más grande se acerca a 0, y el valor más pequeño decrece de manera más lenta.
 
 Donde $GI(K, \lambda t)$ = $\frac{1}{\Gamma(K)} \int_{0}^{\lambda t} u^{K - 1} e^{-u} du$
 
 \begin{align*}
 h(t) = \frac{\frac{\lambda^{K} t^{K - 1} e^{-\lambda t}}{\Gamma (k)}}{1 - GI(K, \lambda t)}
 \end{align*}
+
 ```{r}
 Supervivencia_Gamma_1<-function(x,k=0.25,lambda=10){
   return (1-pgamma(x, shape=k, rate = lambda, log = FALSE))
@@ -1139,5 +1179,5 @@ p + geom_function(fun=Supervivencia_Gamma_1, mapping = aes(color="k = 0.25")
 
 Los riesgos son grandes en un inicio, para posteriormente decrecer hasta hacerse constantes (Ya que el límite converge a $\alpha$).
 
-d)
+
 
