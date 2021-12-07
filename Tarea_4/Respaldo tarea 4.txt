@@ -1,22 +1,10 @@
----
-output: pdf_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r pressure2, echo=FALSE, out.width = '210%'}
-knitr::include_graphics("CARATULA.PNG")
-```
-
 \newpage
 
 ## Ejercicio 1 
 
 Resuelva lo siguiente:
 
-a) Suponga que la función de riesgo de asociada a un tiempo de supervivencia es una función lineal $h(t) = a + bt$ donde $a > 0$ y $b \in \mathbb{R}$. Obtenga: $S(t)$, $F(t)$, $f(t)$, $h(t)$, y la media, mediana y moda de la distribución. Grafique las funciones.
+a) Suponga que la función de riesgo de asociada a un tiempo de supervivencia es una función lineal $h(t) = a + bt$ donde $ a > 0$ y $b \in \mathbb{R}$. Obtenga: $S(t)$, $F(t)$, $f(t)$, $h(t)$, y la media, mediana y moda de la distribución. Grafique las funciones.
 
 b) Supongo que una función de supervivencia está definida por $S(t) = exp(-t^{\gamma})$ para $0 \leq t$. Obtenga su función de densidad $f(t)$ y su función de riesgo $h(t).$
 
@@ -111,10 +99,7 @@ t &=  - \frac{a}{b} + \frac{1}{\sqrt{b}} > 0\\
 & - e^{-\left(at + \frac{bt^{2}}{2}\right)}(a^{2} + 2abt + b^{2}t^{2} - b)\\
 &= a^{2}(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)} + 2ab\left(t(a + bt)e^{-(at + \frac{bt^{2}}{2})} - e^{-\left(at + \frac{bt^{2}}{2}\right)}\right)\\
 & + b^{2}\left(t^{2}(a + bt)e^{-\left(at + \frac{bt^{2}}{2}\right)} - 2t e^{-\left(at + \frac{bt^{2}}{2}\right)}\right) - b(a + bt) e^{-\left(at + \frac{bt^{2}}{2}\right)}\\
-&= e^{-\left(at + \frac{bt^{2}}{2}\right)}\left(a^{3} + a^{2}bt + 2a^{2}bt + 2ab^{2}t^{2} - 2ab + ab^{2}t^{2} + b^{3}t^{3} - t - ab - b^{2}t\right)
-\end{align*}
-
-\begin{align*}
+&= e^{-\left(at + \frac{bt^{2}}{2}\right)}\left(a^{3} + a^{2}bt + 2a^{2}bt + 2ab^{2}t^{2} - 2ab + ab^{2}t^{2} + b^{3}t^{3} - t - ab - b^{2}t\right)\\
 &= a^{3} + 2a^{2}bt + 2a^{2}bt +3ab^{2}t^{2} + b^{3}t^{3} - 3b^{2}t * 3ab\\
 \text{Factorizando}\\
 &= (a + bt)(a^{2} + 2abt + b(bt^{2}-3))\\
@@ -150,7 +135,7 @@ Entonces, si $b < 0$ siempre es decreciente, por lo que su máximo es en $t=0$ (
 &\Leftrightarrow t + \frac{a}{b} = \sqrt{\frac{2bln(2) + a^{2}}{b^{2}}}\\
 &\Leftrightarrow t = \frac{\sqrt{a^{2}+2bln(2)}{b}}{b} - \frac{a}{b}\\
 &\Leftrightarrow t = \frac{-a + \sqrt{a^{2}+2bln(2)}}{b}\\
-\therefore \quad \text{La mediana es} \quad t &= \frac{-a + \sqrt{a^{2}+2bln(2)}}{b} \quad _\blacksquare
+\therefore \quad \text{La media es} \quad t &= \frac{-a + \sqrt{a^{2}+2bln(2)}}{b} \quad _\blacksquare
 \end{align*}
 
 Ahora, como $t > 0$, solo está definido si:
@@ -752,7 +737,7 @@ h(t) = \frac{\frac{\lambda^{K} t^{K - 1} e^{-\lambda t}}{\Gamma (k)}}{1 - GI(K, 
 ## Log-Normal
 La Log-Normal 
 \begin{align*}
-S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\sigma}\right)\\
+S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)\\
 \end{align*}
 donde $\phi(k)$ es la función de distribución de una $Normal(0,1)$ evaluada en $x = k$
 ```{r}
@@ -789,7 +774,7 @@ p + geom_function(fun=Riesgo_LNorm_1, mapping = aes(color="mu = 1")
 Conforme los valores de mu y sigma, el comportamiento decrece hasta un punto, crece hasta un máximo y posteriormente decrece.
 
 \begin{align*}
-h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\sigma}\right)}
+h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)}
 \end{align*}
 ```{r}
 Supervivencia_LNorm_1<-function(x,mu=0,sigma=10){
@@ -998,11 +983,11 @@ Mientras el valor de gamma sea más pequeño va decreciento lentamente, y porter
 
 La Log-Normal 
 \begin{align*}
-S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\sigma}\right)\\
+S(t) &= 1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)\\
 \end{align*}
 donde $\phi(k)$ es la función de distribución de una $Normal(0,1)$ evaluada en $x = K$
 \begin{align*}
-h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\sigma}\right)}
+h(t) &= \frac{\frac{1}{\sqrt{2\pi \sigma^{2}t}} e^{-\left(\frac{(ln(t)- \mu)^{2}}{2\sigma^{2}}\right)}}{1 - \phi\left(\frac{ln(t) - \mu}{\theta}\right)}
 \end{align*}
 
 ```{r}
