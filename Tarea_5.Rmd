@@ -9,11 +9,11 @@ Utiliza la base de datos de R llamada larynx, del paquete KMsurv, y realice lo s
 
 Explique sus resultados.
 
-#Análisis descriptivo
+# Análisis descriptivo
 
 1.- Realice un análisis descriptivo sobre el tiempo de supervivencia de los sujetos, además de sus características generales y particulares.
 
-#Kaplan-Meier
+# Kaplan-Meier
 
 2.- Con el estimador de Kaplan-Meier para la función de supervivencia S(t), calcule y grafique:
 
@@ -25,7 +25,9 @@ Explique sus resultados.
 
 Identifique las variables que afectan el tiempo de supervivencia. Incluya los intervalos del 95\% confianza.
 
-# Pruebas Log-Rank con \alpha=0.05
+# Pruebas Log-Rank con $\alpha=0.05$
+
+3.- Usando pruebas No paramétricas Log-Rank:
 
 ## Por estadio
 
