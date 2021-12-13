@@ -25,10 +25,12 @@ library(ggsci) #En esta paquetería hay paletas de color bonitas, échale un ojo
 Grafiquemos y revisemos:
 ```{r}
 data("larynx")
-Surv_general <- Surv(larynx$time, larynx$delta)
-general_fit <- survfit(Surv_general ~ 1)
+Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
+general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=larynx)
 plot(general_fit, main="Supervivencia", col="red", las=1) #ponlas bonito yisus
-ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,censor.shape=124)
+ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,
+           censor.shape=124)
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
