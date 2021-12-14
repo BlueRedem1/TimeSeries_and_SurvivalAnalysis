@@ -131,12 +131,13 @@ Es de esperar que el año con menor pacientes registrados sea 1970, pues es el
 año más lejano, con solo 2 pacientes.
 ##Fallas y censuras
 ```{r}
-#Fallas
-sum(delta==1)
-sum(delta==1)/.9
-#Censuras
-sum(delta==0)
-sum(delta==0)/.9
+fallas <- table(delta)
+names(fallas)<-c('Censura','Falla')
+b <- barplot(fallas,col= palette(pal_lancet("lanonc")(5)),
+             main="Gráfica de barras: Etapa de cáncer", col.main="red", 
+             ylab="Frecuencia absoluta", col.lab="green",ylim=c(0,60))
+text(x=b,y=c(fallas), labels=c(fallas), pos=3, col="darkgreen", cex=1.5, xpd=TRUE)
+fallas/.9
 ```
 Tenemos 50 fallas, que representan el 55.55\% de nuestros datos, y 40 censuras,
 que representan el 44.44\% de nuestros datos. Tenemos ligeramente más fallas que
