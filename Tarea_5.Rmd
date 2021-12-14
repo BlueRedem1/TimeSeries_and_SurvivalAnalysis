@@ -66,7 +66,19 @@ periodo.
 
 ## S(t) poblacional
 
+Este ya lo calculamos en el inciso anterior:
+
+```{r}
+summary(general_fit)
+plot(general_fit, main="Supervivencia", col="red", las=1) #ponlas bonito yisus
+ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,
+           censor.shape=124)
+```
+
+
 ## S(t) por estadio de la enfermedad
+
+
 
 ## S(t) por grupos de edad
 
