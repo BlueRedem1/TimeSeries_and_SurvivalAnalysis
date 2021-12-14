@@ -27,12 +27,122 @@ Realice un análisis descriptivo sobre el tiempo de supervivencia de los sujetos
 library(survminer)
 library(survival)
 library(KMsurv)
-library(ggsci) 
+library(ggsci)
+library(scales)
+data("larynx")
 ```
 
-Grafiquemos y revisemos:
+## Composición de la base
 ```{r}
-data("larynx")
+attach(larynx)
+head(larynx)
+```
+Esta base de datos es acerca del tiempo de supervivencia en pacientes que padecen cáncer
+de larínge en distintas etapas.
+
+Tenemos 5 variables y 90 observaciones:
+
+Stage, que representa la etapa en la que se encuentra dicha enfermedad del paciente
+
+Time. que nos dice el tiempo de la observación, en meses
+
+Age, que es edad del paciente cuando se le diagnosticó la enfermedad
+
+Diagyr, que es el año en que se diagnisticó la enfermedad
+
+Delta, que es un indicador tal que es 1 si el paciente murió al tiempo de observación
+y 0 y se encuentra vivo. En nuestro contexto, la muerte es la falla y el estar vivo
+la censura
+
+### NA y número de observaciones
+```{r}
+length(larynx$time)
+sum(is.na.data.frame(larynx))
+```
+
+Tenemos 5 variables y 90 observaciones, no tenemos ningún NA. 
+
+## Etapa
+```{r}
+#Usamos la paleta de lancet porque es una revista de oncología
+Edad <- table(stage) 
+names(Edad) <- unique(larynx$stage)
+b <- barplot(Edad,col= palette(pal_lancet("lanonc")(5)),
+             main="Gráfica de barras: Etapa de cáncer", col.main="red", 
+             ylab="Frecuencia absoluta", col.lab="green")
+text(x=b,y=c(Edad), labels=c(Edad), pos=3, col="darkgreen", cex=1.5, xpd=TRUE)
+#Observaciones
+Edad
+#Porcentaje
+Edad/.9
+```
+Podemos ver que la mayoría de las observaciones se concentran en pacientes en etapa 1,
+que es la inicial, concentrando el 36.66\% de las observaciones, después sigue la
+etapa 3, que tiene 27 observaciones las cuales representan el 30\% del total, 
+seguidas de 17 observaciones en etapa 2, representando un 18.8\% y al final, como
+resulta intuitivo, la etapa con menos observaciones es la 4, con 13 que representan 
+el 14.4\% del total, esto porque es la etapa más avanzada y grave de la enfermedad,
+por lo que es entendible que hayan menos pacientes de esta etapa y más de la primera,
+pues es natural que existan más pacientes en dicho grupo.
+
+
+## Edad
+```{r,message=FALSE}
+edad<-hist(age, probability=F, col=palette(pal_lancet("lanonc")(9)), border="white", 
+     main="Histograma del tiempo de supervencia",labels=TRUE,ylim=c(0,20)) 
+#Puntos de corte
+edad$breaks
+#Cantidad
+edad$counts
+#Porcentaje
+edad$counts/.9
+```
+Podemos ver que la mayoría de las observaciones se concentran entre 61 y 70 años,
+teniendo 32 pacientes en dicho grupo de edad, y notamos que mientras se alejan 
+de este grupo de edad, va decreciendo el número de pacientes en ese grupo de edad,
+parece tener una forma parecida a una distribución simétrica, o acampanada,
+pero no parece ser una normal, a primera vista, aunque le da un parecido.
+el grupo más joven y el más viejo tienen la menor concentración de pacientes.
+
+## Año de diagnóstico 
+```{r}
+year <- table(diagyr)
+b <- barplot(year,col= palette(pal_lancet("lanonc")(5)),
+             main="Gráfica de barras: Etapa de cáncer", col.main="red", 
+             ylab="Frecuencia absoluta", col.lab="green",ylim=c(0,25))
+text(x=b,y=c(year), labels=c(year), pos=3, col="darkgreen", cex=1.5, xpd=TRUE)
+#Observaciones
+year
+#Porcentaje
+year/.9
+```
+Tenemos que el año en el que más personas recibieron su diagnóstico fue en 1976,
+con 19 personas que representan el 21.11\% de los pacientes.
+Le sigue 1974 con 14 pacientes
+Hay casi la mosma cantidad de pacientes cuyo diagnóstico fue en 1971,1973 y 1977,
+siendo de 12 en el primero y 11 en los otros 2.
+Después de esto, 1972 y 1975 tienen casi los mismos representantes, siendo 9 y 8
+respectivamente
+Posteriormente tenemos a 1978, que es el año más reciente, con 4 representantes.
+Esto puede ser natural ya que, podría costar un poco de trabajo contactar a 
+personas para el estudio que hayan recibido su diagnóstico muy recientemente,
+si es que el estudio se realizó el mismo año.
+Es de esperar que el año con menor pacientes registrados sea 1970, pues es el
+año más lejano, con solo 2 pacientes.
+##Fallas y censuras
+```{r}
+#Fallas
+sum(delta==1)
+sum(delta==1)/.9
+#Censuras
+sum(delta==0)
+sum(delta==0)/.9
+```
+Tenemos 50 fallas, que representan el 55.55\% de nuestros datos, y 40 censuras,
+que representan el 44.44\% de nuestros datos. Tenemos ligeramente más fallas que
+censuras en nuestro estudio.
+## Función de supervivencia
+```{r}
 Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
 general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=larynx)
