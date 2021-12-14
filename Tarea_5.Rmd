@@ -5,13 +5,21 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r pressure2, echo=FALSE, out.width = '220%'}
+knitr::include_graphics("CARATULA.PNG")
+```
+
+\newpage
+
 Utiliza la base de datos de R llamada larynx, del paquete KMsurv, y realice lo siguiente:
 
 Explique sus resultados.
 
 # Análisis descriptivo
 
-1.- Realice un análisis descriptivo sobre el tiempo de supervivencia de los sujetos, además de sus características generales y particulares.
+## Ejercicio 1
+
+Realice un análisis descriptivo sobre el tiempo de supervivencia de los sujetos, además de sus características generales y particulares.
 
 
 ```{r,echo=FALSE,message=FALSE}
@@ -19,7 +27,7 @@ Explique sus resultados.
 library(survminer)
 library(survival)
 library(KMsurv)
-library(ggsci) #En esta paquetería hay paletas de color bonitas, échale un ojo yisus
+library(ggsci) 
 ```
 
 Grafiquemos y revisemos:
@@ -28,17 +36,18 @@ data("larynx")
 Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
 general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=larynx)
-plot(general_fit, main="Supervivencia", col="red", las=1) #ponlas bonito yisus
-ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,
-           censor.shape=124)
+plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
+           col="blue1", las=1) 
+ggsurvplot(general_fit, data=larynx,palette = "#24693D",censor.size=7, 
+           censor.shape= 124)
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
-aproximadamente; siendo los periodos donde más se concentran las fallas.\\
+aproximadamente; siendo los periodos donde más se concentran las fallas.\
 
 Otro punto a destacar es que no llegamos a $0$ en la función de supervivencia, esto 
 porque los últimos datos son censuras, como podemos ver en el dataset (en este contexto 
-es que se encuentran vivos).\\
+es que se encuentran vivos).\
 
 Podemos notar un periodo de estabilidad, donde la función de supervivencia se mantiene
 constante, en el periodo de aproximadamente 4 meses y medio a poco antes de 6, 
@@ -46,10 +55,10 @@ si bien tenemos fallas, estas son pocas, por lo que se mantiene casi constante e
 el periodo mencionado, aunque existen muchas fallas (bajo este contexto, ello significa
 que el sujeto de estudio se encontraba vivo al tiempo de observación).
 
-Al inicio, los intervalos de confianza están bastante cercanos al estimador puntual.\\
+Al inicio, los intervalos de confianza están bastante cercanos al estimador puntual.\
 Los intervalos de confianza se hacen muy grandes hacia el final de la función de 
 supervivencia, pero sesgados hacia la derecha, es decir, el intervalo de confianza
-superior tiene una distancia mayor al estimador puntual, respecto del intervalo inferior.\\
+superior tiene una distancia mayor al estimador puntual, respecto del intervalo inferior.\
 
 Dicho lo anterior, se puede intuir que los primeros dos meses son los 'más difíciles', 
 puesto que hay muchas fallas en este periodo (son frecuentes y es donde más se acumulan), 
@@ -62,7 +71,13 @@ periodo.
 
 # Kaplan-Meier
 
-2.- Con el estimador de Kaplan-Meier para la función de supervivencia S(t), calcule y grafique:
+## Ejercicio 2
+
+Con el estimador de Kaplan-Meier para la función de supervivencia S(t), calcule y grafique:
+ S(t) poblacional.
+ S(t) por estadio de la enfermedad.
+ S(t) por grupos de edad.
+Identifique las variables que afectan el tiempo de supervivencia. Incluya los intervalos del 95\% confianza.
 
 ## S(t) poblacional
 
@@ -82,11 +97,12 @@ ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,
 
 ## S(t) por grupos de edad
 
-Identifique las variables que afectan el tiempo de supervivencia. Incluya los intervalos del 95\% confianza.
 
 # Pruebas Log-Rank con $\alpha=0.05$
 
-3.- Usando pruebas No paramétricas Log-Rank:
+## Ejercicio 3
+
+Usando pruebas No paramétricas Log-Rank:
 
 ## Por estadio
 
