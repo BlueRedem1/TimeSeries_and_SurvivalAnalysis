@@ -69,9 +69,9 @@ Tenemos 5 variables y 90 observaciones, no tenemos ningún NA.
 Edad <- table(stage) 
 names(Edad) <- unique(larynx$stage)
 b <- barplot(Edad,col= palette(pal_lancet("lanonc")(5)),
-             main="Gráfica de barras: Etapa de cáncer", col.main="red", 
-             ylab="Frecuencia absoluta", col.lab="green")
-text(x=b,y=c(Edad), labels=c(Edad), pos=3, col="darkgreen", cex=1.5, xpd=TRUE)
+             main="Gráfica de barras: Etapa de cáncer", col.main="cornflowerblue", 
+             ylab="Frecuencia absoluta", col.lab="blue4")
+text(x=b,y=c(Edad), labels=c(Edad), pos=3, col="deepskyblue4", cex=1.5, xpd=TRUE)
 #Observaciones
 Edad
 #Porcentaje
@@ -89,8 +89,9 @@ pues es natural que existan más pacientes en dicho grupo.
 
 ## Edad
 ```{r,message=FALSE}
-edad<-hist(age, probability=F, col=palette(pal_lancet("lanonc")(9)), border="white", 
-     main="Histograma del tiempo de supervencia",labels=TRUE,ylim=c(0,20)) 
+edad<-hist(age, probability=F, col=palette(pal_lancet("lanonc")(9)), border="gray0", 
+     main="Histograma del tiempo de supervencia",col.main="darkorange4",ylab = "Frecuencia", col.lab = "darkgoldenrod4",
+     xlab = "Edad", labels=TRUE,ylim=c(0,20)) 
 #Puntos de corte
 edad$breaks
 #Cantidad
@@ -108,9 +109,9 @@ el grupo más joven y el más viejo tienen la menor concentración de pacientes.
 ```{r}
 year <- table(diagyr)
 b <- barplot(year,col= palette(pal_lancet("lanonc")(5)),
-             main="Gráfica de barras: Etapa de cáncer", col.main="red", 
-             ylab="Frecuencia absoluta", col.lab="green",ylim=c(0,25))
-text(x=b,y=c(year), labels=c(year), pos=3, col="darkgreen", cex=1.5, xpd=TRUE)
+             main="Gráfica de barras: Etapa de cáncer", col.main="indianred1", 
+             ylab="Frecuencia absoluta", xlab = "Edad", col.lab="lightcoral",ylim=c(0,25))
+text(x=b,y=c(year), labels=c(year), pos=3, col="gray0", cex=1.5, xpd=TRUE)
 #Observaciones
 year
 #Porcentaje
@@ -135,11 +136,11 @@ año más lejano, con solo 2 pacientes.
 ##Fallas y censuras
 ```{r}
 fallas <- table(delta)
-names(fallas)<-c('Censura','Falla')
+names(fallas)<-c('Censura','Falla')  
 b <- barplot(fallas,col= palette(pal_lancet("lanonc")(5)),
-             main="Gráfica de barras: Etapa de cáncer", col.main="red", 
-             ylab="Frecuencia absoluta", col.lab="green",ylim=c(0,60))
-text(x=b,y=c(fallas), labels=c(fallas), pos=3, col="darkgreen", cex=1.5, xpd=TRUE)
+             main="Gráfica de barras: Etapa de cáncer", col.main="slateblue", 
+             ylab="Frecuencia absoluta", col.lab="slateblue1",ylim=c(0,60))
+text(x=b,y=c(fallas), labels=c(fallas), pos=3, col= c("red", "navy"), cex=1.5, xpd=TRUE)
 fallas/.9
 ```
 Tenemos 50 fallas, que representan el 55.55\% de nuestros datos, y 40 censuras,
@@ -152,9 +153,14 @@ general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=larynx)
 plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
            col="blue1", las=1) 
+<<<<<<< HEAD
 ggsurvplot(general_fit, data=larynx,palette = "#24693D",censor.size=7, 
            censor.shape= 124,legend.labs ="Supervivencia general",
            xlab = "Tiempo en meses")
+=======
+ggsurvplot(general_fit, data=larynx,palette = "violetred3",censor.size=7, 
+           censor.shape= 124)
+>>>>>>> e7843ef25989fff7e707660597445751c006dbbb
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
