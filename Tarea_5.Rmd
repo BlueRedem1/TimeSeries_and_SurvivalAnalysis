@@ -90,7 +90,8 @@ pues es natural que existan más pacientes en dicho grupo.
 ## Edad
 ```{r,message=FALSE}
 edad<-hist(age, probability=F, col=palette(pal_lancet("lanonc")(9)), border="gray0", 
-     main="Histograma del tiempo de supervencia",col.main="darkorange4",ylab = "Frecuencia", col.lab = "darkgoldenrod4",
+     main="Histograma del tiempo de supervencia",col.main="darkorange4",
+     ylab = "Frecuencia", col.lab = "darkgoldenrod4",
      xlab = "Edad", labels=TRUE,ylim=c(0,20)) 
 #Puntos de corte
 edad$breaks
@@ -198,7 +199,7 @@ Identifique las variables que afectan el tiempo de supervivencia. Incluya los in
 ### Creación de la función para K-M
 Crearemos una función para facilitar los cálculos:
 ```{r}
-KM<-function(fallas,tiempo){
+KM<-function(fallas,tiempo,redondear=TRUE,digitos=5){
   long=length(fallas)
   d<-fallas
   f_aux<-rep(1:long)
@@ -250,6 +251,10 @@ KM<-function(fallas,tiempo){
   KM=data.frame("Tiempo"=tiempo,"nj"=n,"dj"=d,"cj"=c,
                 "dif_ponderada"=f_aux,"s(t)"=s,"Var"=var,
                 "Se"=se,"L"=L,"U"=U)
+  #Agregamos esta opción de redondear para hacerlo más legible
+  if(redondear){
+    KM=round(KM,digitos)
+  }
   return(KM)
 }
 ```
@@ -427,7 +432,8 @@ Agrupemos...
 ```{r}
 aux5<- larynx %>%
   mutate("Fecha_Diag"=cut(larynx$diagyr,breaks=seq(70,78,by=2)))
-year_fit2 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", conf.int = 0.95,conf.type = "plain",data=aux5)
+year_fit2 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", 
+                     conf.int = 0.95,conf.type = "plain",data=aux5)
 ggsurvplot(year_fit2,data = aux5,palette = pal_lancet()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
            xlab = "Tiempo en meses")
