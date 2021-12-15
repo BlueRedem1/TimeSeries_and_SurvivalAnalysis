@@ -29,6 +29,7 @@ library(survival)
 library(KMsurv)
 library(ggsci)
 library(scales)
+library(dplyr)
 data("larynx")
 ```
 
@@ -103,7 +104,6 @@ de este grupo de edad, va decreciendo el número de pacientes en ese grupo de ed
 parece tener una forma parecida a una distribución simétrica, o acampanada,
 pero no parece ser una normal, a primera vista, aunque le da un parecido.
 el grupo más joven y el más viejo tienen la menor concentración de pacientes.
-
 ## Año de diagnóstico 
 ```{r}
 year <- table(diagyr)
@@ -129,6 +129,9 @@ personas para el estudio que hayan recibido su diagnóstico muy recientemente,
 si es que el estudio se realizó el mismo año.
 Es de esperar que el año con menor pacientes registrados sea 1970, pues es el
 año más lejano, con solo 2 pacientes.
+
+
+
 ##Fallas y censuras
 ```{r}
 fallas <- table(delta)
@@ -150,7 +153,8 @@ general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
 plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
            col="blue1", las=1) 
 ggsurvplot(general_fit, data=larynx,palette = "#24693D",censor.size=7, 
-           censor.shape= 124)
+           censor.shape= 124,legend.labs ="Supervivencia general",
+           xlab = "Tiempo en meses")
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
@@ -190,23 +194,216 @@ Con el estimador de Kaplan-Meier para la función de supervivencia S(t), calcule
  S(t) por grupos de edad.
 Identifique las variables que afectan el tiempo de supervivencia. Incluya los intervalos del 95\% confianza.
 
+### Creación de la función para K-M
+Crearemos una función para facilitar los cálculos:
+```{r}
+KM<-function(fallas,tiempo){
+  long=length(fallas)
+  d<-fallas
+  f_aux<-rep(1:long)
+  s<-rep(1,long)
+  var<-rep(1,long)
+  f2<-rep(0,long)
+  n=seq(long,1,by=-1)
+  c=abs(fallas-1)
+  for(i in 1:long){
+    if(n[i]>d[i]){
+     f2[i]<-d[i]/(n[i]*(n[i]-d[i])) 
+    }
+    else{
+      f2[i]=0
+    }
+  }
+  for (i in 1:long){
+    f_aux[i]<-(n[i]-d[i])/n[i]
+    for(j in 1:i){
+      s[i]<-s[i]*f_aux[i]
+    }
+    for ( j in 1:i){
+      var[i]<-sum(f2[1:j])*(s[i])^2
+    }
+  }
+  L<-rep(0,long)
+  U<-rep(0,long)
+  for (i in 1:long){
+    L[i]<-s[i] -qnorm(.975)*sqrt(var[i])
+    if(L[i]<0){
+      L[i]=0 #Truncammos
+    }
+    U[i]<-s[i] +qnorm(.975)*sqrt(var[i])
+    if(U[i]>1){
+      U[i]=1 #Truncammos
+    }
+  }
+  #A tiempo 0 tenemos lo siguiente, por eso añadimos:
+  tiempo=c(0,tiempo)
+  n=c(long,n)
+  d=c(0,d)
+  c=c(0,c)
+  f_aux=c(1,f_aux)
+  s=c(1,s)
+  var=c(1,var)
+  se=sqrt(var)
+  L=c(1,L)
+  U=c(1,U)
+  KM=data.frame("Tiempo"=tiempo,"nj"=n,"dj"=d,"cj"=c,
+                "dif_ponderada"=f_aux,"s(t)"=s,"Var"=var,
+                "Se"=se,"L"=L,"U"=U)
+  return(KM)
+}
+```
+
+
 ## S(t) poblacional
 
-Este ya lo calculamos en el inciso anterior:
+Este ya lo calculamos en el inciso anterior y dimos su interpretación:
 
 ```{r}
-summary(general_fit)
 plot(general_fit, main="Supervivencia", col="red", las=1) 
 ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,
            censor.shape=124)
 ```
 
+```{r}
+data.frame("t"=general_fit$time,"Expuestos"=general_fit$n.risk,"S(t)"=general_fit$surv,
+           "error estándar"=general_fit$std.err, "límite superior"=general_fit$lower,
+           "límite inferior"=general_fit$upper)
+```
+```{r}
+KM(delta,time)
+```
+
 
 ## S(t) por estadio de la enfermedad
 
+```{r}
+stage_fit <- survfit(Surv_general ~ stage, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=larynx)
+ggsurvplot(stage_fit,data = larynx,palette = pal_lancet()(4),censor.size=7, 
+           censor.shape= 124,legend.labs =c("Etapa 1", "Etapa 2", "Etapa 3", 
+                                            "Etapa 4"),
+           xlab = "Tiempo en meses")
+```
+Al menos de manera gráfica, vemos que podríamos unir la etaopa 1 y 2 en un mismo
+grupo puesto que parecen describir casi la misma función de supervivencia, 
+y parece haber una diferencia signficativa entre la etapa 4, la etapa 3
+y, si juntásemos la etapa 1 y 2 en un mismo grupo, estos 3 serían funciones, 
+al menos e manera gráfica, muy distinguibles entre sí.
+Y hasta cierto punto es intuitivo que aquellos con una etapa más avanzada tengan
+una menor supervivencia que aquellos en etapas tempranas. 
+Podemos destacar también que los pacientes en etaoa 3 parecen tener una 
+alta mortaidad al inicio, al menos en los prieros dos meses, pues observamos
+fallas constantes
+
+```{r}
+for (i in 1:4){
+  print(paste("Para la etapa",i))
+  print(KM(delta[stage==i],time[stage==i]))
+}
+```
 
 
 ## S(t) por grupos de edad
+
+```{r}
+aux<- larynx %>%
+  mutate("Grupo"=cut(larynx$age,breaks=c(40,55,70,Inf)))
+age_fit <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=aux)
+ggsurvplot(age_fit,data = aux,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = TRUE,
+           xlab = "Tiempo en meses")
+ggsurvplot(age_fit,data = aux,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = FALSE,
+           xlab = "Tiempo en meses")
+for(i in levels(aux$Grupo)){
+  print(paste("Para el grupo de edad del intervalo:",i))
+  delta_aux=(aux$delta)[aux$Grupo==i]
+  time_aux=(aux$time)[aux$Grupo==i]
+  print(KM(delta_aux,time_aux))
+}
+```
+Elegimos esta división por la distribución de los datos, para tratar
+de compensar los pocos datos que hay en los extremos respecto de la inicial.
+Además de que graficando en los grupos por edades de 40 a 50, de 51 a 60, de 61 
+a 70 y de 71 en adelante no obteniamos una gráfica donde se pudieran distinguir
+muy bien. El intervalo es de 15 años cada grupo, que parece razonable
+
+Bajo esta división. parece que tendríamos que juntar las edades de 40 a 55 y de 
+56 a 70, ya que parecen tener una función de supervivencia similar, están 
+muy cerna la una de la otra hasta cerca de los 6 meses, que es cuando se 
+da la separación. Por otro lado, la supervivencia del grupo mayor a 70 
+años parece tener una ruta distinta de las dos anteriores, siendo distinguible.
+
+¿Qué pasará si dividimos entre "Adultos" y "Tercera edad"?
+```{r}
+aux2<- larynx %>%
+  mutate("Grupo"=cut(larynx$age,breaks=c(40,65,Inf)))
+age_fit2 <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=aux2)
+ggsurvplot(age_fit2,data = aux2,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = TRUE,
+           xlab = "Tiempo en meses")
+ggsurvplot(age_fit2,data = aux2,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = FALSE,
+           xlab = "Tiempo en meses")
+for(i in unique(aux2$Grupo)){
+  print(i)
+  print(paste("Para el grupo de edad del intervalo:",i))
+  delta_aux=(aux2$delta)[aux2$Grupo==i]
+  time_aux=(aux2$time)[aux2$Grupo==i]
+  print(KM(delta_aux,time_aux))
+}
+```
+¡Son indistinguibles! Prácticamente son la misma.
+```{r}
+aux3<- larynx %>%
+  mutate("Grupo"=cut(larynx$age,breaks=c(40,70,Inf)))
+age_fit3 <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=aux3)
+ggsurvplot(age_fit3,data = aux3,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = TRUE,
+           xlab = "Tiempo en meses")
+ggsurvplot(age_fit3,data = aux3,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = FALSE,
+           xlab = "Tiempo en meses")
+for(i in levels(aux3$Grupo)){
+  print(paste("Para el grupo de edad del intervalo:",i))
+  delta_aux=(aux3$delta)[aux3$Grupo==i]
+  time_aux=(aux3$time)[aux3$Grupo==i]
+  print(KM(delta_aux,time_aux))
+}
+```
+Bajo esta división parecen ser diferentes funciones de supervivencia.
+
+```{r}
+aux4<- larynx %>%
+  mutate("Grupo"=cut(larynx$age,breaks=c(40,50,60,70,Inf)))
+age_fit4 <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=aux4)
+ggsurvplot(age_fit4,data = aux4,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = TRUE,
+           xlab = "Tiempo en meses")
+ggsurvplot(age_fit4,data = aux4,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = FALSE,
+           xlab = "Tiempo en meses")
+for(i in levels(aux4$Grupo)){
+  print(paste("Para el grupo de edad del intervalo:",i))
+  delta_aux=(aux4$delta)[aux4$Grupo==i]
+  time_aux=(aux4$time)[aux4$Grupo==i]
+  print(KM(delta_aux,time_aux))
+}
+```
+Esta es la división que comentamos el inicio: 
+Cruzan demasiado entre sí durante los primeros meses, y entre el mes 4 y 5 la 
+supervivencia del grupo de 40 a 50 y de 51 a 60 parece ser la misma, y en los
+primeros 2 meses y medio, la supervivencia del grupo de 51 a 60 parece la misma
+que la del grupo de 61 a 70. En el mismo periodo, la supervivencia del grupo 
+de 70 en adelante parece estar muy cerca de la supervivencia del grupo de 40 a 50,
+lo cual es sorprendente puesto que son los grupos contrarios: El más joven y el
+más viejo. Ello parece contraintuitivo
+
+### Variables más importantes
 
 
 # Pruebas Log-Rank con $\alpha=0.05$
