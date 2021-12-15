@@ -153,14 +153,11 @@ general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=larynx)
 plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
            col="blue1", las=1) 
-<<<<<<< HEAD
 ggsurvplot(general_fit, data=larynx,palette = "#24693D",censor.size=7, 
            censor.shape= 124,legend.labs ="Supervivencia general",
            xlab = "Tiempo en meses")
-=======
 ggsurvplot(general_fit, data=larynx,palette = "violetred3",censor.size=7, 
            censor.shape= 124)
->>>>>>> e7843ef25989fff7e707660597445751c006dbbb
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
@@ -270,11 +267,6 @@ ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,
            censor.shape=124)
 ```
 
-```{r}
-data.frame("t"=general_fit$time,"Expuestos"=general_fit$n.risk,"S(t)"=general_fit$surv,
-           "error estándar"=general_fit$std.err, "límite superior"=general_fit$lower,
-           "límite inferior"=general_fit$upper)
-```
 ```{r}
 KM(delta,time)
 ```
@@ -411,7 +403,70 @@ más viejo. Ello parece contraintuitivo
 
 ### Variables más importantes
 
+Podemos observar de manera gráfica que, definitivamente la edad es un
+factor que afecta siempre y cuando partamos los grupos de edad de 40 a 70 y de
+70 en adelante, así mismo se puede observar que la etapa juega un rol fundamental
+para el tiempo de supervivencia; esto se comprueba en la última parte de esta 
+tarea.
 
+Veamos qué pasa, de manera gráfica, con las demás variables:
+
+```{r}
+year_fit <- survfit(Surv_general ~ diagyr, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=larynx)
+ggsurvplot(year_fit,data = larynx,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = FALSE,
+           xlab = "Tiempo en meses")
+```
+A simple vista, vemos que hay muchos empates hasta el mes 5, hagamos el test:
+```{r}
+survdiff(Surv(time,delta)~diagyr,rho=0,data=larynx) # log-rank
+survdiff(Surv(time,delta)~diagyr,rho=1,data=larynx) # Generalized Wilcoxon
+```
+Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico parece no afectar con este agrupamiento
+Agrupemos...
+
+```{r}
+aux5<- larynx %>%
+  mutate("Fecha_Diag"=cut(larynx$diagyr,breaks=seq(70,78,by=2)))
+year_fit2 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", conf.int = 0.95,conf.type = "plain",data=aux5)
+ggsurvplot(year_fit2,data = aux5,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = FALSE,
+           xlab = "Tiempo en meses")
+```
+Así no parece haber mucha diferencia, podemos ver que se agrupan demaiado en los
+primeros 4 meses, hagamos el test:
+```{r}
+print("Para el segundo grupo de años donde los grupos son: ")
+print(levels(aux5$Fecha_Diag))
+survdiff(Surv(time,delta)~Fecha_Diag,rho=0,data=aux5) # log-rank
+survdiff(Surv(time,delta)~Fecha_Diag,rho=1,data=aux5) # Generalized Wilcoxon
+```
+Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico parece no afectar con este agrupamiento
+
+Probemos con otro agrupamiento:
+
+```{r}
+aux6<- larynx %>%
+  mutate("Fecha_Diag"=cut(larynx$diagyr,breaks=c(70,74,Inf)))
+year_fit3 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", conf.int = 0.95, conf.type = "plain",data=aux6)
+ggsurvplot(year_fit3,data = aux6,palette = pal_lancet()(9),censor.size=7, 
+           censor.shape= 124,conf.int = FALSE,
+           xlab = "Tiempo en meses")
+```
+De nuevo, aquí no parece haber ninguna diferencia. Hagamos los test:
+
+```{r}
+print("Para el tercer grupo de años donde los grupos son: ")
+print(levels(aux6$Fecha_Diag))
+survdiff(Surv(time,delta)~Fecha_Diag,rho=0,data=aux6) # log-rank
+survdiff(Surv(time,delta)~Fecha_Diag,rho=1,data=aux6) # Generalized Wilcoxon
+```
+Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico parece no afectar con este agrupamiento
+
+En conclusión: El año de diagnóstico no parece ser una variable importante, bajo
+ningún agrupamiento, mientras que la etapa sí lo es, y la edad del paciente 
+bajo el agrupamiento de 40 a 70 y de 71 en adelante
 # Pruebas Log-Rank con $\alpha=0.05$
 
 ## Ejercicio 3
@@ -425,6 +480,41 @@ de hipótesis:
 
 $$H_0: S_j(t)=S_k(t) \forall t >0, \forall j,k\textbf{.         vs        .} H_a: S_j(t) \not = S_k(t);\textbf{p.a }t>0, p.a j\not = k.$$
 
-## Por grupo de edad
+```{r}
+survdiff(Surv(time,delta)~stage,rho=0,data=larynx) #log-rank
+survdiff(Surv(time,delta)~stage,rho=1,data=larynx) # Generalized Wilcoxon
+```
 
+Por lo que, con ambos test obtenemos un p-value demasiado pequeño, entonces
+podemos decir que hay evidencia estadísticamente significativa como para 
+decir que son funciones de supervivencia distintas
+
+## Por grupo de edad
 Compare las funciones de supervivencia por grupos de edad
+```{r}
+print("Para el primer grupo de edad donde los grupos son: ")
+print(levels(aux$Grupo))
+survdiff(Surv(time,delta)~Grupo,rho=0,data=aux) # log-rank
+survdiff(Surv(time,delta)~Grupo,rho=1,data=aux) # Generalized Wilcoxon
+
+print("Para el segundo grupo de edad donde los grupos son: ")
+print(levels(aux2$Grupo))
+survdiff(Surv(time,delta)~Grupo,rho=0,data=aux2) # log-rank
+survdiff(Surv(time,delta)~Grupo,rho=1,data=aux2) # Generalized Wilcoxon
+
+print("Para el tercer grupo de edad donde los grupos son: ")
+print(levels(aux3$Grupo))
+survdiff(Surv(time,delta)~Grupo,rho=0,data=aux3) # log-rank
+survdiff(Surv(time,delta)~Grupo,rho=1,data=aux3) # Generalized Wilcoxon
+
+print("Para el cuarto grupo de edad donde los grupos son: ")
+print(levels(aux4$Grupo))
+survdiff(Surv(time,delta)~Grupo,rho=0,data=aux4) # log-rank
+survdiff(Surv(time,delta)~Grupo,rho=1,data=aux4) # Generalized Wilcoxon
+```
+
+Entonces, para el acomodo que hicimos partiendo en el grupo de edad de
+40 a 70 y de 71 en adelante, ambos test nos dicen que sí son diferentes
+las funciones de supervivencia; para las demás clasificaciones nos dice que
+no hay evidencia significativa estadísticamente como para decir que sí son 
+diferentes.
