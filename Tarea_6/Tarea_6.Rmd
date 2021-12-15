@@ -11,3 +11,20 @@ knitr::include_graphics("CARATULA.PNG")
 ```
 
 \newpage
+
+Utiliza la base de datos de R llamada larynx, del paquete KMsurv, y realice lo siguiente:
+
+Ajuste un modelo de riesgos proporcionales de Cox para definir la contribución de las variables
+al tiempo de supervivencia de los pacientes.
+
+## Ejercicio 1 
+¿Cuál es la estimación puntual para los coeficientes de regresión? Interprete 
+los coeficientes deregresión.
+
+## Ejercicio 2
+¿Las variables explicativas tienen o no efecto en el modelo? Obtenga un intervalo de confianza
+al $95\%$ para la estimación de los coeficientes de regresión. Justifique.
+
+## Ejercicio 3
+¿Es válido tu modelo de acuerdo al supuesto de riesgos proporcionales? Realice las pruebas de
+análisis de residuos y concluya.
