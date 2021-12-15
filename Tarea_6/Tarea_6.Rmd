@@ -1,0 +1,13 @@
+---
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r pressure2, echo=FALSE, out.width = '220%'}
+knitr::include_graphics("CARATULA.PNG")
+```
+
+\newpage
