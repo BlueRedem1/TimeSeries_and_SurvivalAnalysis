@@ -11,7 +11,8 @@ knitr::include_graphics("CARATULA.PNG")
 
 \newpage
 
-Utiliza la base de datos de R llamada larynx, del paquete KMsurv, y realice lo siguiente:
+Utiliza la base de datos de R llamada larynx, del paquete KMsurv, y realice lo 
+siguiente:
 
 Explique sus resultados.
 
@@ -19,7 +20,8 @@ Explique sus resultados.
 
 ## Ejercicio 1
 
-Realice un análisis descriptivo sobre el tiempo de supervivencia de los sujetos, además de sus características generales y particulares.
+Realice un análisis descriptivo sobre el tiempo de supervivencia de los sujetos, 
+además de sus características generales y particulares.
 
 
 ```{r,echo=FALSE,message=FALSE}
@@ -111,7 +113,8 @@ el grupo más joven y el más viejo tienen la menor concentración de pacientes.
 year <- table(diagyr)
 b <- barplot(year,col= palette(pal_lancet("lanonc")(5)),
              main="Gráfica de barras: Etapa de cáncer", col.main="indianred1", 
-             ylab="Frecuencia absoluta", xlab = "Edad", col.lab="lightcoral",ylim=c(0,25))
+             ylab="Frecuencia absoluta", xlab = "Edad", col.lab="lightcoral",
+             ylim=c(0,25))
 text(x=b,y=c(year), labels=c(year), pos=3, col="gray0", cex=1.5, xpd=TRUE)
 #Observaciones
 year
@@ -141,7 +144,8 @@ names(fallas)<-c('Censura','Falla')
 b <- barplot(fallas,col= palette(pal_lancet("lanonc")(5)),
              main="Gráfica de barras: Etapa de cáncer", col.main="slateblue", 
              ylab="Frecuencia absoluta", col.lab="slateblue1",ylim=c(0,60))
-text(x=b,y=c(fallas), labels=c(fallas), pos=3, col= c("red", "navy"), cex=1.5, xpd=TRUE)
+text(x=b,y=c(fallas), labels=c(fallas), pos=3, col= c("red", "navy"), cex=1.5, 
+     xpd=TRUE)
 fallas/.9
 ```
 Tenemos 50 fallas, que representan el 55.55\% de nuestros datos, y 40 censuras,
@@ -158,7 +162,8 @@ intEndpts <- (0:11)
 ntotal <- dim(tabla_act_aux)[1]
 cens <- tabla_aux[,1]
 fallas <- tabla_aux[,2]
-Tabla_Vida_Actuarial<- lifetab(tis = intEndpts, ninit=ntotal, nlost=cens, nevent=fallas)
+Tabla_Vida_Actuarial<- lifetab(tis = intEndpts, ninit=ntotal, nlost=cens, 
+                               nevent=fallas)
 round(Tabla_Vida_Actuarial,8)
 names(Tabla_Vida_Actuarial)
 ```
@@ -167,8 +172,8 @@ Graficamos la función de supervivencia:
 ```{r}
 x = rep(intEndpts,rep(2,12))[2:23]
 y = rep(Tabla_Vida_Actuarial$surv,rep(2,11))
-plot(x, y, type="l", col="orangered3", xlab="Time", ylab="Supervivencia (Life Table)", 
-     col.lab="darkblue", lwd=2)
+plot(x, y, type="l", col="orangered3", xlab="Time", 
+     ylab="Supervivencia (Life Table)", col.lab="darkblue", lwd=2)
 title(main="Supervivencia al cáncer", cex=0.6, col.main="darkblue")
 ```
 La gráfica de la función de supervivencia acorde a la tabla de vida actuarial
@@ -193,11 +198,15 @@ a la tabla, a partir del mes 8
 
 ## Ejercicio 2
 
-Con el estimador de Kaplan-Meier para la función de supervivencia S(t), calcule y grafique:
+Con el estimador de Kaplan-Meier para la función de supervivencia S(t), 
+calcule y grafique:
+
  S(t) poblacional.
  S(t) por estadio de la enfermedad.
  S(t) por grupos de edad.
-Identifique las variables que afectan el tiempo de supervivencia. Incluya los intervalos del 95\% confianza.
+ 
+Identifique las variables que afectan el tiempo de supervivencia. 
+Incluya los intervalos del 95\% confianza.
 
 ### Creación de la función para K-M
 Crearemos una función para facilitar los cálculos:
@@ -273,7 +282,8 @@ plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
            col="blue1", las=1, col.lab="darkblue") 
 ggsurvplot(general_fit, data=larynx,palette = "violetred3",censor.size=7, 
            censor.shape= 124,legend.labs ="Supervivencia general",
-           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia", col.lab="deeppink")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia", 
+           col.lab="deeppink")
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
@@ -356,12 +366,16 @@ for(i in levels(aux$Grupo)){
   time_aux=(aux$time)[aux$Grupo==i]
   print(KM(delta_aux,time_aux))
 }
+aux%>%
+  group_by(Grupo) %>%
+  summarise(n=n(), porc=n/.9)
 ```
 Elegimos esta división por la distribución de los datos, para tratar
 de compensar los pocos datos que hay en los extremos respecto de la inicial.
 Además de que graficando en los grupos por edades de 40 a 50, de 51 a 60, de 61 
 a 70 y de 71 en adelante no obteniamos una gráfica donde se pudieran distinguir
-muy bien. El intervalo es de 15 años cada grupo, que parece razonable
+muy bien. El intervalo es de 15 años cada grupo, que parece razonable, además de
+que todos tienen arriba de 20 observaciones.
 
 Bajo esta división. parece que tendríamos que juntar las edades de 40 a 55 y de 
 56 a 70, ya que parecen tener una función de supervivencia similar, están 
@@ -388,8 +402,14 @@ for(i in unique(aux2$Grupo)){
   time_aux=(aux2$time)[aux2$Grupo==i]
   print(KM(delta_aux,time_aux))
 }
+aux2%>%
+  group_by(Grupo) %>%
+  summarise(n=n(), porc=n/.9)
 ```
-¡Son indistinguibles! Prácticamente son la misma.
+¡Son indistinguibles! Prácticamente son la misma función de supervivencia, a simple
+vista. Aquí hay casi la misma cantidad de datos en cada categoría y la división
+suena la más natural, puesto que es la división que haría INEGI para adultos y
+adultos mayores.
 ```{r}
 aux3<- larynx %>%
   mutate("Grupo"=cut(larynx$age,breaks=c(40,70,Inf)))
@@ -408,8 +428,18 @@ for(i in levels(aux3$Grupo)){
   print(KM(delta_aux,time_aux))
 }
 ```
-Bajo esta división parecen ser diferentes funciones de supervivencia.
+Bajo esta división parecen ser diferentes funciones de supervivencia. Lo confirmaremos
+en las pruebas Log-Rank. Puede usarse
+como una nueva clasificación entre "Adultos" y personas en "Vejez".
 
+```{r}
+aux3%>%
+  group_by(Grupo) %>%
+  summarise(n=n(), porc=n/.9)
+```
+Hay una diferencia de 34 observaciones de un grupo respecto al otro, pero el
+segundo grupo todvía tiene una cantidad considerable de obsevaciones, que es el
+31\% de las observaciones, siendo 28. 
 ```{r}
 aux4<- larynx %>%
   mutate("Grupo"=cut(larynx$age,breaks=c(40,50,60,70,Inf)))
@@ -427,8 +457,12 @@ for(i in levels(aux4$Grupo)){
   time_aux=(aux4$time)[aux4$Grupo==i]
   print(KM(delta_aux,time_aux))
 }
+aux4%>%
+  group_by(Grupo) %>%
+  summarise(n=n(), porc=n/.9)
 ```
-Esta es la división que comentamos el inicio: 
+Esta es la división que comentamos el inicio, además notemos que en el primer
+grupo tenemos muy pocos datos. Respecto a la gráfica, notemos lo siguiente: 
 Cruzan demasiado entre sí durante los primeros meses, y entre el mes 4 y 5 la 
 supervivencia del grupo de 40 a 50 y de 51 a 60 parece ser la misma, y en los
 primeros 2 meses y medio, la supervivencia del grupo de 51 a 60 parece la misma
@@ -459,7 +493,8 @@ A simple vista, vemos que hay muchos empates hasta el mes 5, hagamos el test:
 survdiff(Surv(time,delta)~diagyr,rho=0,data=larynx) # log-rank
 survdiff(Surv(time,delta)~diagyr,rho=1,data=larynx) # Generalized Wilcoxon
 ```
-Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico parece no afectar con este agrupamiento
+Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico 
+parece no afectar con este agrupamiento
 Agrupemos...
 
 ```{r}
@@ -479,14 +514,16 @@ print(levels(aux5$Fecha_Diag))
 survdiff(Surv(time,delta)~Fecha_Diag,rho=0,data=aux5) # log-rank
 survdiff(Surv(time,delta)~Fecha_Diag,rho=1,data=aux5) # Generalized Wilcoxon
 ```
-Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico parece no afectar con este agrupamiento
+Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico 
+parece no afectar con este agrupamiento
 
 Probemos con otro agrupamiento:
 
 ```{r}
 aux6<- larynx %>%
   mutate("Fecha_Diag"=cut(larynx$diagyr,breaks=c(70,74,Inf)))
-year_fit3 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", conf.int = 0.95, conf.type = "plain",data=aux6)
+year_fit3 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", 
+                     conf.int = 0.95, conf.type = "plain",data=aux6)
 ggsurvplot(year_fit3,data = aux6,palette = pal_simpsons()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
            xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
@@ -499,7 +536,8 @@ print(levels(aux6$Fecha_Diag))
 survdiff(Surv(time,delta)~Fecha_Diag,rho=0,data=aux6) # log-rank
 survdiff(Surv(time,delta)~Fecha_Diag,rho=1,data=aux6) # Generalized Wilcoxon
 ```
-Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico parece no afectar con este agrupamiento
+Rechazamos, por lo que no hay una diferencia, es decir, el año de diagnóstico parece 
+no afectar con este agrupamiento
 
 En conclusión: El año de diagnóstico no parece ser una variable importante, bajo
 ningún agrupamiento, mientras que la etapa sí lo es, y la edad del paciente 
