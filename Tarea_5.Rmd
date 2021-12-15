@@ -270,10 +270,10 @@ Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
 general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=larynx)
 plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
-           col="blue1", las=1) 
+           col="blue1", las=1, col.lab="darkblue") 
 ggsurvplot(general_fit, data=larynx,palette = "violetred3",censor.size=7, 
            censor.shape= 124,legend.labs ="Supervivencia general",
-           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia", col.lab="deeppink")
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
