@@ -167,7 +167,7 @@ Graficamos la función de supervivencia:
 ```{r}
 x = rep(intEndpts,rep(2,12))[2:23]
 y = rep(Tabla_Vida_Actuarial$surv,rep(2,11))
-plot(x, y, type="l", col="darkred", xlab="Time", ylab="Supervivencia (Life Table)", 
+plot(x, y, type="l", col="orangered3", xlab="Time", ylab="Supervivencia (Life Table)", 
      col.lab="darkblue", lwd=2)
 title(main="Supervivencia al cáncer", cex=0.6, col.main="darkblue")
 ```
@@ -179,7 +179,7 @@ parecer, del mes 2 al mes 3 y en el periodo de 4 a 6 meses del estudio.
 ### Grafica: funcion de riesgo de la tabla actuarial de vida
 
 y = rep(Tabla_Vida_Actuarial$hazard, rep(2,11))
-plot(x, y, type="l", col="darkgreen", xlab="Time", ylab="Riesgo (Life Table)",
+plot(x, y, type="l", col="purple3", xlab="Time", ylab="Riesgo (Life Table)",
      col.lab="darkblue",lwd=2)
 title(main="Supervivencia al cáncer", cex=.6,col.main="orange")
 ```
@@ -273,7 +273,7 @@ plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
            col="blue1", las=1) 
 ggsurvplot(general_fit, data=larynx,palette = "violetred3",censor.size=7, 
            censor.shape= 124,legend.labs ="Supervivencia general",
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 ```
 Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
 una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
@@ -313,10 +313,10 @@ KM(delta,time)
 ```{r}
 stage_fit <- survfit(Surv_general ~ stage, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=larynx)
-ggsurvplot(stage_fit,data = larynx,palette = pal_lancet()(4),censor.size=7, 
+ggsurvplot(stage_fit,data = larynx,palette = pal_jama()(4),censor.size=7, 
            censor.shape= 124,legend.labs =c("Etapa 1", "Etapa 2", "Etapa 3", 
                                             "Etapa 4"),
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 ```
 Al menos de manera gráfica, vemos que podríamos unir la etaopa 1 y 2 en un mismo
 grupo puesto que parecen describir casi la misma función de supervivencia, 
@@ -346,10 +346,10 @@ age_fit <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=aux)
 ggsurvplot(age_fit,data = aux,palette = pal_lancet()(9),censor.size=7, 
            censor.shape= 124,conf.int = TRUE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 ggsurvplot(age_fit,data = aux,palette = pal_lancet()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 for(i in levels(aux$Grupo)){
   print(paste("Para el grupo de edad del intervalo:",i))
   delta_aux=(aux$delta)[aux$Grupo==i]
@@ -375,12 +375,12 @@ aux2<- larynx %>%
   mutate("Grupo"=cut(larynx$age,breaks=c(40,65,Inf)))
 age_fit2 <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=aux2)
-ggsurvplot(age_fit2,data = aux2,palette = pal_lancet()(9),censor.size=7, 
+ggsurvplot(age_fit2,data = aux2,palette = pal_startrek()(9),censor.size=7, 
            censor.shape= 124,conf.int = TRUE,
-           xlab = "Tiempo en meses")
-ggsurvplot(age_fit2,data = aux2,palette = pal_lancet()(9),censor.size=7, 
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
+ggsurvplot(age_fit2,data = aux2,palette = pal_startrek()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 for(i in unique(aux2$Grupo)){
   print(i)
   print(paste("Para el grupo de edad del intervalo:",i))
@@ -395,12 +395,12 @@ aux3<- larynx %>%
   mutate("Grupo"=cut(larynx$age,breaks=c(40,70,Inf)))
 age_fit3 <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=aux3)
-ggsurvplot(age_fit3,data = aux3,palette = pal_lancet()(9),censor.size=7, 
+ggsurvplot(age_fit3,data = aux3,palette = pal_nejm()(8),censor.size=7, 
            censor.shape= 124,conf.int = TRUE,
-           xlab = "Tiempo en meses")
-ggsurvplot(age_fit3,data = aux3,palette = pal_lancet()(9),censor.size=7, 
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
+ggsurvplot(age_fit3,data = aux3,palette = pal_nejm()(8),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 for(i in levels(aux3$Grupo)){
   print(paste("Para el grupo de edad del intervalo:",i))
   delta_aux=(aux3$delta)[aux3$Grupo==i]
@@ -415,12 +415,12 @@ aux4<- larynx %>%
   mutate("Grupo"=cut(larynx$age,breaks=c(40,50,60,70,Inf)))
 age_fit4 <- survfit(Surv_general ~ Grupo, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=aux4)
-ggsurvplot(age_fit4,data = aux4,palette = pal_lancet()(9),censor.size=7, 
+ggsurvplot(age_fit4,data = aux4,palette = pal_rickandmorty()(9),censor.size=7, 
            censor.shape= 124,conf.int = TRUE,
-           xlab = "Tiempo en meses")
-ggsurvplot(age_fit4,data = aux4,palette = pal_lancet()(9),censor.size=7, 
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
+ggsurvplot(age_fit4,data = aux4,palette = pal_rickandmorty()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 for(i in levels(aux4$Grupo)){
   print(paste("Para el grupo de edad del intervalo:",i))
   delta_aux=(aux4$delta)[aux4$Grupo==i]
@@ -450,9 +450,9 @@ Veamos qué pasa, de manera gráfica, con las demás variables:
 ```{r}
 year_fit <- survfit(Surv_general ~ diagyr, type = "kaplan-meier", conf.int = 0.95,
                        conf.type = "plain",data=larynx)
-ggsurvplot(year_fit,data = larynx,palette = pal_lancet()(9),censor.size=7, 
+ggsurvplot(year_fit,data = larynx,palette = pal_tron()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia" )
 ```
 A simple vista, vemos que hay muchos empates hasta el mes 5, hagamos el test:
 ```{r}
@@ -467,9 +467,9 @@ aux5<- larynx %>%
   mutate("Fecha_Diag"=cut(larynx$diagyr,breaks=seq(70,78,by=2)))
 year_fit2 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", 
                      conf.int = 0.95,conf.type = "plain",data=aux5)
-ggsurvplot(year_fit2,data = aux5,palette = pal_lancet()(9),censor.size=7, 
+ggsurvplot(year_fit2,data = aux5,palette = pal_jco()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 ```
 Así no parece haber mucha diferencia, podemos ver que se agrupan demaiado en los
 primeros 4 meses, hagamos el test:
@@ -487,9 +487,9 @@ Probemos con otro agrupamiento:
 aux6<- larynx %>%
   mutate("Fecha_Diag"=cut(larynx$diagyr,breaks=c(70,74,Inf)))
 year_fit3 <- survfit(Surv_general ~ Fecha_Diag, type = "kaplan-meier", conf.int = 0.95, conf.type = "plain",data=aux6)
-ggsurvplot(year_fit3,data = aux6,palette = pal_lancet()(9),censor.size=7, 
+ggsurvplot(year_fit3,data = aux6,palette = pal_simpsons()(9),censor.size=7, 
            censor.shape= 124,conf.int = FALSE,
-           xlab = "Tiempo en meses")
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
 ```
 De nuevo, aquí no parece haber ninguna diferencia. Hagamos los test:
 
