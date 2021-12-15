@@ -147,44 +147,47 @@ fallas/.9
 Tenemos 50 fallas, que representan el 55.55\% de nuestros datos, y 40 censuras,
 que representan el 44.44\% de nuestros datos. Tenemos ligeramente más fallas que
 censuras en nuestro estudio.
-## Función de supervivencia
-```{r}
-Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
-general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
-                       conf.type = "plain",data=larynx)
-plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
-           col="blue1", las=1) 
-ggsurvplot(general_fit, data=larynx,palette = "violetred3",censor.size=7, 
-           censor.shape= 124,legend.labs ="Supervivencia general",
-           xlab = "Tiempo en meses")
+## Función de supervivencia: Tabla actuarial
+
+```{r,message=FALSE}
+#Elegimos intervalos mensuales
+tabla_act_aux<- larynx %>%
+  mutate('interval'=floor(larynx$time))
+tabla_aux <- table(tabla_act_aux$interval,tabla_act_aux$delta)
+intEndpts <- (0:11)
+ntotal <- dim(tabla_act_aux)[1]
+cens <- tabla_aux[,1]
+fallas <- tabla_aux[,2]
+Tabla_Vida_Actuarial<- lifetab(tis = intEndpts, ninit=ntotal, nlost=cens, nevent=fallas)
+round(Tabla_Vida_Actuarial,8)
+names(Tabla_Vida_Actuarial)
 ```
-Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
-una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
-aproximadamente; siendo los periodos donde más se concentran las fallas.\
 
-Otro punto a destacar es que no llegamos a $0$ en la función de supervivencia, esto 
-porque los últimos datos son censuras, como podemos ver en el dataset (en este contexto 
-es que se encuentran vivos).\
+Graficamos la función de supervivencia:
+```{r}
+x = rep(intEndpts,rep(2,12))[2:23]
+y = rep(Tabla_Vida_Actuarial$surv,rep(2,11))
+plot(x, y, type="l", col="darkred", xlab="Time", ylab="Supervivencia (Life Table)", 
+     col.lab="darkblue", lwd=2)
+title(main="Supervivencia al cáncer", cex=0.6, col.main="darkblue")
+```
+La gráfica de la función de supervivencia acorde a la tabla de vida actuarial
+parece tener un comportamiento "Casi" lineal. Parece que el mayor salto lo da 
+en el primer mes, y del mes 6 al mes 7. Los menores cambios los presenta, al 
+parecer, del mes 2 al mes 3 y en el periodo de 4 a 6 meses del estudio.
+```{r}
+### Grafica: funcion de riesgo de la tabla actuarial de vida
 
-Podemos notar un periodo de estabilidad, donde la función de supervivencia se mantiene
-constante, en el periodo de aproximadamente 4 meses y medio a poco antes de 6, 
-si bien tenemos fallas, estas son pocas, por lo que se mantiene casi constante en
-el periodo mencionado, aunque existen muchas fallas (bajo este contexto, ello significa
-que el sujeto de estudio se encontraba vivo al tiempo de observación).
+y = rep(Tabla_Vida_Actuarial$hazard, rep(2,11))
+plot(x, y, type="l", col="darkgreen", xlab="Time", ylab="Riesgo (Life Table)",
+     col.lab="darkblue",lwd=2)
+title(main="Supervivencia al cáncer", cex=.6,col.main="orange")
+```
 
-Al inicio, los intervalos de confianza están bastante cercanos al estimador puntual.\
-Los intervalos de confianza se hacen muy grandes hacia el final de la función de 
-supervivencia, pero sesgados hacia la derecha, es decir, el intervalo de confianza
-superior tiene una distancia mayor al estimador puntual, respecto del intervalo inferior.\
-
-Dicho lo anterior, se puede intuir que los primeros dos meses son los 'más difíciles', 
-puesto que hay muchas fallas en este periodo (son frecuentes y es donde más se acumulan), 
-pero observamos que conforme se acerca a los 8 meses se entra a un periodo "seguro",
-donde las fallas son casi nulas, y al tiempo de observación vemos sujetos vivos (fallas)
-únicamente; teniendo un valor de entre 0.22 y 0.40 aproximadamente, la función de supervivencia
-con los intervalos de confianza, y de aproximadamente 0.26 con el estimador puntual,
-por lo que tienen todavía una "Buena" probabilidad de sobrevivir al menos hasta este
-periodo.
+Podemos observar un comportamiento que no es monótono: En los primeros dos meses
+se mantiene constante, después baja y vuelve a subir constantemente, alcanzando 
+el mayor riesgo entre los 6 y 8 meses, y teniendo un riesgo nulo, de acuerdo
+a la tabla, a partir del mes 8
 
 # Kaplan-Meier
 
@@ -262,13 +265,43 @@ KM<-function(fallas,tiempo,redondear=TRUE,digitos=5){
 
 ## S(t) poblacional
 
-Este ya lo calculamos en el inciso anterior y dimos su interpretación:
-
 ```{r}
-plot(general_fit, main="Supervivencia", col="red", las=1) 
-ggsurvplot(general_fit, data=larynx,palette = 'lancet',censor.size=4.9,
-           censor.shape=124)
+Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
+general_fit <- survfit(Surv_general ~ 1, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=larynx)
+plot(general_fit, main="Supervivencia", xlab =  "t = meses", ylab = "S(t)",
+           col="blue1", las=1) 
+ggsurvplot(general_fit, data=larynx,palette = "violetred3",censor.size=7, 
+           censor.shape= 124,legend.labs ="Supervivencia general",
+           xlab = "Tiempo en meses")
 ```
+Podemos observar que al inicio del estudio, en los primeros dos meses, se tiene
+una gran cantidad de fallas, seguido por el periodo de 3 a 4 meses y de 6 a 6 y medio meses,
+aproximadamente; siendo los periodos donde más se concentran las fallas.\
+
+Otro punto a destacar es que no llegamos a $0$ en la función de supervivencia, esto 
+porque los últimos datos son censuras, como podemos ver en el dataset (en este contexto 
+es que se encuentran vivos).\
+
+Podemos notar un periodo de estabilidad, donde la función de supervivencia se mantiene
+constante, en el periodo de aproximadamente 4 meses y medio a poco antes de 6, 
+si bien tenemos fallas, estas son pocas, por lo que se mantiene casi constante en
+el periodo mencionado, aunque existen muchas fallas (bajo este contexto, ello significa
+que el sujeto de estudio se encontraba vivo al tiempo de observación).
+
+Al inicio, los intervalos de confianza están bastante cercanos al estimador puntual.\
+Los intervalos de confianza se hacen muy grandes hacia el final de la función de 
+supervivencia, pero sesgados hacia la derecha, es decir, el intervalo de confianza
+superior tiene una distancia mayor al estimador puntual, respecto del intervalo inferior.\
+
+Dicho lo anterior, se puede intuir que los primeros dos meses son los 'más difíciles', 
+puesto que hay muchas fallas en este periodo (son frecuentes y es donde más se acumulan), 
+pero observamos que conforme se acerca a los 8 meses se entra a un periodo "seguro",
+donde las fallas son casi nulas, y al tiempo de observación vemos sujetos vivos (fallas)
+únicamente; teniendo un valor de entre 0.22 y 0.40 aproximadamente, la función de supervivencia
+con los intervalos de confianza, y de aproximadamente 0.26 con el estimador puntual,
+por lo que tienen todavía una "Buena" probabilidad de sobrevivir al menos hasta este
+periodo.
 
 ```{r}
 KM(delta,time)
