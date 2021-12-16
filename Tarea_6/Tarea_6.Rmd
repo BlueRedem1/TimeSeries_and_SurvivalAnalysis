@@ -143,7 +143,7 @@ modelo_conjunto_aux1
 Con este modelo son significativos de manera conjunta, sin embargo en la edad
 tenemos un coeficiente no significativo al 95\% de confianza, pero al 90\% sí
 lo sería.
-### Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
 ```{r}
 stage_aux_2<- aux_age %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"Temprana(1,2)",
@@ -164,8 +164,14 @@ los coeficientes de regresión.
 ## Estimación puntual 
 
 ### Modelo 1: Sin modificaciones
+```{r}
+modelo_conjunto$coefficients
+```
 
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+```{r}
+modelo_conjunto_aux1
+```
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
 
@@ -176,6 +182,8 @@ los coeficientes de regresión.
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+
+### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
 
 # Ejercicio 2: Análisis del efecto de las variables en el modelo
 
@@ -190,6 +198,8 @@ de confianza al $95\%$ para la estimación de los coeficientes de regresión. Ju
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
 
+### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+
 ## Intervalo del 95\% de confianza
 
 ### Modelo 1: Sin modificaciones
@@ -197,6 +207,8 @@ de confianza al $95\%$ para la estimación de los coeficientes de regresión. Ju
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+
+### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
 
 # Ejercicio 3: Análisis de supuesto de riesgos proporcionales
 
@@ -210,3 +222,5 @@ pruebas de análisis de residuos y concluya.
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+
+### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
