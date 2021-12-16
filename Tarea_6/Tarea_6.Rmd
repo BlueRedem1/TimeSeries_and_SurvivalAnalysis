@@ -43,11 +43,12 @@ stage_model<-coxph(Surv_general~factor(stage))
 stage_model
 #Notamos que la base de comparación es la etapa 1
 ```
-¡ Tiene un p-value muy pequeño! Ello quiere decir que el coeficiente es 
-significativo, y concuerda con lo obtenido en la tarea 5, donde vimos que 
-para cada una de las etapas, el test de Log-Rank y de Wilcoxon generalizada
-nos dice que son funciones de supervivencia distintos, por ende es natural que
-haciendo un modelo de Cox, se tenga un parámetro significativo
+¡Tiene un p-value muy pequeño \textbf{conjuntamente}! Ello quiere decir que el coeficiente es significativo, y concuerda con lo obtenido en la tarea 5, 
+donde vimos que para cada una de las etapas, el test de Log-Rank y de Wilcoxon generalizada nos dice que son funciones de supervivencia distintos, por ende es natural que haciendo un modelo de Cox, se tenga un parámetro significativo; sin embargoesto es de \textbf{manera conjunta}. 
+Ya que el p-value del grupo de la etapa 2 es demasiado grande, probemos con 
+las nuevas clasificaciones que probamos en la tarea 5:
+
+Agrupando la eta 1 y 2:
 ```{r}
 stage_aux<- larynx %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"1 o 2",stage)))
@@ -56,23 +57,28 @@ stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier",
 
 stage_model_aux1<-coxph(Surv_general~factor(stage_aux),data=stage_aux) 
 stage_model_aux1
+#la etapa base es la 1 o 2
 ```
-
+¡De manera conjunta tiene un p-value muy pequeño! y notemos que, si bien en la 
+etapa 3 tiene un p-value de 0.0663, este es menor a 0.2, y vimos con la profesora
+que, acorde a autores como Hosmer-Lemeshow, si tienen un p-value menor o igual
+a 0.2, se deben considerar en el modelo múltiple
 ```{r}
 stage_aux2<- larynx %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"Temprana(1,2)",
                                  "Avanzada(3,4)")))
 stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier", 
                          conf.int = 0.95, conf.type = "plain",data=stage_aux2)
-
 stage_model_aux2<-coxph(Surv_general~factor(stage_aux),data=stage_aux2) 
 stage_model_aux2
+#La etapa base es la avanzada
 ```
-
+Teneos un p-value demasiado pequeño, por lo que definitivamente es una variable
+significativa bajo esta clasificación
 ## Modelo para edad
 ```{r}
-age_model1<-coxph(Surv_general~age)
-age_model1
+age_model<-coxph(Surv_general~age)
+age_model
 ```
 Tiene un p-value mayor a 0.05, sin embargo, en clase vimos que autores como
 Hosmer-Lemeshow consideran que, en un analisis exploratorio, las variables con 
@@ -96,8 +102,8 @@ menor a 0.05, por lo que concuerda con lo obtenido en los test de la tarea
 anterior. 
 
 ```{r}
-diagyr_model1<-coxph(Surv_general~diagyr)
-diagyr_model1
+diagyr_model<-coxph(Surv_general~diagyr)
+diagyr_model
 ```
 Definitivamente, no es una variable que aporte mucho: Su p-value es altísimo,
 por lo que los coeficientes no son significativos inclusive bajo el criterio
@@ -110,7 +116,9 @@ Veamos el modelo en conjunto:
 modelo_conjunto<-coxph(Surv_general ~ factor(stage)+age)
 modelo_conjunto
 ```
-¡Conjuntamente, son significativos! El p-value es menor a 0.05
+¡Conjuntamente, son significativos! El p-value es menor a 0.05; sin embargo
+la edad y 2 de las etapas de la enfermedad tienen un p.value mayor a 0.05, por
+lo que no son significativos de manera individual.
 
 Y usando la clasificación de edades propuesta, hubiésemos tenido este modelo:
 ```{r}
@@ -119,7 +127,14 @@ modelo_conjunto_aux
 ```
 De la misma manera, y como se esperaba, usando los grupos propuestos para edad,
 los coeficientes son significativos de manera conjunta. De hecho, el p-value
-es menor que en el primer modelo conjunto obtenido en la línea anterior.
+es menor que en el primer modelo conjunto obtenido en la línea anterior. Sin 
+embargo, tenemos parámetros no significativos en las etapas de la enfermedad
+
+```{r}
+modelo_conjunto_aux<-coxph(Surv_general ~ factor(stage)+Grupo,data=aux_age)
+modelo_conjunto_aux
+```
+
 # Análisis de los coeficientes de regresión
 
 ## Ejercicio 1 
