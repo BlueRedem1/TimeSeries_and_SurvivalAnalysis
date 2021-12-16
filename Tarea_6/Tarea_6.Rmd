@@ -113,7 +113,7 @@ la consideraremos en el modelo conjunto.
 ## Modelo conjunto
 Veamos el modelo en conjunto:
 
-### Sin modificaciones
+### Modelo 1: Sin modificaciones
 ```{r}
 modelo_conjunto<-coxph(Surv_general ~ factor(stage)+age)
 modelo_conjunto
@@ -122,7 +122,7 @@ modelo_conjunto
 la edad y 2 de las etapas de la enfermedad tienen un p.value mayor a 0.05, por
 lo que no son significativos de manera individual.
 
-### Con grupo de edad de 40 a 70 y de 71 en adelante
+### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 Y usando la clasificación de edades propuesta, hubiésemos tenido este modelo:
 ```{r}
 modelo_conjunto_aux<-coxph(Surv_general ~ factor(stage)+Grupo,data=aux_age)
@@ -133,7 +133,7 @@ los coeficientes son significativos de manera conjunta. De hecho, el p-value
 es menor que en el primer modelo conjunto obtenido en la línea anterior. Sin 
 embargo, tenemos parámetros no significativos en las etapas de la enfermedad
 
-### Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
 ```{r}
 stage_aux<- aux_age %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"1 o 2",stage)))
@@ -155,31 +155,58 @@ En este modelo, todos los parámetros son significativos de manera individual y
 de manera conjunta (Bajo el grupo de edad de 40 a 70 y de 71 en adelante, y
 con etapa temprana y avanzada)
 
-# Análisis de los coeficientes de regresión
+#  Ejercicio 1 : Análisis de los coeficientes de regresión
 
-## Ejercicio 1 
 ¿Cuál es la estimación puntual para los coeficientes de regresión? Interprete 
 los coeficientes de regresión.
 
 
-### Estimación puntual 
+## Estimación puntual 
 
-### Interpretación
+### Modelo 1: Sin modificaciones
 
-# Análisis del efecto de las variables en el modelo
+### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 
-## Ejercicio 2
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+
+## Interpretación
+
+### Modelo 1: Sin modificaciones
+
+### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+
+# Ejercicio 2: Análisis del efecto de las variables en el modelo
+
 ¿Las variables explicativas tienen o no efecto en el modelo? Obtenga un intervalo 
 de confianza al $95\%$ para la estimación de los coeficientes de regresión. Justifique.
 
-### Efecto/significancia de las variables explicativas en el modelo
+## Efecto/significancia de las variables explicativas en el modelo
 
-### Intervalo del 95\% de confianza
+### Modelo 1: Sin modificaciones
 
-# Análisis de supuesto de riesgos proporcionales
+### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 
-## Ejercicio 3
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+
+## Intervalo del 95\% de confianza
+
+### Modelo 1: Sin modificaciones
+
+### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+
+# Ejercicio 3: Análisis de supuesto de riesgos proporcionales
+
 ¿Es válido tu modelo de acuerdo al supuesto de riesgos proporcionales? Realice las 
 pruebas de análisis de residuos y concluya.
 
-###Pruebas de análisis de residuos
+## Pruebas de análisis de residuos
+
+### Modelo 1: Sin modificaciones
+
+### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
