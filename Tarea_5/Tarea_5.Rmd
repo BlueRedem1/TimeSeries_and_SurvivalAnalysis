@@ -327,6 +327,11 @@ ggsurvplot(stage_fit,data = larynx,palette = pal_jama()(4),censor.size=7,
            censor.shape= 124,legend.labs =c("Etapa 1", "Etapa 2", "Etapa 3", 
                                             "Etapa 4"),
            xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
+ggsurvplot(stage_fit,data = larynx,palette = pal_jama()(4),censor.size=7, 
+           censor.shape= 124,legend.labs =c("Etapa 1", "Etapa 2", "Etapa 3", 
+                                            "Etapa 4"),
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia",
+           conf.int = TRUE)
 ```
 Al menos de manera gráfica, vemos que podríamos unir la etaopa 1 y 2 en un mismo
 grupo puesto que parecen describir casi la misma función de supervivencia, 
@@ -346,6 +351,71 @@ for (i in 1:4){
 }
 ```
 
+¿Y si agrupamos la etapa 1 y 2? Ya que, de manera gráfica vimos que se parecían
+mucho sus funciones
+```{r}
+stage_aux<- larynx %>%
+  mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"1 o 2",stage)))
+stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=stage_aux)
+ggsurvplot(stage_fit_aux,data = stage_aux,palette = pal_jama()(4),censor.size=7, 
+           censor.shape= 124,legend.labs =c("Etapa 1 o 2", "Etapa 3", "Etapa 4"),
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
+ggsurvplot(stage_fit_aux,data = stage_aux,palette = pal_jama()(4),censor.size=7, 
+           censor.shape= 124,legend.labs =c("Etapa 1 o 2", "Etapa 3", "Etapa 4"),
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia",
+           conf.int = TRUE)
+stage_aux %>%
+  group_by(stage_aux) %>%
+  summarise(n=n(),perc=n/0.9)
+```
+¡Sí se ven bastante diferentes! Aunque, evidentemente, se tiene una mayor
+concentración de datos en el primer grupo, que es la etapa 1 y 2 juntas,
+a comparación, por ejemplo, de la etapa 4: Poco más de la mitad se encuentran
+en la etapa 1 o 2
+```{r}
+for(i in levels(stage_aux$stage_aux)){
+  print(paste("Para la etapa:",i))
+  delta_aux=(stage_aux$delta)[stage_aux$stage_aux==i]
+  time_aux=(stage_aux$time)[stage_aux$stage_aux==i]
+  print(KM(delta_aux,time_aux))
+}
+```
+
+Tratemos con una tercera clasificación, por curiosidad, de qué pasaría si 
+clasificamos a la 1 y 2 como "Etapas tempranas" Y la 3 y 4 como "Etapas avanzadas",
+ya que además así quedaría casi la misma proporción de datos:
+
+```{r}
+stage_aux2<- larynx %>%
+  mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"Temprana(1,2)",
+                                 "Avanzada(3,4)")))
+stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier", conf.int = 0.95,
+                       conf.type = "plain",data=stage_aux2)
+ggsurvplot(stage_fit_aux,data = stage_aux2,palette = pal_jama()(4),censor.size=7, 
+           censor.shape= 124,legend.labs =c("Etapa Temprana (1 o 2)",
+                                            "Etapa Avanzada (3 o 4)"),
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia")
+ggsurvplot(stage_fit_aux,data = stage_aux2,palette = pal_jama()(4),censor.size=7, 
+           censor.shape= 124,legend.labs =c("Etapa Temprana (1 o 2)",
+                                            "Etapa Avanzada (3 o 4)"),
+           xlab = "Tiempo en meses", ylab = "Probabilidad de Supervivencia",
+           conf.int = TRUE)
+stage_aux2 %>%
+  group_by(stage_aux) %>%
+  summarise(n=n(),perc=n/0.9)
+```
+Bajo esta clasifiación los intervalos de confianza casi ni se tocan y tenemos
+casi la misma proporción en cada clasificación
+
+```{r}
+for(i in levels(stage_aux2$stage_aux)){
+  print(paste("Para la etapa:",i))
+  delta_aux=(stage_aux2$delta)[stage_aux2$stage_aux==i]
+  time_aux=(stage_aux2$time)[stage_aux2$stage_aux==i]
+  print(KM(delta_aux,time_aux))
+}
+```
 
 ## S(t) por grupos de edad
 
@@ -541,7 +611,10 @@ no afectar con este agrupamiento
 
 En conclusión: El año de diagnóstico no parece ser una variable importante, bajo
 ningún agrupamiento, mientras que la etapa sí lo es, y la edad del paciente 
-bajo el agrupamiento de 40 a 70 y de 71 en adelante
+bajo el agrupamiento de 40 a 70 y de 71 en adelante. Cabe destacar que obtuvimos
+mejores resultados agrupando la etapa 1 y 2 en una sola, y aún mejores resultados
+agrupando la 1 y 2 en una sola y la 3 y 4 en otra distinta, obteniendo la 
+clasificación "Temprana" y "Avanzada". 
 # Pruebas Log-Rank con $\alpha=0.05$
 
 ## Ejercicio 3
@@ -562,8 +635,20 @@ survdiff(Surv(time,delta)~stage,rho=1,data=larynx) # Generalized Wilcoxon
 
 Por lo que, con ambos test obtenemos un p-value demasiado pequeño, entonces
 podemos decir que hay evidencia estadísticamente significativa como para 
-decir que son funciones de supervivencia distintas
+decir que son funciones de supervivencia distintas; veamis con la agrupación
+que hicimos:
 
+```{r}
+survdiff(Surv(time,delta)~stage_aux,rho=0,data=stage_aux) #log-rank
+survdiff(Surv(time,delta)~stage_aux,rho=1,data=stage_aux) # Generalized Wilcoxon
+```
+¡Tenemos un p-value muy pequeño! Por lo que sí hay una diferencia significativa.
+
+```{r}
+survdiff(Surv(time,delta)~stage_aux,rho=0,data=stage_aux2) #log-rank
+survdiff(Surv(time,delta)~stage_aux,rho=1,data=stage_aux2) # Generalized Wilcoxon
+```
+Bajo la clasificación de "Temprana" y "Avanzada", el p-value es aún menor
 ## Por grupo de edad
 Compare las funciones de supervivencia por grupos de edad
 ```{r}

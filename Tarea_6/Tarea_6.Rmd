@@ -19,6 +19,50 @@ siguiente:
 Ajuste un modelo de riesgos proporcionales de Cox para definir la contribución 
 de las variables al tiempo de supervivencia de los pacientes.
 
+```{r,echo=FALSE,message=FALSE}
+#Cargamos librería y la base de datos
+library(survminer)
+library(survival)
+library(KMsurv)
+library(ggsci)
+library(scales)
+library(dplyr)
+data("larynx")
+attach(larynx) #Fijamos la base de datos
+```
+
+## Modelo para etapa
+```{r}
+coxph(Surv(time,censor)~treat)
+
+survdiff(Surv(time,censor)~treat,rho=0) ## Comparacion con Log-rank
+survdiff(Surv(time,censor)~treat,rho=1) ## Comparacion con  Generalized Wilcoxon
+
+coxph(Surv(time,censor)~site)
+survdiff(Surv(time,censor)~site,rho=0) ## Comparacion con Log-rank
+survdiff(Surv(time,censor)~site,rho=1) ## Comparacion con  Generalized Wilcoxon
+
+coxph(Surv(time,censor)~age)
+coxph(Surv(time,censor)~agecat2)
+survdiff(Surv(time,censor)~agecat2,rho=0) ## Comparacion con Log-rank
+survdiff(Surv(time,censor)~agecat2,rho=1) ## Comparacion con  Generalized Wilcoxon
+
+coxph(Surv(time,censor)~ndrugtx)
+
+coxph(Surv(time,censor)~factor(hercoc))
+
+coxph(Surv(time,censor)~beck)
+
+coxph(Surv(time,censor)~factor(ivhx))
+
+coxph(Surv(time,censor)~race)
+
+```
+
+## Modelo para edad
+
+## Modelo para año de diagnóstico
+
 # Análisis de los coeficientes de regresión
 
 ## Ejercicio 1 
