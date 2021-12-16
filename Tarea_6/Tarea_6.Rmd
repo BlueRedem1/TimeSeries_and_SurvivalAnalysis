@@ -48,6 +48,27 @@ significativo, y concuerda con lo obtenido en la tarea 5, donde vimos que
 para cada una de las etapas, el test de Log-Rank y de Wilcoxon generalizada
 nos dice que son funciones de supervivencia distintos, por ende es natural que
 haciendo un modelo de Cox, se tenga un parámetro significativo
+```{r}
+stage_aux<- larynx %>%
+  mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"1 o 2",stage)))
+stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier", 
+                         conf.int = 0.95, conf.type = "plain",data=stage_aux)
+
+stage_model_aux1<-coxph(Surv_general~factor(stage_aux),data=stage_aux) 
+stage_model_aux1
+```
+
+```{r}
+stage_aux2<- larynx %>%
+  mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"Temprana(1,2)",
+                                 "Avanzada(3,4)")))
+stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier", 
+                         conf.int = 0.95, conf.type = "plain",data=stage_aux2)
+
+stage_model_aux2<-coxph(Surv_general~factor(stage_aux),data=stage_aux2) 
+stage_model_aux2
+```
+
 ## Modelo para edad
 ```{r}
 age_model1<-coxph(Surv_general~age)
