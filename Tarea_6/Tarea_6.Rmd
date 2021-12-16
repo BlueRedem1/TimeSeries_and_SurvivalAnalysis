@@ -163,6 +163,8 @@ los coeficientes de regresión.
 
 ## Estimación puntual e interpretación
 
+Antes de entrar a este apartado, ya calculamos los modelos, retomémoslos:
+
 ### Modelo 1: Sin modificaciones
 
 ```{r}
@@ -198,21 +200,50 @@ de confianza al $95\%$ para la estimación de los coeficientes de regresión. Ju
 ```{r}
 confint(modelo_conjunto)
 ```
-
+Podemos observar que la etapa 2 y 3, así como la edad (En este modelo), contienen
+al cero en su intervalo de confianza al 95\%, por lo que bajo este contexto no
+son significativas. Ello puede ser debido a la clasificación que estamos haciendo,
+ya que como vimos en la tarea 5, se podían juntar las etapas 1 y 2, además de que
+convenía juntar la edad de 40 a 70 y de 71 en adelante. El único coeficiente
+que aporta algo en este modelo es, entonces, la etapa 4; notamos que la etapa 3
+está casi del lado positivo únicamente, por lo que a un nivel de confianza menor
+sí sería significativo, al igual que la edad.
+En resumen: En este contexto, convendría tomar la edad como grupo y no contínua, 
+y ver si de esta manera ya tenemos un parámetro significativo, que aporte al 
+modelo. En cuanto a las etapas, definitivamente la etapa 2 no aorta mucho al modelo,
+tomando como base la etapa 1, esto por lo que vimos que prácticamente no había
+mucha diferencia en la función de supervivencia. La etapa 4 sí difiere mucho,
+esto tiene sentido puesto que es la etapa más avanzada, por ende es natural
+que tenga un comportamiento distinto un paciente en etapa avanzada a comparación
+de uno en etapa temprana.
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 ```{r}
 confint(modelo_conjunto_aux)
 ```
-
+Aquí la etapa 4 y 3 tienen ya un coeficiente significativo, por lo que al agrupar
+las edades el parámetro de la etapa 3 pasó a ser significativo, sin embargo
+seguimos teniendo problemas con la etapa 2, y vemos que el coeficiente de la edad
+por poco podría ser significativo, ya que está más del lado positivo que del 
+negativo, por mucho. Entonces podríamos tratar de agrupar la etapa 1 y 2 para
+ver qué efecto tiene
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
 ```{r}
 confint(modelo_conjunto_aux1)
 ```
-
+Agrupando las etapas 1 y 2, así como la edad, vemos que seguimos teniendo a la 
+etapa 3 y 4 como parámetros significativos. ¿Tendrá algún efecto el considerar
+los grupos 3 y 4 en conjunto?
 ### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
 ```{r}
 confint(modelo_conjunto_aux2)
 ```
+De esta manera, vemos que ya los dos prámetros son significativos, al agrupar 
+la etapa 1 y 2 en un conjunto, y la 3 y 4 en otro; así como la edad. Esto tiene
+sentidp  ya que, el primer grupo de edad es, relativamente "joven" o, bueno,
+aún son adultos que podrían tener la fuerza para luchar con la enfermedad,
+resoecto al segundo grupo que son personas ya en etapa de vejez. Y las etapas
+1 y 2 son las iniciales, cuando las 3 y 4 es estar ya en una etapa algo avanzada
+de la enfermedad, por ello es natural que sí sean significativos los parámetros.
 
 # Ejercicio 3: Análisis de supuesto de riesgos proporcionales
 
