@@ -161,54 +161,58 @@ con etapa temprana y avanzada)
 los coeficientes de regresión.
 
 
-## Estimación puntual 
+## Estimación puntual e interpretación
 
 ### Modelo 1: Sin modificaciones
+
 ```{r}
 modelo_conjunto$coefficients
 ```
 
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 ```{r}
-modelo_conjunto_aux1
+modelo_conjunto_aux$coefficients
 ```
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
-
-## Interpretación
-
-### Modelo 1: Sin modificaciones
-
-### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
-
-### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+```{r}
+modelo_conjunto_aux1$coefficients
+```
 
 ### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+
+```{r}
+modelo_conjunto_aux2$coefficients
+```
 
 # Ejercicio 2: Análisis del efecto de las variables en el modelo
 
 ¿Las variables explicativas tienen o no efecto en el modelo? Obtenga un intervalo 
 de confianza al $95\%$ para la estimación de los coeficientes de regresión. Justifique.
 
-## Efecto/significancia de las variables explicativas en el modelo
+
+## Intervalo del 95\% de confianza y Efecto/significancia de las variables explicativas en el modelo
 
 ### Modelo 1: Sin modificaciones
 
-### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
-
-### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
-
-### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
-
-## Intervalo del 95\% de confianza
-
-### Modelo 1: Sin modificaciones
+```{r}
+confint(modelo_conjunto)
+```
 
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+```{r}
+confint(modelo_conjunto_aux)
+```
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+```{r}
+confint(modelo_conjunto_aux1)
+```
 
 ### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+```{r}
+confint(modelo_conjunto_aux2)
+```
 
 # Ejercicio 3: Análisis de supuesto de riesgos proporcionales
 
