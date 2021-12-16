@@ -37,6 +37,7 @@ data("larynx")
 
 ## Composición de la base
 ```{r}
+larynx<-arrange(larynx,time)
 attach(larynx)
 head(larynx)
 ```
@@ -231,7 +232,7 @@ KM<-function(fallas,tiempo,redondear=TRUE,digitos=5){
   for (i in 1:long){
     f_aux[i]<-(n[i]-d[i])/n[i]
     for(j in 1:i){
-      s[i]<-s[i]*f_aux[i]
+      s[i]<-s[i]*f_aux[j]
     }
     for ( j in 1:i){
       var[i]<-sum(f2[1:j])*(s[i])^2
