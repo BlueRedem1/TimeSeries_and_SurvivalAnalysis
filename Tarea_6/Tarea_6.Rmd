@@ -33,7 +33,10 @@ attach(larynx) #Fijamos la base de datos
 
 Hagamos un modelo de "Uno en uno" con el fin de ver cuales son significativos
 y, posteriormente, hacer el modelo conjunto
+
 ## Modelo para etapa
+
+### Sin modificar
 ```{r}
 #Creamos el objeto
 Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
@@ -48,7 +51,8 @@ donde vimos que para cada una de las etapas, el test de Log-Rank y de Wilcoxon g
 Ya que el p-value del grupo de la etapa 2 es demasiado grande, probemos con 
 las nuevas clasificaciones que probamos en la tarea 5:
 
-Agrupando la etapa 1 y 2:
+
+### Agrupando la etapa 1 y 2:
 ```{r}
 stage_aux<- larynx %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"1 o 2",stage)))
@@ -63,6 +67,8 @@ stage_model_aux1
 etapa 3 tiene un p-value de 0.0663, este es menor a 0.2, y vimos con la profesora
 que, acorde a autores como Hosmer-Lemeshow, si tienen un p-value menor o igual
 a 0.2, se deben considerar en el modelo múltiple
+
+### Agrupando la etapa 1 y 2 en un grupo, y la 3 y 4 en otro:
 ```{r}
 stage_aux2<- larynx %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"Temprana(1,2)",
@@ -75,7 +81,10 @@ stage_model_aux2
 ```
 Teneos un p-value demasiado pequeño, por lo que definitivamente es una variable
 significativa bajo esta clasificación
+
 ## Modelo para edad
+
+### Sin modificar (contínua)
 ```{r}
 age_model<-coxph(Surv_general~age)
 age_model
@@ -86,6 +95,8 @@ un nivel de significancia menor o igual a 0.2 se consideren en el modelo multipl
 entonces podemos ingresar la variable de edad al modelo múltiple; ello coincide
 un poco con lo que obtuvimos en la tarea 5: Que dada cierta clasificación en el
 grupo de edad, sí había una diferencia significativa con base en los test.
+
+### Agrupando de 40 a 70 y de 71 en adelante
 
 Por curiosidad, veamos qué pasa con la clasificación que propusimos en la
 tarea 5:
@@ -111,6 +122,7 @@ del 0.2 propuesto por algunos autores como Hosmer-Lemeshow, por lo que no
 la consideraremos en el modelo conjunto.
 
 ## Modelo conjunto
+
 Veamos el modelo en conjunto:
 
 ### Modelo 1: Sin modificaciones
@@ -143,6 +155,7 @@ modelo_conjunto_aux1
 Con este modelo son significativos de manera conjunta, sin embargo en la edad
 tenemos un coeficiente no significativo al 95\% de confianza, pero al 90\% sí
 lo sería.
+
 ### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
 ```{r}
 stage_aux_2<- aux_age %>%
@@ -216,6 +229,7 @@ mucha diferencia en la función de supervivencia. La etapa 4 sí difiere mucho,
 esto tiene sentido puesto que es la etapa más avanzada, por ende es natural
 que tenga un comportamiento distinto un paciente en etapa avanzada a comparación
 de uno en etapa temprana.
+
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 ```{r}
 confint(modelo_conjunto_aux)
@@ -226,6 +240,7 @@ seguimos teniendo problemas con la etapa 2, y vemos que el coeficiente de la eda
 por poco podría ser significativo, ya que está más del lado positivo que del 
 negativo, por mucho. Entonces podríamos tratar de agrupar la etapa 1 y 2 para
 ver qué efecto tiene
+
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
 ```{r}
 confint(modelo_conjunto_aux1)
@@ -233,6 +248,7 @@ confint(modelo_conjunto_aux1)
 Agrupando las etapas 1 y 2, así como la edad, vemos que seguimos teniendo a la 
 etapa 3 y 4 como parámetros significativos. ¿Tendrá algún efecto el considerar
 los grupos 3 y 4 en conjunto?
+
 ### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
 ```{r}
 confint(modelo_conjunto_aux2)
