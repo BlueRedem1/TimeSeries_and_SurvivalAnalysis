@@ -31,38 +31,74 @@ data("larynx")
 attach(larynx) #Fijamos la base de datos
 ```
 
+Hagamos un modelo de "Uno en uno" con el fin de ver cuales son significativos
+y, posteriormente, hacer el modelo conjunto
 ## Modelo para etapa
 ```{r}
-coxph(Surv(time,censor)~treat)
+#Creamos el objeto
+Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
 
-survdiff(Surv(time,censor)~treat,rho=0) ## Comparacion con Log-rank
-survdiff(Surv(time,censor)~treat,rho=1) ## Comparacion con  Generalized Wilcoxon
-
-coxph(Surv(time,censor)~site)
-survdiff(Surv(time,censor)~site,rho=0) ## Comparacion con Log-rank
-survdiff(Surv(time,censor)~site,rho=1) ## Comparacion con  Generalized Wilcoxon
-
-coxph(Surv(time,censor)~age)
-coxph(Surv(time,censor)~agecat2)
-survdiff(Surv(time,censor)~agecat2,rho=0) ## Comparacion con Log-rank
-survdiff(Surv(time,censor)~agecat2,rho=1) ## Comparacion con  Generalized Wilcoxon
-
-coxph(Surv(time,censor)~ndrugtx)
-
-coxph(Surv(time,censor)~factor(hercoc))
-
-coxph(Surv(time,censor)~beck)
-
-coxph(Surv(time,censor)~factor(ivhx))
-
-coxph(Surv(time,censor)~race)
-
+#Modelo de etapas
+stage_model<-coxph(Surv_general~factor(stage)) 
+stage_model
+#Notamos que la base de comparación es la etapa 1
 ```
-
+¡ Tiene un p-value muy pequeño! Ello quiere decir que el coeficiente es 
+significativo, y concuerda con lo obtenido en la tarea 5, donde vimos que 
+para cada una de las etapas, el test de Log-Rank y de Wilcoxon generalizada
+nos dice que son funciones de supervivencia distintos, por ende es natural que
+haciendo un modelo de Cox, se tenga un parámetro significativo
 ## Modelo para edad
+```{r}
+age_model1<-coxph(Surv_general~age)
+age_model1
+```
+Tiene un p-value mayor a 0.05, sin embargo, en clase vimos que autores como
+Hosmer-Lemeshow consideran que, en un analisis exploratorio, las variables con 
+un nivel de significancia menor o igual a 0.2 se consideren en el modelo multiple,
+entonces podemos ingresar la variable de edad al modelo múltiple; ello coincide
+un poco con lo que obtuvimos en la tarea 5: Que dada cierta clasificación en el
+grupo de edad, sí había una diferencia significativa con base en los test.
 
-## Modelo para año de diagnóstico
+Por curiosidad, veamos qué pasa con la clasificación que propusimos en la
+tarea 5:
+```{r}
+aux_age<- larynx %>%
+  mutate("Grupo"=cut(larynx$age,breaks=c(40,70,Inf)))
+aux_age_model<- coxph(Surv_general~aux_age$Grupo,data = aux_age)
+aux_age_model
+#Notamos que la base es el grupo de 40 a 70
+```
+Podemos observar que bajo la clasificación en la que obtuvimos una función de
+supervivencia distinta para ambos grupos en la tarea 5, tenemos aquí un p-value
+menor a 0.05, por lo que concuerda con lo obtenido en los test de la tarea 
+anterior. 
 
+```{r}
+diagyr_model1<-coxph(Surv_general~diagyr)
+diagyr_model1
+```
+Definitivamente, no es una variable que aporte mucho: Su p-value es altísimo,
+por lo que los coeficientes no son significativos inclusive bajo el criterio
+del 0.2 propuesto por algunos autores como Hosmer-Lemeshow, por lo que no 
+la consideraremos en el modelo conjunto.
+
+Veamos el modelo en conjunto:
+
+```{r}
+modelo_conjunto<-coxph(Surv_general ~ factor(stage)+age)
+modelo_conjunto
+```
+¡Conjuntamente, son significativos! El p-value es menor a 0.05
+
+Y usando la clasificación de edades propuesta, hubiésemos tenido este modelo:
+```{r}
+modelo_conjunto_aux<-coxph(Surv_general ~ factor(stage)+Grupo,data=aux_age)
+modelo_conjunto_aux
+```
+De la misma manera, y como se esperaba, usando los grupos propuestos para edad,
+los coeficientes son significativos de manera conjunta. De hecho, el p-value
+es menor que en el primer modelo conjunto obtenido en la línea anterior.
 # Análisis de los coeficientes de regresión
 
 ## Ejercicio 1 
