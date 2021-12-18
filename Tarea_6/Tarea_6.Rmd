@@ -27,6 +27,12 @@ library(KMsurv)
 library(ggsci)
 library(scales)
 library(dplyr)
+library(foreign)
+library(muhaz)
+library(TH.data)
+library(ggplot2)
+library(ggfortify)
+library(proto)
 data("larynx")
 attach(larynx) #Fijamos la base de datos
 ```
@@ -43,12 +49,14 @@ Surv_general <- Surv(larynx$time, larynx$delta,type = "right")
 
 #Modelo de etapas
 stage_model<-coxph(Surv_general~factor(stage)) 
-stage_model
+summary(stage_model)
 #Notamos que la base de comparación es la etapa 1
 ```
-¡Tiene un p-value muy pequeño \textbf{conjuntamente}! Ello quiere decir que el coeficiente es significativo, y concuerda con lo obtenido en la tarea 5, 
-donde vimos que para cada una de las etapas, el test de Log-Rank y de Wilcoxon generalizada nos dice que son funciones de supervivencia distintos, por ende es natural que haciendo un modelo de Cox, se tenga un parámetro significativo; sin embargoesto es de \textbf{manera conjunta}. 
-Ya que el p-value del grupo de la etapa 2 es demasiado grande, probemos con 
+No tenemos problema con el coeficiente de la etapa 4, y bajo lo que se vio en 
+clase, que acorde a algunos autores en supervivencia 0.2 sigue siendo significativo,
+tampoco lo hay para la etapa.
+Sin embargo, ya que el p-value del grupo de la etapa 2 es demasiado grande, 
+por lo que descartamos bajo esta clasifiación. Ahora probemos con 
 las nuevas clasificaciones que probamos en la tarea 5:
 
 
@@ -60,10 +68,10 @@ stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier",
                          conf.int = 0.95, conf.type = "plain",data=stage_aux)
 
 stage_model_aux1<-coxph(Surv_general~factor(stage_aux),data=stage_aux) 
-stage_model_aux1
+summary(stage_model_aux1)
 #la etapa base es la 1 o 2
 ```
-¡De manera conjunta tiene un p-value muy pequeño! y notemos que, si bien en la 
+**¡Resolvimos el problema!** y notemos que, si bien en la 
 etapa 3 tiene un p-value de 0.0663, este es menor a 0.2, y vimos con la profesora
 que, acorde a autores como Hosmer-Lemeshow, si tienen un p-value menor o igual
 a 0.2, se deben considerar en el modelo múltiple
@@ -76,7 +84,7 @@ stage_aux2<- larynx %>%
 stage_fit_aux <- survfit(Surv_general ~ stage_aux, type = "kaplan-meier", 
                          conf.int = 0.95, conf.type = "plain",data=stage_aux2)
 stage_model_aux2<-coxph(Surv_general~factor(stage_aux),data=stage_aux2) 
-stage_model_aux2
+summary(stage_model_aux2)
 #La etapa base es la avanzada
 ```
 Teneos un p-value demasiado pequeño, por lo que definitivamente es una variable
@@ -87,7 +95,7 @@ significativa bajo esta clasificación
 ### Sin modificar (contínua)
 ```{r}
 age_model<-coxph(Surv_general~age)
-age_model
+summary(age_model)
 ```
 Tiene un p-value mayor a 0.05, sin embargo, en clase vimos que autores como
 Hosmer-Lemeshow consideran que, en un analisis exploratorio, las variables con 
@@ -114,7 +122,7 @@ anterior.
 
 ```{r}
 diagyr_model<-coxph(Surv_general~diagyr)
-diagyr_model
+summary(diagyr_model)
 ```
 Definitivamente, no es una variable que aporte mucho: Su p-value es altísimo,
 por lo que los coeficientes no son significativos inclusive bajo el criterio
@@ -125,48 +133,33 @@ la consideraremos en el modelo conjunto.
 
 Veamos el modelo en conjunto:
 
-### Modelo 1: Sin modificaciones
-```{r}
-modelo_conjunto<-coxph(Surv_general ~ factor(stage)+age)
-modelo_conjunto
-```
-¡Conjuntamente, son significativos! El p-value es menor a 0.05; sin embargo
-la edad y 2 de las etapas de la enfermedad tienen un p.value mayor a 0.05, por
-lo que no son significativos de manera individual.
-
-### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
-Y usando la clasificación de edades propuesta, hubiésemos tenido este modelo:
-```{r}
-modelo_conjunto_aux<-coxph(Surv_general ~ factor(stage)+Grupo,data=aux_age)
-modelo_conjunto_aux
-```
-De la misma manera, y como se esperaba, usando los grupos propuestos para edad,
-los coeficientes son significativos de manera conjunta. De hecho, el p-value
-es menor que en el primer modelo conjunto obtenido en la línea anterior. Sin 
-embargo, tenemos parámetros no significativos en las etapas de la enfermedad
-
-### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+### Modelo 1:etapa 1 y 2 agrupadas
 ```{r}
 stage_aux<- aux_age %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"1 o 2",stage)))
-modelo_conjunto_aux1<-coxph(Surv_general ~ stage_aux+Grupo,data=stage_aux)
-modelo_conjunto_aux1
+modelo_conjunto_1<-coxph(Surv_general ~ stage_aux+age,data=stage_aux)
+summary(modelo_conjunto_1)
 ```
-Con este modelo son significativos de manera conjunta, sin embargo en la edad
-tenemos un coeficiente no significativo al 95\% de confianza, pero al 90\% sí
-lo sería.
+Todos son significativos bajo el criterio de tener un p-value menor o igual a 0.2
 
-### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+### Modelo 2: etapas "Avanzada" y "Temprana"
+
 ```{r}
 stage_aux_2<- aux_age %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"Temprana(1,2)",
                                  "Avanzada(3,4)")))
-modelo_conjunto_aux2<-coxph(Surv_general ~ stage_aux+Grupo,data=stage_aux_2)
-modelo_conjunto_aux2
+modelo_conjunto_2<-coxph(Surv_general ~ stage_aux+age,data=stage_aux2)
+summary(modelo_conjunto_2)
 ```
-En este modelo, todos los parámetros son significativos de manera individual y 
-de manera conjunta (Bajo el grupo de edad de 40 a 70 y de 71 en adelante, y
-con etapa temprana y avanzada)
+Vemos que aquí mejoran los p-values, pues se hacen más pequeños
+
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas 1 y 2 agrupadas
+```{r}
+modelo_conjunto_3<-coxph(Surv_general ~ stage_aux+Grupo,data=stage_aux_2)
+modelo_conjunto_3
+```
+En este modelo, todos los parámetros son significativos inclusive a un nivel del
+95\% de confianza
 
 #  Ejercicio 1 : Análisis de los coeficientes de regresión
 
@@ -178,27 +171,44 @@ los coeficientes de regresión.
 
 Antes de entrar a este apartado, ya calculamos los modelos, retomémoslos:
 
-### Modelo 1: Sin modificaciones
+### Modelo 1:etapa 1 y 2 agrupadas
 
 ```{r}
-modelo_conjunto$coefficients
+modelo_conjunto_1$coefficients
 ```
 
-### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+En cuanto a la edad, esto nos quiere decir que mientras la edad aumenta, presentamos
+un mayor riesgo de morir al padecer cáncer, es decir, es directamente proporcional.
+
+Lo mismo para las etapas: La etapa 3 tiene un mayor riesgo driectamente proporcional
+de morir al padecer cáncer respecto a la etapa 1 y 2.
+
+La etapa 4 presenta un riesgo aún mayor (respecto al presentado por la etapa 3, ya que este coeficiente es mayor que el de 3) e igualmente directamente proporcional de morir al padecer cáncer, respecto
+a las etapas 1 y 2.
+
+### Modelo 2: etapas "Avanzada" y "Temprana"
 ```{r}
-modelo_conjunto_aux$coefficients
+modelo_conjunto_2$coefficients
 ```
+Para la edad tenemos la misma interpretación: Nos quiere decir que mientras la edad aumenta, presentamos un mayor riesgo de morir al padecer cáncer, es decir, es directamente proporcional.
 
-### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+Notemos que aquí el signo en el coeficiente de etapa cambia, pero es porque ahora está respecto a la 
+etapa 3 y 4 agrupadas, por lo que la interpretación sigue teniendo sentido: Hay un 
+riesgo menor en la etapa 1 y 2 respecto a la 3 y 4, ya que se presenta un riesgo 
+inversamente proporcional de morir al padecer cáncer 
+
+### Modelo 3:etapas 1 y 2 agrupadas
 ```{r}
-modelo_conjunto_aux1$coefficients
+modelo_conjunto_3$coefficients
 ```
+Las mismas interpretaciones:
 
-### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+El grupo de 71 años en adelante guarda una relación directamente proporcional en 
+cuanto a riesgo de fallecer por cáncer respecto al grupo de adultos de 40 a 70 años.
 
-```{r}
-modelo_conjunto_aux2$coefficients
-```
+La interpretación para las etaoas se mantiene igual: Hay un 
+riesgo menor en la etapa 1 y 2 respecto a la 3 y 4, ya que se presenta un riesgo 
+inversamente proporcional de morir al padecer cáncer 
 
 # Ejercicio 2: Análisis del efecto de las variables en el modelo
 
@@ -208,59 +218,82 @@ de confianza al $95\%$ para la estimación de los coeficientes de regresión. Ju
 
 ## Intervalo del 95\% de confianza y Efecto/significancia de las variables explicativas en el modelo
 
-### Modelo 1: Sin modificaciones
+### Modelo 1:etapa 1 y 2 agrupadas
 
 ```{r}
-confint(modelo_conjunto)
+confint(modelo_conjunto_1)
 ```
-Podemos observar que la etapa 2 y 3, así como la edad (En este modelo), contienen
-al cero en su intervalo de confianza al 95\%, por lo que bajo este contexto no
-son significativas. Ello puede ser debido a la clasificación que estamos haciendo,
-ya que como vimos en la tarea 5, se podían juntar las etapas 1 y 2, además de que
-convenía juntar la edad de 40 a 70 y de 71 en adelante. El único coeficiente
-que aporta algo en este modelo es, entonces, la etapa 4; notamos que la etapa 3
-está casi del lado positivo únicamente, por lo que a un nivel de confianza menor
-sí sería significativo, al igual que la edad.
-En resumen: En este contexto, convendría tomar la edad como grupo y no contínua, 
-y ver si de esta manera ya tenemos un parámetro significativo, que aporte al 
-modelo. En cuanto a las etapas, definitivamente la etapa 2 no aorta mucho al modelo,
-tomando como base la etapa 1, esto por lo que vimos que prácticamente no había
-mucha diferencia en la función de supervivencia. La etapa 4 sí difiere mucho,
-esto tiene sentido puesto que es la etapa más avanzada, por ende es natural
-que tenga un comportamiento distinto un paciente en etapa avanzada a comparación
-de uno en etapa temprana.
+Podemos observar que en este caso, a un 95\% de confianza la edad y la etapa 3
+no parecen ser significativas. Sin embargo, recordemos que esto puede ser debido
+a que no contamos con tantos datos como debiese ser necesario (Tenemos 40 censuras
+de 90 datos disponibles), por ello es que pueden pasar este tipo de cosas y se recomienda
+tener un nivel de confianza del 80\% en lugar del 95\%, por lo que entendimos en clase.
 
-### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+Igualmente, notamos que el coeficiente de etapa 3 está más pegado su intervalo a la
+derecha que a la izquierda, lo mismo para la edad.
+
+Como extra: ¿Interactúan?
+
 ```{r}
-confint(modelo_conjunto_aux)
+survdiff(Surv_general ~ age + factor(stage_aux), rho = 0, 
+         data = stage_aux)
+survdiff(Surv_general ~ age + factor(stage_aux), rho = 1, 
+         data = stage_aux)
 ```
-Aquí la etapa 4 y 3 tienen ya un coeficiente significativo, por lo que al agrupar
-las edades el parámetro de la etapa 3 pasó a ser significativo, sin embargo
-seguimos teniendo problemas con la etapa 2, y vemos que el coeficiente de la edad
-por poco podría ser significativo, ya que está más del lado positivo que del 
-negativo, por mucho. Entonces podríamos tratar de agrupar la etapa 1 y 2 para
-ver qué efecto tiene
+En ambas pruebas tenemos un p-value de prácticamente cero, por lo que sí hay una 
+diferencia entre las funciones de supervivencia dados estod dos factores.
+Por lo que, decidimos que en realidad **Sí son significantes**, la razón de 
+que tengamos al cero en el intervalo en 2 de los 3 coeficientes puede deberse 
+a la razón antes mencionada.
 
-### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+Veamos los demás modelos.
+
+
+### Modelo 2: etapas "Avanzada" y "Temprana"
 ```{r}
-confint(modelo_conjunto_aux1)
+confint(modelo_conjunto_2)
 ```
-Agrupando las etapas 1 y 2, así como la edad, vemos que seguimos teniendo a la 
-etapa 3 y 4 como parámetros significativos. ¿Tendrá algún efecto el considerar
-los grupos 3 y 4 en conjunto?
+Ahora ya no tenemos ningún problema con el coeficiente de las etapas dada 
+esta agrupación, es significativo.
 
-### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+Sin embargo, pasó lo mismo en la edad, el coeficiente de la edad no es significativo
+al 95\% de confianza, pero ello se puede deber a la misma razón de no tener muchos 
+datos con fallas y enfrentarnos a muchas censuras, quizás con un nivel de confianza
+más bajo si sería significativo. Aún así, notemos que está más cargado hacia la derecha
+que a la izquierda el intervalo, lo cual es bueno.
+
+Como extra: ¿Interactúan?
+
 ```{r}
-confint(modelo_conjunto_aux2)
+survdiff(Surv_general ~ age + factor(stage_aux_2), rho = 0, 
+         data = stage_aux2)
+survdiff(Surv_general ~ age + factor(stage_aux_2), rho = 1, 
+         data = stage_aux2)
 ```
-De esta manera, vemos que ya los dos prámetros son significativos, al agrupar 
-la etapa 1 y 2 en un conjunto, y la 3 y 4 en otro; así como la edad. Esto tiene
-sentidp  ya que, el primer grupo de edad es, relativamente "joven" o, bueno,
-aún son adultos que podrían tener la fuerza para luchar con la enfermedad,
-resoecto al segundo grupo que son personas ya en etapa de vejez. Y las etapas
-1 y 2 son las iniciales, cuando las 3 y 4 es estar ya en una etapa algo avanzada
-de la enfermedad, por ello es natural que sí sean significativos los parámetros.
+En ambos tenemo un p-value muy grande, por lo que podríamos deciar que sí hay 
+una diferencia en la supervivencia del cáncer bajo estos factores, por lo que 
+los dejaremos; es decir, consideramos que **También son significativos bajo esta clasificación**
+### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas 1 y 2 agrupadas
+```{r}
+confint(modelo_conjunto_3)
+```
+Agrupando las etapas 1 y 2, así como la edad, tenemos ambos parámetros como 
+significativos, y ello hace mucho sentido intuitivamente también, ya que 
+las etapas 1 y 2 tienen, naturalmente, mucho menos riesgo que la 3 y 4 que son 
+las más avanzadas, y en el grupo de edad evidentemente no tienen las mismas defensas
+los adultos que las personas de la tercera edad.
 
+¿Interctúan?
+```{r}
+survdiff(Surv_general ~ Grupo+ factor(stage_aux), rho = 0, 
+         data = stage_aux_2)
+survdiff(Surv_general ~ Grupo+ factor(stage_aux), rho = 1, 
+         data = stage_aux_2)
+```
+En ambos casos tenemos un p-balue pequeñísimo, por lo que estos factores sí tienen
+un efecto en la supervivencia al cáncer.
+
+Consideramos que **También son significativos bajo esta clasificación**
 # Ejercicio 3: Análisis de supuesto de riesgos proporcionales
 
 ¿Es válido tu modelo de acuerdo al supuesto de riesgos proporcionales? Realice las 
@@ -269,6 +302,27 @@ pruebas de análisis de residuos y concluya.
 ## Pruebas de análisis de residuos
 
 ### Modelo 1: Sin modificaciones
+
+```{r}
+result.surv0 <- survfit(Surv_general ~ 1, subset={treat == 0})
+time0 <- result.surv0$time
+surv0 <- result.surv0$surv
+cloglog0 <- log(-log(surv0))
+logtime0 <- log(time0)
+result.surv1 <- survfit(Surv(time,censor) ~ 1, subset={treat == 1})
+time1 <- result.surv1$time
+surv1 <- result.surv1$surv
+cloglog1 <- log(-log(surv1))
+logtime1 <- log(time1)
+plot(cloglog0 ~ logtime0, type="s", col="blue", lwd=2)
+lines(cloglog1 ~ logtime1, col="red", lwd=2, type="s")
+legend("bottomright", legend=c("Treat 0 ", "Treat 1"), col=c("blue","red"), lwd=2)
+
+plot(cloglog0 ~ time0, type="s", col="blue", lwd=2)
+lines(cloglog1 ~ time1, col="red", lwd=2, type="s")
+legend("bottomright", legend=c("Treat 0 ", "Treat 1"), col=c("blue","red"), lwd=2)
+```
+
 
 ### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
 
