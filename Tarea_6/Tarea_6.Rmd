@@ -301,31 +301,198 @@ pruebas de análisis de residuos y concluya.
 
 ## Pruebas de análisis de residuos
 
-### Modelo 1: Sin modificaciones
+### Modelo 1:etapa 1 y 2 agrupadas
+
+Utilizamos la funcion cox.zph para hacer el test al modelo, donde:
+
+Ho: los riesgos son proporcionales vs 
+H1: los riesgos no son proporcionales .
 
 ```{r}
-result.surv0 <- survfit(Surv_general ~ 1, subset={treat == 0})
-time0 <- result.surv0$time
-surv0 <- result.surv0$surv
-cloglog0 <- log(-log(surv0))
-logtime0 <- log(time0)
-result.surv1 <- survfit(Surv(time,censor) ~ 1, subset={treat == 1})
-time1 <- result.surv1$time
-surv1 <- result.surv1$surv
-cloglog1 <- log(-log(surv1))
-logtime1 <- log(time1)
-plot(cloglog0 ~ logtime0, type="s", col="blue", lwd=2)
-lines(cloglog1 ~ logtime1, col="red", lwd=2, type="s")
-legend("bottomright", legend=c("Treat 0 ", "Treat 1"), col=c("blue","red"), lwd=2)
+sup_1 = cox.zph(modelo_conjunto_1)
+sup_1
+```
+Ya que el p-value > alpha para cada una de las covariables se 
+concluye que no existen pruebas suficientes para rechazar Ho. 
+Es decir el cociente de riesgos es independiente del tiempo.
 
-plot(cloglog0 ~ time0, type="s", col="blue", lwd=2)
-lines(cloglog1 ~ time1, col="red", lwd=2, type="s")
-legend("bottomright", legend=c("Treat 0 ", "Treat 1"), col=c("blue","red"), lwd=2)
+Verifiquemos gráficamente:
+
+```{r}
+plot(sup_1, var = "age", xlab = "t", main = "Variable 'edad' en el tiempo",
+     col = c("cornflowerblue", "plum"))
+# Y, finalmente,
+plot(sup_1, var = "stage_aux", xlab = "t", 
+     main = "Etapa", col = c("cornflowerblue", "plum")) 
+ggcoxzph(sup_1)#verificacion grafica
+```
+Vemos que los residuos se agrupan de manera aleatoria a ambos lados del valor 0 del 
+eje y, por lo que se cumple el supuesto
+
+Verifiquemos los residuos Cox - Snell
+```{r}
+ggcoxdiagnostics(modelo_conjunto_1, type = "schoenfeld")
+```
+
+Veamos los martingala:
+
+```{r}
+residuales_1 = residuals(modelo_conjunto_1, type = "martingale")
+
+# Graficamos para cada variable
+# Edad
+plot(age, residuales_1, xlab = "Edad", ylab = "Residuos de Martingalas",
+     main = "Linealidad covariables", col ="red", pch = 20)
+lines(smooth.spline(residuales_1 ~ age, df = 6), col = "cornflowerblue")
+lines(age,fitted(lm(residuales_1 ~ age)), col = "plum", lwd = 2)
+```
+
+Veamos los de devianza:
+
+```{r}
+dev_1 = residuals(modelo_conjunto_1, type = "deviance")
+min(dev_1)
+max(dev_1)
+summary(dev_1)
+
+# Graficamos
+plot(dev_1, col = "purple", main = "Residuos de devianza",
+     xlab = "ID", ylab = "dev_1", pch = 20, ylim = c(-3,3))
+abline(h = c(-1, 1), col = "plum")
+abline(h = c(-2.5, 2.5), col = "lightsalmon")
+# Casos extremos:
+dev_1[abs(dev_1) >= 1] # Posicion
+```
+
+Veamos los DfBeta:
+
+```{r}
+dfbeta_1 = resid(modelo_conjunto_1, type = "dfbeta")
+# graficamos para cada covariable
+plot(dfbeta_1[,1], col ="purple", pch = 20, main = "Dfbeta - Edad",
+     ylab = "Dfbeta.edad")
+
+plot(dfbeta_1[,2], col ="purple", pch = 20, main = "Dfbeta - Etapa",
+     ylab = "Dfbeta.abuso")
 ```
 
 
-### Modelo 2: Con grupo de edad de 40 a 70 y de 71 en adelante
+### Modelo 2: etapas "Avanzada" y "Temprana"
 
-### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; así como etapa 1 y 2 agrupadas
+Utilizamos la funcion cox.zph para hacer el test al modelo, donde:
 
-### Modelo 4: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas agrupadas en temprana y avanzada
+Ho: los riesgos son proporcionales vs 
+H1: los riesgos no son proporcionales .
+
+```{r}
+sup_2 = cox.zph(modelo_conjunto_2)
+sup_2
+```
+Lamenteblemente, para las etapas no se pasa la prueba, tampoco de manera global,
+por lo que hay evidencia significativa estadísticamente como para decir que los 
+riesgos no son proporcionales. **No es válido el supuesto en este modelo**
+
+Verifiquemos gráficamente:
+
+```{r}
+plot(sup_2, var = "age", xlab = "t", main = "Variable 'edad' en el tiempo",
+     col = c("cornflowerblue", "plum"))
+# Y, finalmente,
+plot(sup_2, var = "stage_aux", xlab = "t", 
+     main = "Etapa", col = c("cornflowerblue", "plum")) 
+ggcoxzph(sup_2)#verificacion grafica
+```
+Vemos que parece seguir un tipo de patrón para la etapa, no cumple con la carcacterística de 
+tener un comportamiento aleatorio alrededor del eje y; inclusive no se pasa el test 
+de manera conjunta
+Verifiquemos los residuos Cox - Snell
+```{r}
+ggcoxdiagnostics(modelo_conjunto_2, type = "schoenfeld")
+```
+
+Veamos los martingala:
+
+```{r}
+residuales_2 = residuals(modelo_conjunto_2, type = "martingale")
+
+# Graficamos para cada variable
+# Edad
+plot(age, residuales_2, xlab = "Edad", ylab = "Residuos de Martingalas",
+     main = "Linealidad covariables", col ="red", pch = 20)
+lines(smooth.spline(residuales_2 ~ age, df = 6), col = "cornflowerblue")
+lines(age,fitted(lm(residuales_2 ~ age)), col = "plum", lwd = 2)
+```
+
+Veamos los de devianza:
+
+```{r}
+dev_2 = residuals(modelo_conjunto_2, type = "deviance")
+min(dev_2)
+max(dev_2)
+summary(dev_2)
+
+# Graficamos
+plot(dev_2, col = "purple", main = "Residuos de devianza",
+     xlab = "ID", ylab = "dev_2", pch = 20, ylim = c(-3,3))
+abline(h = c(-1, 1), col = "plum")
+abline(h = c(-2.5, 2.5), col = "lightsalmon")
+# Casos extremos:
+dev_2[abs(dev_2) >= 1] # Posicion
+```
+
+
+### Modelo 3:etapas 1 y 2 agrupadas
+
+Utilizamos la funcion cox.zph para hacer el test al modelo, donde:
+
+Ho: los riesgos son proporcionales vs 
+H1: los riesgos no son proporcionales .
+
+```{r}
+sup_3 = cox.zph(modelo_conjunto_3)
+sup_3
+```
+Tenemos el mismo problema, para las etapas no se pasa la prueba, tampoco de manera global,
+por lo que hay evidencia significativa estadísticamente como para decir que los 
+riesgos no son proporcionales. **Tampoco es válido el supuesto en este modelo**
+
+Verifiquemos gráficamente:
+
+```{r}
+plot(sup_3, var = "Grupo", xlab = "t", main = "Variable 'edad' en el tiempo",
+     col = c("cornflowerblue", "plum"))
+# Y, finalmente,
+plot(sup_3, var = "stage_aux", xlab = "t", 
+     main = "Etapa", col = c("cornflowerblue", "plum")) 
+ggcoxzph(sup_3)#verificacion grafica
+```
+Si bien se comporta mejor en la edad, en la etaoa seguimos teniendo problemas en 
+la etapa, aunque se comporta mejor en los grupos d edad al tener un p-value más
+alto, lo que compensa el p-value global, ya que aquí sí se pasa el test de manera
+conjunta, pero no de manera individual.
+
+Verifiquemos los residuos Cox - Snell
+```{r}
+ggcoxdiagnostics(modelo_conjunto_3, type = "schoenfeld")
+```
+
+Aquí no aplican los residuos martingala 
+
+Veamos los de devianza:
+
+```{r}
+dev_3 = residuals(modelo_conjunto_3, type = "deviance")
+min(dev_3)
+max(dev_3)
+summary(dev_3)
+
+# Graficamos
+plot(dev_3, col = "purple", main = "Residuos de devianza",
+     xlab = "ID", ylab = "dev_3", pch = 20, ylim = c(-3,3))
+abline(h = c(-1, 1), col = "plum")
+abline(h = c(-2.5, 2.5), col = "lightsalmon")
+
+# Casos extremos:
+dev_3[abs(dev_3) >= 1] # Posicion
+```
+
