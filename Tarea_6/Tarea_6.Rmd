@@ -467,7 +467,7 @@ Verifiquemos gráficamente los residuos Cox - Snell:
 plot(sup_3, var = "Grupo", xlab = "t", main = "Variable 'edad' en el tiempo",
      col = c("cornflowerblue", "plum"))
 # Y, finalmente,
-plot(sup_3, var = "stage_aux", xlab = "t", 
+plot(sup_3, var = "factor(stage_aux)", xlab = "t", 
      main = "Etapa", col = c("cornflowerblue", "plum")) 
 ggcoxzph(sup_3)#verificacion grafica
 ```
