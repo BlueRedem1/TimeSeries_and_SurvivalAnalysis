@@ -398,10 +398,10 @@ Verifiquemos gráficamente los residuos de Cox - Snell:
 
 ```{r}
 plot(sup_2, var = "age", xlab = "t", main = "Variable 'edad' en el tiempo",
-     col = c("cornflowerblue", "plum"))
+     col = c("cornflowerblue", "purple2"))
 # Y, finalmente,
 plot(sup_2, var = "factor(stage_aux)", xlab = "t", 
-     main = "Etapa", col = c("cornflowerblue", "plum")) 
+     main = "Etapa", col = c("cornflowerblue", "purple2")) 
 ggcoxzph(sup_2)#verificacion grafica
 ```
 Vemos que parece seguir un tipo de patrón para la etapa, no cumple con la carcacterística de 
@@ -446,7 +446,7 @@ caso para las etapas, aunque el problema está más en el inicio y final.
 Para la etapa tenemos datos bastante salidos de los intervalos de confianza,
 que pueden ser los que nos está indicando el análisis de devianza
 
-### Modelo 3:etapas 1 y 2 agrupadas
+### Modelo 3: etapas 1 y 2 agrupadas
 
 Utilizamos la funcion cox.zph para hacer el test al modelo, donde:
 
@@ -465,10 +465,10 @@ Verifiquemos gráficamente los residuos Cox - Snell:
 
 ```{r}
 plot(sup_3, var = "Grupo", xlab = "t", main = "Variable 'edad' en el tiempo",
-     col = c("cornflowerblue", "plum"))
+     col = c("cornflowerblue", "sienna2"))
 # Y, finalmente,
 plot(sup_3, var = "factor(stage_aux)", xlab = "t", 
-     main = "Etapa", col = c("cornflowerblue", "plum")) 
+     main = "Etapa", col = c("cornflowerblue", "sienna2")) 
 ggcoxzph(sup_3)#verificacion grafica
 ```
 Si bien se comporta mejor en la edad, en la etaoa seguimos teniendo problemas en 
