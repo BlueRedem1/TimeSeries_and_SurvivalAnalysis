@@ -137,7 +137,7 @@ Veamos el modelo en conjunto:
 ```{r}
 stage_aux<- aux_age %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"1 o 2",stage)))
-modelo_conjunto_1<-coxph(Surv_general ~ stage_aux+age,data=stage_aux)
+modelo_conjunto_1<-coxph(Surv_general ~ factor(stage_aux)+age,data=stage_aux)
 summary(modelo_conjunto_1)
 ```
 Todos son significativos bajo el criterio de tener un p-value menor o igual a 0.2
@@ -148,14 +148,14 @@ Todos son significativos bajo el criterio de tener un p-value menor o igual a 0.
 stage_aux_2<- aux_age %>%
   mutate(stage_aux=factor(ifelse(stage %in% c(1,2),"Temprana(1,2)",
                                  "Avanzada(3,4)")))
-modelo_conjunto_2<-coxph(Surv_general ~ stage_aux+age,data=stage_aux2)
+modelo_conjunto_2<-coxph(Surv_general ~ factor(stage_aux)+age,data=stage_aux2)
 summary(modelo_conjunto_2)
 ```
 Vemos que aquí mejoran los p-values, pues se hacen más pequeños
 
 ### Modelo 3: Con grupo de edad de 40 a 70 y de 71 en adelante; etapas 1 y 2 agrupadas
 ```{r}
-modelo_conjunto_3<-coxph(Surv_general ~ stage_aux+Grupo,data=stage_aux_2)
+modelo_conjunto_3<-coxph(Surv_general ~ factor(stage_aux)+Grupo,data=stage_aux_2)
 modelo_conjunto_3
 ```
 En este modelo, todos los parámetros son significativos inclusive a un nivel del
@@ -265,10 +265,10 @@ que a la izquierda el intervalo, lo cual es bueno.
 Como extra: ¿Interactúan?
 
 ```{r}
-survdiff(Surv_general ~ age + factor(stage_aux_2), rho = 0, 
-         data = stage_aux2)
-survdiff(Surv_general ~ age + factor(stage_aux_2), rho = 1, 
-         data = stage_aux2)
+survdiff(Surv_general ~ age + factor(stage_aux), rho = 0, 
+         data = stage_aux_2)
+survdiff(Surv_general ~ age + factor(stage_aux), rho = 1, 
+         data = stage_aux_2)
 ```
 En ambos tenemo un p-value muy grande, por lo que podríamos deciar que sí hay 
 una diferencia en la supervivencia del cáncer bajo estos factores, por lo que 
@@ -316,66 +316,68 @@ Ya que el p-value > alpha para cada una de las covariables se
 concluye que no existen pruebas suficientes para rechazar Ho. 
 Es decir el cociente de riesgos es independiente del tiempo.
 
-Verifiquemos gráficamente:
+Verifiquemos gráficamente los residuos Cox-Snell:
 
 ```{r}
 plot(sup_1, var = "age", xlab = "t", main = "Variable 'edad' en el tiempo",
      col = c("cornflowerblue", "plum"))
 # Y, finalmente,
-plot(sup_1, var = "stage_aux", xlab = "t", 
+plot(sup_1, var = "factor(stage_aux)", xlab = "t", 
      main = "Etapa", col = c("cornflowerblue", "plum")) 
 ggcoxzph(sup_1)#verificacion grafica
 ```
 Vemos que los residuos se agrupan de manera aleatoria a ambos lados del valor 0 del 
-eje y, por lo que se cumple el supuesto
+eje y, por lo que se cumple el supuesto, inclusive la linea azul se pega bastante al cero.
+Además de que tenemos el comportamiento deseado, y de hecho
+pasamos la prueba de Schoenfeld con un p-value mayor a 0.05 en los 3 casos.
 
-Verifiquemos los residuos Cox - Snell
-```{r}
-ggcoxdiagnostics(modelo_conjunto_1, type = "schoenfeld")
-```
+**Todo bien hasta aquí**
 
 Veamos los martingala:
 
 ```{r}
-residuales_1 = residuals(modelo_conjunto_1, type = "martingale")
-
-# Graficamos para cada variable
-# Edad
-plot(age, residuales_1, xlab = "Edad", ylab = "Residuos de Martingalas",
-     main = "Linealidad covariables", col ="red", pch = 20)
-lines(smooth.spline(residuales_1 ~ age, df = 6), col = "cornflowerblue")
-lines(age,fitted(lm(residuales_1 ~ age)), col = "plum", lwd = 2)
+ggcoxdiagnostics(modelo_conjunto_1, type = "martingale")
 ```
+Vemos que, de igual manera hay algunos puntos (varios) que salen de los intervalos
+de confianza, pero la línea azul se pega bastante al cero, por lo que podemos considerar
+que, salvo el inicio y final, se ve bien.
+
+
 
 Veamos los de devianza:
+
+```{r}
+ggcoxdiagnostics(modelo_conjunto_1, type = "deviance")
+```
+De igual manera la línea se pega bastante al cero, y parece tener un comportamiento 
+aleatorio donde no tenemos algún comportamiento en particular
 
 ```{r}
 dev_1 = residuals(modelo_conjunto_1, type = "deviance")
 min(dev_1)
 max(dev_1)
 summary(dev_1)
-
-# Graficamos
-plot(dev_1, col = "purple", main = "Residuos de devianza",
-     xlab = "ID", ylab = "dev_1", pch = 20, ylim = c(-3,3))
-abline(h = c(-1, 1), col = "plum")
-abline(h = c(-2.5, 2.5), col = "lightsalmon")
 # Casos extremos:
 dev_1[abs(dev_1) >= 1] # Posicion
+# Casos muy extremos:
+dev_1[abs(dev_1) >= 2] # Posicion
 ```
+La media de los residuos es bastante cercana al cero, además de que 
+si bien tenemos varios datos extremos, solo 4 sobrepasan las 2 unidades, pero 
+ninguna supera los 2.5; estos pueden ser considerados datos atípicos
+
 
 Veamos los DfBeta:
 
 ```{r}
-dfbeta_1 = resid(modelo_conjunto_1, type = "dfbeta")
-# graficamos para cada covariable
-plot(dfbeta_1[,1], col ="purple", pch = 20, main = "Dfbeta - Edad",
-     ylab = "Dfbeta.edad")
-
-plot(dfbeta_1[,2], col ="purple", pch = 20, main = "Dfbeta - Etapa",
-     ylab = "Dfbeta.abuso")
+ggcoxdiagnostics(modelo_conjunto_1, type = "dfbeta")
 ```
 
+Aquí la línea azul no se pega tanto al cero, en el caso de la etaoa 3; en la edad
+parece ser que sí, pero en la etapa 4 tenemos problemas al inicio y al final
+
+Parece ser que tenemos algunos datos atípicos, tal como nos lo sugiere el análisis
+de devianza
 
 ### Modelo 2: etapas "Avanzada" y "Temprana"
 
@@ -392,54 +394,57 @@ Lamenteblemente, para las etapas no se pasa la prueba, tampoco de manera global,
 por lo que hay evidencia significativa estadísticamente como para decir que los 
 riesgos no son proporcionales. **No es válido el supuesto en este modelo**
 
-Verifiquemos gráficamente:
+Verifiquemos gráficamente los residuos de Cox - Snell:
 
 ```{r}
 plot(sup_2, var = "age", xlab = "t", main = "Variable 'edad' en el tiempo",
      col = c("cornflowerblue", "plum"))
 # Y, finalmente,
-plot(sup_2, var = "stage_aux", xlab = "t", 
+plot(sup_2, var = "factor(stage_aux)", xlab = "t", 
      main = "Etapa", col = c("cornflowerblue", "plum")) 
 ggcoxzph(sup_2)#verificacion grafica
 ```
 Vemos que parece seguir un tipo de patrón para la etapa, no cumple con la carcacterística de 
 tener un comportamiento aleatorio alrededor del eje y; inclusive no se pasa el test 
-de manera conjunta
-Verifiquemos los residuos Cox - Snell
-```{r}
-ggcoxdiagnostics(modelo_conjunto_2, type = "schoenfeld")
-```
+de manera conjunta. Además, en el factor la línea azul no se pega mucho al cero.
 
 Veamos los martingala:
 
-```{r}
-residuales_2 = residuals(modelo_conjunto_2, type = "martingale")
 
-# Graficamos para cada variable
-# Edad
-plot(age, residuales_2, xlab = "Edad", ylab = "Residuos de Martingalas",
-     main = "Linealidad covariables", col ="red", pch = 20)
-lines(smooth.spline(residuales_2 ~ age, df = 6), col = "cornflowerblue")
-lines(age,fitted(lm(residuales_2 ~ age)), col = "plum", lwd = 2)
+```{r}
+ggcoxdiagnostics(modelo_conjunto_2, type = "martingale")
 ```
+
+Aunque vario datos se salen de los intervalos de confianza, observamos que 
+la línea azul se pega bastante al cero, por lo que vamos bien aquí.
 
 Veamos los de devianza:
 
 ```{r}
+ggcoxdiagnostics(modelo_conjunto_2, type = "deviance")
 dev_2 = residuals(modelo_conjunto_2, type = "deviance")
 min(dev_2)
 max(dev_2)
 summary(dev_2)
-
-# Graficamos
-plot(dev_2, col = "purple", main = "Residuos de devianza",
-     xlab = "ID", ylab = "dev_2", pch = 20, ylim = c(-3,3))
-abline(h = c(-1, 1), col = "plum")
-abline(h = c(-2.5, 2.5), col = "lightsalmon")
 # Casos extremos:
 dev_2[abs(dev_2) >= 1] # Posicion
+dev_2[abs(dev_2) >= 2] # Posicion
+```
+La misma dinámica: Parece tener un comportamiento algo aleatorio, además de que tenemos
+a la línea azul muy pegada al cero. Si bien tenemos algunos datos que se salen
+de los intervalos, podemos ver que solo 5 datos son mayores a 2, y solo uno de ellos
+es mayor a 5, siendo este un dato que puede estar afectando demasiado nuestro modelo
+al ser tan atípico
+
+```{r}
+ggcoxdiagnostics(modelo_conjunto_2, type = "dfbeta")
 ```
 
+La línea azul de la edad sí se pega bastante al cero, sin embargo no es el 
+caso para las etapas, aunque el problema está más en el inicio y final.
+
+Para la etapa tenemos datos bastante salidos de los intervalos de confianza,
+que pueden ser los que nos está indicando el análisis de devianza
 
 ### Modelo 3:etapas 1 y 2 agrupadas
 
@@ -456,7 +461,7 @@ Tenemos el mismo problema, para las etapas no se pasa la prueba, tampoco de mane
 por lo que hay evidencia significativa estadísticamente como para decir que los 
 riesgos no son proporcionales. **Tampoco es válido el supuesto en este modelo**
 
-Verifiquemos gráficamente:
+Verifiquemos gráficamente los residuos Cox - Snell:
 
 ```{r}
 plot(sup_3, var = "Grupo", xlab = "t", main = "Variable 'edad' en el tiempo",
@@ -469,30 +474,49 @@ ggcoxzph(sup_3)#verificacion grafica
 Si bien se comporta mejor en la edad, en la etaoa seguimos teniendo problemas en 
 la etapa, aunque se comporta mejor en los grupos d edad al tener un p-value más
 alto, lo que compensa el p-value global, ya que aquí sí se pasa el test de manera
-conjunta, pero no de manera individual.
-
-Verifiquemos los residuos Cox - Snell
-```{r}
-ggcoxdiagnostics(modelo_conjunto_3, type = "schoenfeld")
-```
+conjunta, pero no de manera individual. Inclusive tenemos severos problemas 
+debido a que la línea azul difiere considerablemente del cero.
 
 Aquí no aplican los residuos martingala 
 
 Veamos los de devianza:
 
 ```{r}
+
 dev_3 = residuals(modelo_conjunto_3, type = "deviance")
 min(dev_3)
 max(dev_3)
 summary(dev_3)
 
-# Graficamos
 plot(dev_3, col = "purple", main = "Residuos de devianza",
-     xlab = "ID", ylab = "dev_3", pch = 20, ylim = c(-3,3))
+     xlab = "ID", ylab = "dev", pch = 20, ylim = c(-3,3))
 abline(h = c(-1, 1), col = "plum")
 abline(h = c(-2.5, 2.5), col = "lightsalmon")
 
 # Casos extremos:
 dev_3[abs(dev_3) >= 1] # Posicion
+dev_3[abs(dev_3) >= 2] # Posicion
+```
+La línea azul se pega bastante al cero, aunque hay varios datos que se salen de 
+las bandas de confianza; aquí tenemos 4 datos que sobrepasan con más de 2 unidades
+pero es grave ver que hay un dato que difiere casi 2.6 unidades, por lo que 
+están afectando de manera muy considerable nuestro modelo al ser tan atípicos. 
+Además se observa un patrón que decrece, crece y vuelve a crecer. Como líneas
+diagonales.
+
+
+```{r}
+ggcoxdiagnostics(modelo_conjunto_3, type = "dfbeta")
 ```
 
+Aquí la línea azul se pega más al cero, sin embargo seguimos teniendo datos atípicos
+en la edad, de hecho hay un punto muy, muy extremo que sobresale y puede ser 
+considerado un outlayer de bastante importancia que esté afetando considerablemente
+nuestro modelo.
+
+
+### Modelo ganador
+
+Al pasar el supuesto de riesgos proporcionales en todas sus variables, lo cual
+consideramos es de mayor peso, creemos que **el modelo 1 es el ganador**, además
+de que no presenta muchos problemas en el análisis de residuales.
