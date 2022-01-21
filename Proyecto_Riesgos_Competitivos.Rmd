@@ -112,11 +112,12 @@ Lo hacemos definiendo una matriz de valores lógicos inficando los posibles tipo
 
 ```{r}
 tra <- matrix(FALSE, ncol = 3, nrow = 3)
-dimnames(tra) <- list(c("0", "1", "2"), c("0", "1", "2")) > tra[1, 2:3] 
-<- TRUE
-> tra
+dimnames(tra) <- list(c("0", "1", "2"), c("0", "1", "2"))  
+tra[1, 2:3] <- TRUE
+tra
 ```
 
+Esta matriz nos dice que un individup se puede mover del estado 0 al estado 1, y del estado 0 al estado 2, pero las transiciones en el sentido contrario no son posibles; además los valores en diagonal están como falsos: Las transiciones de un estado a sí mismo no están modeladas. No es necesario un modelo para dicha "transición". Los individuos que no hacen una transición a uno de los dos pares competitivos al tiempo t, permanece en el estado inicial 0 a tiempo t.
 
 Ahora, calculamos la función de acumulación de riesgos específicos para muerte y dados de alta, respectivamente, y estratificados por su estatus de neumonía al momento de admisión:
 
@@ -125,5 +126,19 @@ Ahora, calculamos la función de acumulación de riesgos específicos para muert
 my.nelaal.nop <- mvna(my.sir.data[my.sir.data$pneu == 0, ], c("0", "1", "2"), tra, "cens") 
 ## con neumonía
 my.nelaal.p <- mvna(my.sir.data[my.sir.data$pneu == 1, ], c("0", "1", "2"), tra, "cens")
+```
+
+Graficamos: 
+
+```{r}
+library(lattice)
+ltheme <- canonical.theme(color = FALSE) 
+## in-built B&W theme 
+ltheme$strip.background$col <- "white" 
+## change strip bg
+lattice.options(default.theme = ltheme) 
+## set as default
+
+#dessin.nop <- xyplot(my.nelaal.nop, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Sin neumonía: Dados de alta", "Sin Neumonía: Muertos"), par.strip.text = list(font = 2)), ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
 ```
 
