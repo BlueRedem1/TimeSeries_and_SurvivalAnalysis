@@ -15,6 +15,7 @@ Trabajaremos con la base sir.adm; dispinible en el paquete "mvna", llamado así 
 
 ```{r}
 library(mvna)
+library(lattice)
 ```
 
 Cargamos la base de datos
@@ -133,7 +134,6 @@ my.nelaal.p <- mvna(my.sir.data[my.sir.data$pneu == 1, ], c("0", "1", "2"), tra,
 Graficamos: 
 
 ```{r}
-library(lattice)
 ltheme <- canonical.theme(color = FALSE) 
 ## in-built B&W theme 
 ltheme$strip.background$col <- "white" 
@@ -141,6 +141,14 @@ ltheme$strip.background$col <- "white"
 lattice.options(default.theme = ltheme) 
 ## set as default
 
-#dessin.nop <- xyplot(my.nelaal.nop, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Sin neumonía: Dados de alta", "Sin Neumonía: Muertos"), par.strip.text = list(font = 2)), ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
+#Plot para los que no tenían neumonía
+dessin.nop <- xyplot(my.nelaal.nop, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Sin neumonía: Dados de alta", "Sin Neumonía: Muertos"), par.strip.text = list(font = 2)), ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
+
+#Plot para los que tenían neumonía
+dessin.p <- xyplot(my.nelaal.p, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Con neumonía: Dados de alta", "Con neumonía: Muertos"), par.strip.text = list(font = 2)), ylab = "", ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
+
+#Ploteamos 
+print(dessin.nop, split = c(1, 1, 2, 1), more = TRUE, position = c(0, 0, 1.07, 1)) 
+print(dessin.p, split = c(2, 1, 2, 1), position = c(-0.07, 0, 1, 1))
 ```
 
