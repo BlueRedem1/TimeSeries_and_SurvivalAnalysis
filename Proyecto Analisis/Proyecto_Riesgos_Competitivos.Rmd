@@ -106,8 +106,7 @@ Lo hicimos de manera correcta.
 
 Antes de continuar, necesitamos describir el modelo de riesgos competitivos muliestado siguiente:
 
-```{r}
-{r pressure2, echo=FALSE, out.width = '240%'}
+```{r pressure2, echo=FALSE, out.width = '240%'}
 knitr::include_graphics("Imagen1.PNG")
 ```
 
