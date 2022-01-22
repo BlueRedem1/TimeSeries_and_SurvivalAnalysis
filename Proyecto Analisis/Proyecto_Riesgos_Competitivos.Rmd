@@ -7,7 +7,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Introducción y preeliminares: Descripción de la base elegida
+# Introducción y preeliminares en el análisis de datos de un hospital: Impacto del estado del estado de neumonía al momento de la admisión en la unidad de terapia intensiva
 
 En este trabajo, abordamos el análisis de supervivencia de riesgos competitivos, por lo que el esquema de trabajo cambia un poco respecto al visto en clase, que es realizar el modelo de Cox. Así mismo, como tenemos otro enfoque (Al tratar ahora desde el punto de vista de riesgos competitivos), no aplican las estimaciones de Kaplan-Meier, sino otros estimadores.
 
@@ -200,7 +200,7 @@ my.sir.cif
 ```
 
 El valor regresado por cuminc es una lista con los componentes "0 1", "1 1", "0 2" y
-"1 2". Los componentes "0 1" y "1 1" contienen resultados para el tipo de fallo 1; los componentes "0 2" y "1 2" contienen resultados para el tipo de fallo 2. Los componentes
+"1 2". Los componentes "0 1" y "1 1" contienen resultados para el tipo de fallo 1 (Muerte); los componentes "0 2" y "1 2" contienen resultados para el tipo de fallo 2 (Recuperación). Los componentes
 Los componentes "0 1" y "0 2" son para pacientes con estado de neumonía 0 al ingreso, es decir, sin neumonía, y los componentes "1 1" y "1 2" son para pacientes con estado de neumonía 1. 
 
 Esto también lo podemos hacer con la paquetería etm, para matrices de transiciones; al igual que con mvna. 
@@ -250,3 +250,90 @@ vemos más casos de muerte en el grupo de pacientes con neumonía. Los gráficos
 Sin embargo, tenemos que examinar los peligros acumulados por causas específicas para ver si el aumento de la mortalidad se debe a un aumento del peligro de muerte,
 o, como en el presente ejemplo, a una disminución del riesgo de muerte.
 
+# Modelo de riesgos proporcionales de causa específica
+
+En el apartado anterior dimos un análisis no paramétrico.
+
+
+# Modelo de subdistribución de riesgos proporcionales
+
+Consideramos el modelo de subdistribución
+
+```{r}
+fit.sir<-crr(ftime = my.sir.data$time, fstatus = my.sir.data$to,cov1 = my.sir.data$pneu, failcode = "1", cencode = "cens")
+fit.sir
+```
+El valor reportado, es el p-value correspondiente a un test del tipo log-rank para la subdistribución de riesgos (Abarcaremos esto más a detalle al final, en la conclusión)
+
+Veamos un summary: 
+```{r}
+summary(fit.sir)
+```
+
+Vemos que el coeficiente es significativo: Encontramos un efecto significativo de la neumonía en la función de incidencia acumulada por muerte hospitalaria 2.65 veces mayor (usando el estimador puntual), puesto que nos da un intervalo de confianza para el coeficiente de $[1.63,4.32]$; como el coeficiente es positivo, en el contexto de riesgos competitivos, nos indica que la neumonía incrementa la mortalidad en los hospitales (Es decir, de las personas que se encuentran ya hospitalizadas), sin embargo, no muestra algún efecto en la causa específica para muerte de pacientes hospitalizados. El incremento en la mortalidad fue debido a un considerable decrecimiento del riesgo de causa específica para vivos dados de alta. (Todo esto porque la base es que no ingresó con neumonía)
+
+Ahora, usemos dicho modelo para modelar la CIF:
+
+```{r}
+daddeln <- predict.crr(fit.sir, cov1 = matrix(c(0, 1), nrow = 2))
+
+## predicción sin neumonía
+split.screen(figs=c(1,2)) 
+screen(1) 
+plot(c(0, 25), c(0, 0.2), xlab = expression(paste(Tiempo, " ", italic(t))), ylab = "", type = "n", axes=FALSE, main = "Sin neumonía", cex.main = 1.5, cex.lab = 1.5)
+axis(1, at = seq(0, 25, 5), cex.axis = 1.5) 
+axis(2, at = seq(0, 0.2, 0.05), cex.axis = 1.25) 
+box() 
+mtext(text="CIF por estado de neumonía", side = 2, line = 3, cex = 1.25) 
+lines(my.sir.cif$`0 1`$time,my.sir.cif$`0 1`$est, type = "s", lwd = 2,lty = 1)
+## predicción con neuonía
+lines(daddeln[,1], daddeln[,2], type = "s", lwd = 2, lty = 1, col = "darkgrey") 
+screen(2) 
+plot(c(0, 25), c(0, 0.2), xlab = expression(paste(Tiempo, " ", italic(t))), ylab = "", type = "n", axes = FALSE, main = "Con neumonía", cex.main = 1.5, cex.lab = 1.5) 
+axis(1, at = seq(0, 25, 5), cex.axis = 1.5)
+axis(2, at = seq(0, 0.2, 0.05), cex.axis = 1.25)
+box() 
+mtext(text="CIF por estado de neumonía", side = 2, line = 3, cex = 1.25)
+lines(my.sir.cif$`1 1`$time,my.sir.cif$`1 1`$est, type = "s", lwd = 2,lty = 1)
+## predicted curves 
+lines(daddeln[,1], daddeln[,3], type = "s", lwd = 2, col = "darkgrey")
+close.screen(all.screens=TRUE)
+```
+Las líneas negras están dadas por el estimador de Aalen-Johansen, y las grises por el modelo bajo el supuesto de modelo de subdistribución de riesgos proporcionales; vemos para las personas sin neumonía es prácticamente la misma, pero no es el caso para las personas con neumonía inicialmente.
+
+# Entonces, ¿Sí influye el que ingrese con neumonía o sin neumonía?
+
+Revisamos brevemente el ejemplo de datos hospitalarios, donde el objetivo era investigar el impacto de neumonía diagnosticada al ingreso. El resultado no fue una diferencia significativa entre los peligros específicos de la causa de muerte en el hospital, pero los peligros específicos de la causa significativamente diferentes para el alta con vida. Este ejemplo, se ilustran las limitaciones de probar la igualdad de riesgos de causa específica. Nuestro análisis anterior mostró que la neumonía aumentó el número de pacientes que mueren en el hospital, aunque el riesgo para muerte hospitalaria se encontrado que es similar con o sin neumonía.
+
+El hallazgo encontrado en nuestro análisis ha sido que una interpretación adecuada de un análisis de riesgos competitivos requiere una consideración cuidadosa de todos los riesgos específicos de la causa, incluidos los signos y las magnitudes de los efectos de, por ejemplo, el estado de neumonía así como la magnitud relativa de los riesgos específicos de causa única dentro de un grupo.
+
+
+El modelo anterior se usa a menudo para estudiar directamente el impacto de covariables como la neumonía,
+Este modelo es un modelo de tipo Cox para el riesgo de subdistribución, y que la subdistribución
+el peligro restablece una correspondencia biyectiva con la función de incidencia acumulada de interés. Por lo tanto, el p-value obtenido al ajustar tal modelo debe ser adecuado para comparar funciones de incidencia acumulada directamente. Ilustramos esto brevemente con los datos del hospital.
+
+```{r}
+fit.sir
+```
+
+Encontramos un efecto significativo de la neumonía en la función de incidencia acumulada por muerte hospitalaria.
+Esta prueba se debe a Gray y, por lo tanto, a menudo se llama Prueba de Gray, y consiste en un test no paramétrico en el que se comparan dos o más CIFs. El test es análogo al log-rank para comparar curvas derivadas de los estimadores de Kaplan-Meier, usando una estadística de prueba modíficada de la ji-cuadrada. La prueba puede derivarse en analogía con nuestra derivación de la prueba log-rank ya vista en clase, si usamos los incrementos del estimador de la función de riesgo de subdistribución acumulativa. 
+
+# Comprobación de supuestos
+
+Se necesita, en riesgos proporcionales *en la CIF*.
+
+Para comprobar la hipótesis de proporcionalidad de la regresión de riesgos competitivos, podemos plotear $ln(-ln(1-F))$ contra $ln(tiempo)$, donde F es la CIF del evento de interés.
+
+```{r}
+fit=cuminc(my.sir.data$time,my.sir.data$to,cencode = "cens",strata=my.sir.data$pneu)
+a=timepoints(fit,times=my.sir.data$time)
+cif=t(a$est[1:2,])
+llcif=log(-log(1-cif))
+matplot(log(unique(sort(my.sir.data$time))),llcif,pch=c(1,3),
+col=1,
+xlab='Tiempo para la muerte', ylab='log(-log(1-CIF))')
+```
+Notamos que las curvas difieren a una distancia casi similar durante todo el tiempo, lo que prueba que dichos riesgos son proporcionales
+
+En el modelado deriesgos de causa específia, se asume que el logaritmo del riesgo cambia linealmente con la covariable. Puede ser revisada categorizando la covariable y examinando los efectos para cada categoría; sin embargo nuestras variables de interés ya son categóricas, y el test de Gray nos garantiza que hay diferencia entre estas; por lo que se cumple la linealidad.
