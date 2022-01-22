@@ -254,6 +254,52 @@ o, como en el presente ejemplo, a una disminución del riesgo de muerte.
 
 En el apartado anterior dimos un análisis no paramétrico.
 
+Recordemos, en particular, que a partir de las estimaciones de Nelson-Aalen de los riesgos acumulativos por causas específicas en la primera gráfica que hicimos, que la neumonía de ingreso aumenta la mortalidad hospitalaria a través de un efecto decreciente sobre el riesgo 
+de alta en vida, mientras que el riesgo de muerte en el hospital se mantiene esencialmente sin cambios. El objetivo del presente análisis es volver a investigar este hallazgo mediante
+modelos de riesgos proporcionales a la causa. Utilizamos el data frame my.sir.data generado al inicio. La primer gráfica que hicimos sugiere que la neumonía tiene diferentes efectos en los riesgos específicos de la causa. Por lo tanto, simplemente ajustamos dos modelos de Cox diferente. Este es el resultado del análisis de la causa específica de interés para la muerte en el hospital,
+
+
+```{r}
+fit.pneu.01 <- coxph(Surv(time, to == 1) ~ pneu, my.sir.data) 
+fit.pneu.02 <- coxph(Surv(time, to == 2) ~ pneu, my.sir.data)
+summary(fit.pneu.02) 
+summary(fit.pneu.02)
+```
+
+
+Los análisis de riesgos proporcionales específicos a la causa concuerdan con nuestros resultados anteriores. El resultado de R anterior también vuelve a poner de relieve dos aspectos importantes en el análisis de los datos de riesgos concurrentes: en primer lugar, todos los riesgos específicos de las causas deben analizarse.  No debemos concluir de ninguna manera a partir de una razón de riesgo de muerte específica por causa de 0,85 con un intervalo de confianza del 95% [0,503, 1,437] que la neumonía parece no tener impacto en la muerte hospitalaria. En segundo lugar, los cocientes de riesgo específicos de la causa que se muestran arriba, no hacen ninguna declaración sobre la magnitud de los riesgos base específicos de la causa. Esto es muy diferente a nuestro análisis inicial basado en los estimadores de Nelson-Aalen en la gráfica inicial.
+
+```{r}
+a01.0 <- basehaz(fit.pneu.01, centered=FALSE) 
+a02.0 <- basehaz(fit.pneu.02, centered=FALSE)
+
+split.screen(figs=c(1,2)) 
+screen(1) 
+plot(c(0, 50), c(0, 5), xlab = expression(paste(Time, " ", italic(t))), ylab = "Cumulative cause-specific hazard", type = "n", axes = FALSE, main = "No neumonía", cex.main = 1.5, cex.lab = 1.5) 
+axis(1, at=seq(0, 50, 10), cex.axis=1.5) 
+axis(2, at=seq(0, 5, 1), cex.axis=1.25) 
+box() 
+lines(a02.0$time, a02.0$hazard, type="s", lwd=2, lty=2) 
+lines(a01.0$time, a01.0$hazard, type="s", lwd=2) 
+lines(my.nelaal.nop, conf.int = FALSE, col = rep("darkgray", 2), lty = c(1, 2), lwd = 2) 
+legend(0,5,c("Muerte", "Recuperado"), lty=1:2,bty="n", cex=1.2, lwd=2) 
+screen(2)
+plot(x=c(0, 50), y=c(0, 5), xlab=expression(paste(Time, " ", italic(t))), ylab="Cumulative cause-specific hazard", type="n", axes=F, main="Neumonía", cex.main=1.5, cex.lab=1.5) 
+axis(1, at=seq(0, 50, 10), cex.axis=1.5) 
+axis(2, at=seq(0, 5, 1), cex.axis=1.25) 
+box() 
+lines(a02.0$time, a02.0$hazard, type="s", lwd=2, lty=2) 
+lines(a01.0$time, a01.0$hazard, type="s", lwd=2) 
+lines(my.nelaal.p, conf.int = FALSE, col = rep("darkgray", 2), lty = c(1, 2), lwd = 2) 
+legend(0,5,c("Muerte", "Recuperado"), lty=1:2,bty="n", cex=1.2, lwd=2) 
+close.screen(all.screens=TRUE)
+```
+
+
+La gráfica anterior es de los estimadores de Nelson-Aalen junto con los estimadores de Breslow (para la ausencia de neumonía) y los estimadores de riesgo acumulado  (para la neumonía al ingreso). Encontramos que todas las curvas específicas de la muerte en el hospital están en buena concordancia, al igual que los estimadores de referencia del riesgo acumulado en el alta. Sin embargo, los estimadores respectivos del riesgo acumulado en el alta para los pacientes con neumonía no coinciden tanto, indicando que el efecto de la neumonía en el riesgo en el alta puede no seguir un modelo de riesgos proporcionales a la causa.
+
+La gráfica sugiere que la razón de riesgo de alta estimada por causa específica es de 0,336 con un intervalo de confianza del 95% [0,261, 0,434] (Es decir, los datos del summary) informa de un efecto promediado al tiempo de la neumonía sobre el riesgo de alta.
+
 
 # Modelo de subdistribución de riesgos proporcionales
 
