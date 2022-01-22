@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.10.14)  21 JAN 2022 22:35
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (MiKTeX 21.8) (preloaded format=pdflatex 2021.10.14)  21 JAN 2022 22:49
 entering extended mode
 **./Proyecto_Riesgos_Competitivos.tex
 (Proyecto_Riesgos_Competitivos.tex
@@ -313,23 +313,8 @@ Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
 \Gm@layouthoffset=\dimen159
 \Gm@layoutvoffset=\dimen160
 \Gm@dimlist=\toks25
-(D:\Miktwx LaTex\tex/latex/geometry\geometry.cfg)) (D:\Miktwx LaTex\tex/latex/f
-ancyvrb\fancyvrb.sty
-Package: fancyvrb 2021/08/12 v3.8 verbatim text (tvz,hv)
-\FV@CodeLineNo=\count285
-\FV@InFile=\read2
-\FV@TabBox=\box52
-\c@FancyVerbLine=\count286
-\FV@StepNumber=\count287
-\FV@OutFile=\write3
-) (D:\Miktwx LaTex\tex/latex/framed\framed.sty
-Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
-\OuterFrameSep=\skip54
-\fb@frw=\dimen161
-\fb@frh=\dimen162
-\FrameRule=\dimen163
-\FrameSep=\dimen164
-) (D:\Miktwx LaTex\tex/latex/graphics\graphicx.sty
+(D:\Miktwx LaTex\tex/latex/geometry\geometry.cfg)) (D:\Miktwx LaTex\tex/latex/g
+raphics\graphicx.sty
 Package: graphicx 2020/12/05 v1.2c Enhanced LaTeX Graphics (DPC,SPQR)
 (D:\Miktwx LaTex\tex/latex/graphics\graphics.sty
 Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
@@ -340,42 +325,42 @@ File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
 )
-\Gin@req@height=\dimen165
-\Gin@req@width=\dimen166
+\Gin@req@height=\dimen161
+\Gin@req@width=\dimen162
 ) (D:\Miktwx LaTex\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2021-08-04 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count288
-\l__pdf_internal_box=\box53
+\l__color_backend_stack_int=\count285
+\l__pdf_internal_box=\box52
 )
 No file Proyecto_Riesgos_Competitivos.aux.
 \openout1 = `Proyecto_Riesgos_Competitivos.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 109.
-LaTeX Font Info:    ... okay on input line 109.
-LaTeX Info: Redefining \microtypecontext on input line 109.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 69.
+LaTeX Font Info:    ... okay on input line 69.
+LaTeX Info: Redefining \microtypecontext on input line 69.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
 Package microtype Info: Automatic font expansion enabled (level 2),
 (microtype)             stretch: 20, shrink: 20, step: 1, non-selected.
 Package microtype Info: Using default expansion set `alltext-nott'.
-LaTeX Info: Redefining \showhyphens on input line 109.
+LaTeX Info: Redefining \showhyphens on input line 69.
 Package microtype Info: No adjustment of tracking.
 Package microtype Info: No adjustment of interword spacing.
 Package microtype Info: No adjustment of character kerning.
@@ -384,16 +369,16 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 ) (D:\Miktwx LaTex\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count289
-\scratchdimen=\dimen167
-\scratchbox=\box54
-\nofMPsegments=\count290
-\nofMParguments=\count291
+\scratchcounter=\count286
+\scratchdimen=\dimen163
+\scratchbox=\box53
+\nofMPsegments=\count287
+\nofMParguments=\count288
 \everyMPshowfont=\toks26
-\MPscratchCnt=\count292
-\MPscratchDim=\dimen168
-\MPnumerator=\count293
-\makeMPintoPDFobject=\count294
+\MPscratchCnt=\count289
+\MPscratchDim=\dimen164
+\MPnumerator=\count290
+\makeMPintoPDFobject=\count291
 \everyMPtoPDFconversion=\toks27
 ) (D:\Miktwx LaTex\tex/latex/epstopdf-pkg\epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -402,7 +387,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 (D:\Miktwx LaTex\tex/latex/00miktex\epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring OFF on input line 109.
+Package hyperref Info: Link coloring OFF on input line 69.
 (D:\Miktwx LaTex\tex/latex/hyperref\nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
 (D:\Miktwx LaTex\tex/latex/refcount\refcount.sty
@@ -410,11 +395,11 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ) (D:\Miktwx LaTex\tex/generic/gettitlestring\gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count295
+\c@section@level=\count292
 )
-LaTeX Info: Redefining \ref on input line 109.
-LaTeX Info: Redefining \pageref on input line 109.
-LaTeX Info: Redefining \nameref on input line 109.
+LaTeX Info: Redefining \ref on input line 69.
+LaTeX Info: Redefining \pageref on input line 69.
+LaTeX Info: Redefining \nameref on input line 69.
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -449,124 +434,65 @@ LaTeX Info: Redefining \nameref on input line 109.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-11.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 7
+1.
 (D:\Miktwx LaTex\tex/latex/lm\ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-11.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 7
+1.
 (D:\Miktwx LaTex\tex/latex/lm\omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-111.
+71.
 (D:\Miktwx LaTex\tex/latex/lm\omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-111.
+71.
 (D:\Miktwx LaTex\tex/latex/lm\omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 111.
+(Font)              <12> on input line 71.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 111.
+(Font)              <8> on input line 71.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 111.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 111
-.
+(Font)              <6> on input line 71.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 71.
+
 (D:\Miktwx LaTex\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (D:\Miktwx LaTex\tex/latex/microtype\mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 111
-.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 71.
+
 (D:\Miktwx LaTex\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (D:\Miktwx LaTex\tex/latex/microtype\mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
-)
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-30.
-(D:\Miktwx LaTex\tex/latex/lm\t1lmtt.fd
-File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-137.
-(D:\Miktwx LaTex\tex/latex/lm\ts1lmtt.fd
-File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 ) [1
 
-{C:/Users/HP/AppData/Local/MiKTeX/pdftex/config/pdftex.map}] [2]
-<Imagen1.png, id=22, 695.59875pt x 319.1925pt>
-File: Imagen1.png Graphic file (type png)
-<use Imagen1.png>
-Package pdftex.def Info: Imagen1.png  used on input line 367.
-(pdftex.def)             Requested size: 469.75302pt x 215.55765pt.
-<Imagen_2.png, id=24, 637.38126pt x 315.1775pt>
-File: Imagen_2.png Graphic file (type png)
-<use Imagen_2.png>
-Package pdftex.def Info: Imagen_2.png  used on input line 369.
-(pdftex.def)             Requested size: 469.75824pt x 232.2899pt.
-[3 <./Imagen1.png>]
-LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 404.
-
-LaTeX Font Warning: Font shape `T1/lmtt/bx/it' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/sl' tried instead on input line 404.
-
-[4 <./Imagen_2.png>]
-<Proyecto_Riesgos_Competitivos_files/figure-latex/unnamed-chunk-19-1.pdf, id=39
-, 469.755pt x 325.215pt>
-File: Proyecto_Riesgos_Competitivos_files/figure-latex/unnamed-chunk-19-1.pdf G
-raphic file (type pdf)
-<use Proyecto_Riesgos_Competitivos_files/figure-latex/unnamed-chunk-19-1.pdf>
-Package pdftex.def Info: Proyecto_Riesgos_Competitivos_files/figure-latex/unnam
-ed-chunk-19-1.pdf  used on input line 444.
-(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<pic_1.png, id=40, 690.58pt x 359.3425pt>
-File: pic_1.png Graphic file (type png)
-<use pic_1.png>
-Package pdftex.def Info: pic_1.png  used on input line 473.
-(pdftex.def)             Requested size: 469.75677pt x 244.4374pt.
-[5 <./Proyecto_Riesgos_Competitivos_files/figure-latex/unnamed-chunk-19-1.pdf>]
+{C:/Users/HP/AppData/Local/MiKTeX/pdftex/config/pdftex.map}]
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 522.
+(Font)              <10> on input line 158.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 522.
+(Font)              <7> on input line 158.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 522.
-[6 <./pic_1.png>]
-<Proyecto_Riesgos_Competitivos_files/figure-latex/unnamed-chunk-22-1.pdf, id=67
-, 469.755pt x 325.215pt>
-File: Proyecto_Riesgos_Competitivos_files/figure-latex/unnamed-chunk-22-1.pdf G
-raphic file (type pdf)
-<use Proyecto_Riesgos_Competitivos_files/figure-latex/unnamed-chunk-22-1.pdf>
-Package pdftex.def Info: Proyecto_Riesgos_Competitivos_files/figure-latex/unnam
-ed-chunk-22-1.pdf  used on input line 590.
-(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[7]
-
-! Package inputenc Error: Unicode character ≤ (U+2264)
-(inputenc)                not set up for use with LaTeX.
-
-See the inputenc package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.599 \(\mathbb{P}( b T ≤
-                            t, X_{T} = j)\) de las funciones de incidencia 
+(Font)              <5> on input line 158.
+! Misplaced alignment tab character &.
+l.158 \{r\} sum(sir.adm\(status==2 &
+                                     sir.adm\)pneu==1) 
 Here is how much of TeX's memory you used:
- 13207 strings out of 478927
- 195696 string characters out of 2866168
- 551607 words of memory out of 3000000
- 30726 multiletter control sequences out of 15000+600000
- 455508 words of font info for 115 fonts, out of 8000000 for 9000
+ 12521 strings out of 478927
+ 184659 string characters out of 2866168
+ 532638 words of memory out of 3000000
+ 30118 multiletter control sequences out of 15000+600000
+ 445017 words of font info for 90 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,6n,80p,1559b,358s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 74i,6n,80p,536b,333s stack positions out of 5000i,500n,10000p,200000b,80000s
 
 !  ==> Fatal error occurred, no output PDF file produced!
 
