@@ -109,11 +109,11 @@ Lo hicimos de manera correcta.
 
 Antes de continuar, necesitamos describir el modelo de riesgos competitivos muliestado siguiente:
 
-```{r pressure2, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '100%'}
 knitr::include_graphics("Imagen1.PNG")
 ```
 
-```{r pressure3, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '100%'}
 knitr::include_graphics("Imagen_2.PNG")
 ```
 
@@ -176,7 +176,7 @@ Esto implica:
 
 Se trata de un fenómeno típico de riesgos competitivos. Como hay más de un riesgo que actúan sobre un individuo, no podemos saber, a partir de un solo riesgo, cuál será el curso futuro de un individuo. Esta situación se muestra de forma esquemática en la siguiente figura:
 
-```{r pressure3, echo=FALSE, out.width = '100%'}
+```{r, echo=FALSE, out.width = '100%'}
 knitr::include_graphics("pic_1.PNG")
 ```
 Fig. 1: Datos del hospital. Representación esquemática del efecto de la neumonía con
@@ -230,13 +230,13 @@ axis(1, at = seq(0, 200, 50))
 title("Recuperados") 
 par(op)
 ```
-Esta gráfica presenta las estimaciones de Aalen-Johansen $\mathbb{P}( b T ≤ t, X_{T} = j)$ de las funciones de incidencia acumulativa para la muerte (izquierda, j = 1) y para el alta (derecha, j = 2), estratificadas por el estado de la neumonía al ingreso. Las líneas continuas corresponden a pacientes sin neumonía.
+Esta gráfica presenta las estimaciones de Aalen-Johansen $\mathbb{P}( b T \leq t, X_{T} = j)$ de las funciones de incidencia acumulativa para la muerte (izquierda, j = 1) y para el alta (derecha, j = 2), estratificadas por el estado de la neumonía al ingreso. Las líneas continuas corresponden a pacientes sin neumonía.
 
 
 Como era de esperarse, encontramos que mueren más pacientes entre los que tienen neumonía.
 
 
-Las estimaciones de Aalen-Johansen $\mathbb{P}( T ≤ t, X_{T} = 1)$ se muestran en la siguiente gráfica, junto con intervalos de confianza del 95% puntuales, generadas por: 
+Las estimaciones de Aalen-Johansen $\mathbb{P}( T \leq t, X_{T} = 1)$ se muestran en la siguiente gráfica, junto con intervalos de confianza del 95% puntuales, generadas por: 
 
 ```{r}
 plot(my.sir.etm.p, tr.choice = '0 1', col = 1, lwd = 2, conf.int = TRUE, ci.fun = "cloglog", legend = FALSE, ylab="Probability", xlim=c(0,190))
