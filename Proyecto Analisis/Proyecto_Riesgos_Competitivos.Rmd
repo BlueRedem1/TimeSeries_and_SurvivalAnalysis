@@ -9,13 +9,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introducción y preeliminares: Descripción de la base elegida
 
-En este trabajo, abordamos el análisis de supervivencia de riesgos competitivos, por lo que el esquema de trabajo cambia un poco respecto al visto en clase, que es realizar el modelo de Cox. 
+En este trabajo, abordamos el análisis de supervivencia de riesgos competitivos, por lo que el esquema de trabajo cambia un poco respecto al visto en clase, que es realizar el modelo de Cox. Así mismo, como tenemos otro enfoque (Al tratar ahora desde el punto de vista de riesgos competitivos), no aplican las estimaciones de Kaplan-Meier, sino otros estimadores.
 
 Trabajaremos con la base sir.adm; dispinible en el paquete "mvna", llamado así por las iniciales de "Multivariate Nelson-Aalen estimator", que permite estimar de manera no paramétrica los riesgos acumulados de transición de modelos de Markov multi-estados arbitrarios, usando dicho estimador.
 
 ```{r}
-library(mvna)
-library(lattice)
+library(mvna) #Estimadores de Nelson-Aalen
+library(lattice) #Apoyo gráfico
+library(cmprsk) #Paquetería enfocada a análisis de subdistribución de riesgos competitivos
+library(etm) #Paquetería que nos permite estimar la matriz de transiciones de probabilidad para modelos multiestado de tiempo no homogéneo de espacio finito, usando el estimador Aalen-Johansen
 ```
 
 Cargamos la base de datos
@@ -88,9 +90,9 @@ Se investiga el tiempo hasta el final de la estadía y el estatus de el estado f
 
 Los puntos finales competitivos son el ser dado de alta y morir en la unidad de terapia intensiva
 
-# Análisis descriptivo 
+# Análisis descriptivo y enfoque no paramétrico
 
-## Función de incidencia acumulada
+## Función de riesgos acumulados
 
 Necesitamos modificar primero el dataset en un dataset de tipo multiestado. Además, renombramos los datos para que, el evento de interés que es la muerte, corresponda al estado 1, y el estado 2 el evento competitivo:
 ```{r}
@@ -138,21 +140,113 @@ my.nelaal.p <- mvna(my.sir.data[my.sir.data$pneu == 1, ], c("0", "1", "2"), tra,
 Graficamos: 
 
 ```{r}
+# Estilo de la gráfica
 ltheme <- canonical.theme(color = FALSE) 
-## in-built B&W theme 
 ltheme$strip.background$col <- "white" 
-## change strip bg
-lattice.options(default.theme = ltheme) 
-## set as default
+lattice.options(default.theme = ltheme)
+```
 
+
+```{r}
 #Plot para los que no tenían neumonía
-dessin.nop <- xyplot(my.nelaal.nop, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Sin neumonía: Dados de alta", "Sin Neumonía: Muertos"), par.strip.text = list(font = 2)), ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
+dessin.nop <- xyplot(my.nelaal.nop, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Sin neumonía:recuperación", "Sin Neumonía: Muertos"), par.strip.text = list(font = 2)), ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
+```
 
+
+```{r}
 #Plot para los que tenían neumonía
-dessin.p <- xyplot(my.nelaal.p, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Con neumonía: Dados de alta", "Con neumonía: Muertos"), par.strip.text = list(font = 2)), ylab = "", ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
+dessin.p <- xyplot(my.nelaal.p, tr.choice = c("0 2", "0 1"), lwd = 2, layout = c(1, 2), strip = strip.custom( factor.levels = c("Con neumonía:recuperación", "Con neumonía: Muertos"), par.strip.text = list(font = 2)), ylab = "", ylim = c(0, 9), xlim = c(0, 190), xlab = "Days", scales = list(alternating = 1, x = list(at = seq(0, 150, 50)), y = list(at = seq(0, 8, 2))))
+```
 
-#Ploteamos 
+
+```{r}
+#Ploteamos ambas
 print(dessin.nop, split = c(1, 1, 2, 1), more = TRUE, position = c(0, 0, 1.07, 1)) 
 print(dessin.p, split = c(2, 1, 2, 1), position = c(-0.07, 0, 1, 1))
 ```
+
+Esto no implica que la neumonía no tenga ningún efecto sobre la mortalidad. La razón es que la neumonía parece reducir el riesgo de ser dados de alta
+Esto implica:
+
+1. 1. La neumonía parece reducir el riesgo por todas las causas al final de la de la unidad de cuidados intensivos.
+
+2. Los pacientes con neumonía al ingreso permanecen más tiempo en la unidad. Durante esta estancia prolongada, están expuestos a un a un riesgo de muerte esencialmente
+
+3. En consecuencia, mueren más pacientes con neumonía que sin neumonía.
+
+Se trata de un fenómeno típico de riesgos competitivos. Como hay más de un riesgo que actúan sobre un individuo, no podemos saber, a partir de un solo riesgo, cuál será el curso futuro de un individuo. Esta situación se muestra de forma esquemática en la siguiente figura:
+
+```{r pressure3, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("pic_1.PNG")
+```
+Fig. 1: Datos del hospital. Representación esquemática del efecto de la neumonía con
+causa específica. El estado de la neumonía no tiene ningún efecto sobre la causa específica de muerte, que es también un peligro menor. Un gráfico como el presente podían producirse con el paquete R compeir; hasta antes de ser deshabilitada del CRAN
+
+Recordemos que una forma de pensar en los peligros de causas específicas es en términos de fuerzas momentáneas de transición que se mueven a lo largo de las flechas de los cuadros multiestado. La magnitud de estas fuerzas se muestra de forma esquemática en la figura 1. La "fuerza de muerte" no está influenciada por el estado de la neumonía, pero la "fuerza del alta" se reduce sustancialmente de la neumonía en el momento del ingreso. La figura 1 ilustra que la "fuerza global”, es decir, el riesgo por todas las causas que arrastra un individuo se ve reducido, conduciendo a una mayor permanencia en la unidad, y que la fuerza relativa entre las fuerzas específicas de la causa de muerte y de alta, se ve modificada por el estado de la neumonía.
+
+Notemos que la representación esquemática de la figura 1 tiene limitaciones. La magnitud de las fuerzas de transición momentánea no suele ser constante sobre el tiempo, de modo que necesitaríamos toda una serie de gráficos como los de la figura 1. De hecho, esto se consigue en la gráfica que ploteamos anteriormente de los estimadores de Nelson-Aalen; la forma de los estimadores de dichos estimadores, que estiman los peligros acumulativos, está determinada por los peligros específicos de la causa. 
+También podemos pensar en la figura 1 de una manera que no necesariamente ilustre la magnitud de los peligros, pudiendo variar con el tiempo, sino únicamente los cocientes de los peligros de muerte y los cocientes de los peligros de descarga, respectivamente, suponiendose constantes. Este es el enfoque adoptado por la modelización de los riesgos proporcionales a la causa.
+
+## Función de incidencia acumulada
+
+Por último, comprobamos si nuestra interpretación del análisis de riesgos acumulativos  ha sido correcta observando los estimadores de Aalen-Johansen de las
+funciones de incidencia acumulada, nuevamente estratificadas por el estado de la neumonía. Recordemos que la función de incidencia acumulada para la muerte, por ejemplo, muestra la proporción esperada de individuos que mueren en la unidad a lo largo del tiempo. Si nuestra interpretación del análisis de riesgos acumulativos ha sido correcta, la función de incidencia acumulativa estimada para la muerte……. dentro de los pacientes
+con neumonía, debería estar por encima de los pacientes sin neumonía.
+
+Utilizando la función cuminc del paquete cmprsk, calculamos las estimaciones $\mathbb{P}( T \leq t, X_{T} = j), j = 1, 2$ (Es decir, de la función acumulativa de incidencia) dentro de los grupos definidos
+```{r}
+my.sir.cif <- cuminc(my.sir.data$time, my.sir.data$to, group=my.sir.data$pneu, cencode="cens")
+my.sir.cif
+```
+
+El valor regresado por cuminc es una lista con los componentes "0 1", "1 1", "0 2" y
+"1 2". Los componentes "0 1" y "1 1" contienen resultados para el tipo de fallo 1; los componentes "0 2" y "1 2" contienen resultados para el tipo de fallo 2. Los componentes
+Los componentes "0 1" y "0 2" son para pacientes con estado de neumonía 0 al ingreso, es decir, sin neumonía, y los componentes "1 1" y "1 2" son para pacientes con estado de neumonía 1. 
+
+Esto también lo podemos hacer con la paquetería etm, para matrices de transiciones; al igual que con mvna. 
+Ejecutamos etm con cada estrato:
+
+```{r}
+my.sir.etm.nop <- etm(my.sir.data[my.sir.data$pneu == 0, ], c("0", "1", "2"), tra, "cens", s = 0) 
+my.sir.etm.p <- etm(my.sir.data[my.sir.data$pneu == 1, ], c("0", "1", "2"), tra, "cens", s = 0)
+```
+
+
+Graficando:
+
+
+```{r}
+op <- par(mfrow = c(1, 2)) 
+#Muerte 
+plot(my.sir.etm.nop, tr.choice = "0 1", conf.int = FALSE, lwd = 2, lty = 1, xlab = "Días", ylab = "Probabilidad", bty = "n", legend = FALSE)
+lines(my.sir.etm.p, tr.choice = "0 1", conf.int = FALSE, lwd = 2, lty = 2)
+legend(0, 0.6, c("neumonía", "sin neumonía"), col = 1, lty = c(1, 2), bty = "n", lwd = 2) 
+title("Muerte") 
+axis(1, at = seq(0, 200, 50)) 
+##Dados de alta 
+plot(my.sir.etm.nop, tr.choice = "0 2", conf.int = FALSE, lwd = 2, lty = 1, xlab = "Días", ylab = "Probabilidad", bty = "n", legend = FALSE)
+lines(my.sir.etm.p, tr.choice = "0 2", conf.int = FALSE, lwd = 2, lty = 2) 
+axis(1, at = seq(0, 200, 50)) 
+title("Recuperados") 
+par(op)
+```
+Esta gráfica presenta las estimaciones de Aalen-Johansen $\mathbb{P}( b T ≤ t, X_{T} = j)$ de las funciones de incidencia acumulativa para la muerte (izquierda, j = 1) y para el alta (derecha, j = 2), estratificadas por el estado de la neumonía al ingreso. Las líneas continuas corresponden a pacientes sin neumonía.
+
+
+Como era de esperarse, encontramos que mueren más pacientes entre los que tienen neumonía.
+
+
+Las estimaciones de Aalen-Johansen $\mathbb{P}( T ≤ t, X_{T} = 1)$ se muestran en la siguiente gráfica, junto con intervalos de confianza del 95% puntuales, generadas por: 
+
+```{r}
+plot(my.sir.etm.p, tr.choice = '0 1', col = 1, lwd = 2, conf.int = TRUE, ci.fun = "cloglog", legend = FALSE, ylab="Probability", xlim=c(0,190))
+lines(my.sir.etm.nop, tr.choice = '0 1', col = "gray", lwd = 2, conf.int = TRUE, ci.fun = "cloglog")
+legend(0, 1, c("neumonía", "sin neumonía"), col = 1, lty = c(1, 2), bty = "n", lwd = 2)
+title("Estimador Aalen-Johansen con intervalos de confianza")
+```
+
+Los intervalos de confianza apoyan nuestra conclusión anterior de que finalmente
+vemos más casos de muerte en el grupo de pacientes con neumonía. Los gráficos de riesgos acumulados, como en la fgráfica de riesgos acumulados (La primera gráfica presentada), y los gráficos de funciones de incidencia acumulada, como en las Figuras 2 y 3, ambos tienen sus méritos relativos: Obviamente, en la figura 3 es más fácil saber si la neumonía aumenta la mortalidad unitaria.
+Sin embargo, tenemos que examinar los peligros acumulados por causas específicas para ver si el aumento de la mortalidad se debe a un aumento del peligro de muerte,
+o, como en el presente ejemplo, a una disminución del riesgo de muerte.
 
